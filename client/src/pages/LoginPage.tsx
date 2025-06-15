@@ -203,61 +203,71 @@ export default function LoginPage() {
           </div>
           {tab === "login" ? (
             <>
-              <h2 style={{ fontSize: 20, margin: "8px 0", color: "#000" }}>Fazer Login</h2>
-              <input
-                type="email"
-                placeholder="Email"
-                style={inputStyle}
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-              />
-              <input
-                type="password"
-                placeholder="Senha"
-                style={inputStyle}
-                value={senha}
-                onChange={e => setSenha(e.target.value)}
-              />
-              <button style={buttonStyle} onClick={handleLogin} disabled={loading}>
-                {loading ? "Entrando..." : "Entrar"}
-              </button>
-              <div style={{ marginTop: 8, textAlign: "right" }}>
-                <a
-                  href="#"
-                  style={{ color: "#1976d2", fontSize: 13, textDecoration: "underline" }}
-                  onClick={e => {
-                    e.preventDefault();
-                    setShowReset(true);
-                  }}
-                >
-                  Esqueci login/senha
-                </a>
-              </div>
-              {showReset && (
-                <div style={{ background: "#fff", border: "1px solid #ddd", borderRadius: 8, padding: 20, marginTop: 16, boxShadow: "0 2px 8px #0002", maxWidth: 340 }}>
-                  <form onSubmit={handleResetPassword}>
-                    <div style={{ fontWeight: 600, marginBottom: 8 }}>Redefinir senha</div>
-                    <input
-                      type="email"
-                      placeholder="Digite seu email"
-                      value={resetEmail}
-                      onChange={e => setResetEmail(e.target.value)}
-                      style={{ width: "100%", padding: 10, borderRadius: 6, border: "1px solid #ccc", fontSize: 15, marginBottom: 10 }}
-                      required
-                    />
-                    <button
-                      type="submit"
-                      style={{ background: "#1976d2", color: "#fff", border: "none", borderRadius: 6, padding: "8px 18px", fontSize: 15, fontWeight: 600, cursor: "pointer", width: "100%" }}
-                    >
-                      Enviar link de redefinição
-                    </button>
-                    {resetMsg && <div style={{ color: resetMsg.includes("Enviamos") ? "green" : "red", marginTop: 8 }}>{resetMsg}</div>}
-                    <div style={{ marginTop: 10, textAlign: "center" }}>
-                      <a href="#" style={{ color: "#1976d2", fontSize: 13 }} onClick={e => { e.preventDefault(); setShowReset(false); }}>Voltar</a>
-                    </div>
-                  </form>
+              <form
+                onSubmit={e => { e.preventDefault(); handleLogin(); }}
+                autoComplete="on"
+                style={{ display: "flex", flexDirection: "column", gap: 12 }}
+              >
+                <h2 style={{ fontSize: 20, margin: "8px 0", color: "#000" }}>Fazer Login</h2>
+                <input
+                  type="email"
+                  placeholder="Email"
+                  style={inputStyle}
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  autoComplete="email"
+                  required
+                />
+                <input
+                  type="password"
+                  placeholder="Senha"
+                  style={inputStyle}
+                  value={senha}
+                  onChange={e => setSenha(e.target.value)}
+                  autoComplete="current-password"
+                  required
+                />
+                <button style={buttonStyle} type="submit" disabled={loading}>
+                  {loading ? "Entrando..." : "Entrar"}
+                </button>
+                <div style={{ marginTop: 8, textAlign: "right" }}>
+                  <a
+                    href="#"
+                    style={{ color: "#1976d2", fontSize: 13, textDecoration: "underline" }}
+                    onClick={e => {
+                      e.preventDefault();
+                      setShowReset(true);
+                    }}
+                  >
+                    Esqueci login/senha
+                  </a>
                 </div>
-              )}
+                {showReset && (
+                  <div style={{ background: "#fff", border: "1px solid #ddd", borderRadius: 8, padding: 20, marginTop: 16, boxShadow: "0 2px 8px #0002", maxWidth: 340 }}>
+                    <form onSubmit={handleResetPassword}>
+                      <div style={{ fontWeight: 600, marginBottom: 8 }}>Redefinir senha</div>
+                      <input
+                        type="email"
+                        placeholder="Digite seu email"
+                        value={resetEmail}
+                        onChange={e => setResetEmail(e.target.value)}
+                        style={{ width: "100%", padding: 10, borderRadius: 6, border: "1px solid #ccc", fontSize: 15, marginBottom: 10 }}
+                        required
+                      />
+                      <button
+                        type="submit"
+                        style={{ background: "#1976d2", color: "#fff", border: "none", borderRadius: 6, padding: "8px 18px", fontSize: 15, fontWeight: 600, cursor: "pointer", width: "100%" }}
+                      >
+                        Enviar link de redefinição
+                      </button>
+                      {resetMsg && <div style={{ color: resetMsg.includes("Enviamos") ? "green" : "red", marginTop: 8 }}>{resetMsg}</div>}
+                      <div style={{ marginTop: 10, textAlign: "center" }}>
+                        <a href="#" style={{ color: "#1976d2", fontSize: 13 }} onClick={e => { e.preventDefault(); setShowReset(false); }}>Voltar</a>
+                      </div>
+                    </form>
+                  </div>
+                )}
+              </form>
             </>
           ) : (
             <>
