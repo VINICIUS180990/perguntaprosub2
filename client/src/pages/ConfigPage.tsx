@@ -6,7 +6,7 @@ import { avisoExclusaoConta } from "../utils/excluirConta";
 const opcoes = [
   { id: "home", label: "Página Inicial" },
   { id: "perfil", label: "Perfil" },
-  { id: "seguranca", label: "Segurança" },
+  { id: "seguranca", label: "Redefinir senha" },
   { id: "excluir", label: "Excluir Conta" },
   { id: "faleconosco", label: "Fale Conosco" }
 ];
@@ -321,6 +321,8 @@ export default function ConfigPage() {
                   onClick={() => {
                     if (opcao.id === "home") {
                       navigate("/main");
+                    } else if (opcao.id === "seguranca") {
+                      navigate("/resetsenha");
                     } else {
                       setOpcaoSelecionada(opcao.id);
                     }
