@@ -65,10 +65,10 @@ export default function RedefinirSenhaPage() {
           {mensagem && <div style={{ color: mensagem.includes("sucesso") ? "green" : "red", marginTop: 6 }}>{mensagem}</div>}
         </form>
         <button
-          onClick={() => navigate("/config")}
+          onClick={() => navigate("/main")}
           style={{ marginTop: 24, background: "#eee", color: "#222", border: "none", borderRadius: 6, padding: "8px 18px", fontSize: 15, fontWeight: 500, cursor: "pointer" }}
         >
-          Voltar para Configurações
+          Pagina Inicial
         </button>
       </div>
     </div>
