@@ -66,3 +66,68 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+/* Responsivo para telas pequenas */
+@media (max-width: 700px) {
+  body {
+    padding: 0 !important;
+    min-width: 0;
+  }
+  #root {
+    padding: 0 !important;
+    max-width: 100vw !important;
+  }
+  header, .header {
+    flex-direction: column !important;
+    height: auto !important;
+    padding: 12px 8px !important;
+    min-height: 60px !important;
+  }
+  aside {
+    width: 100vw !important;
+    min-width: 0 !important;
+    border-right: none !important;
+    border-bottom: 1px solid #eee !important;
+    padding: 10px 4px !important;
+    flex-direction: row !important;
+    overflow-x: auto;
+    height: auto !important;
+  }
+  aside nav > div {
+    flex-direction: row !important;
+    gap: 4px !important;
+  }
+  main, .main-content {
+    padding: 0 !important;
+    margin: 0 !important;
+    min-width: 0 !important;
+    width: 100vw !important;
+    max-width: 100vw !important;
+    height: auto !important;
+    box-shadow: none !important;
+  }
+  form, .form {
+    min-width: 0 !important;
+    width: 100% !important;
+    padding: 0 8px !important;
+  }
+  input, button, select, textarea {
+    font-size: 16px !important;
+    width: 100% !important;
+    box-sizing: border-box;
+  }
+  .card, .manual, .content-box {
+    padding: 10px !important;
+    margin: 0 !important;
+    border-radius: 8px !important;
+    box-shadow: none !important;
+    width: 100% !important;
+    max-width: 100vw !important;
+  }
+  .sidebar {
+    width: 100vw !important;
+    min-width: 0 !important;
+    border: none !important;
+    padding: 0 !important;
+  }
+}
