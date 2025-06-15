@@ -24,6 +24,7 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [nome, setNome] = useState("");
+  const [nomeguerra, setNomeguerra] = useState("");
   const [loading, setLoading] = useState(false);
   const [showReset, setShowReset] = useState(false);
   const [resetEmail, setResetEmail] = useState("");
@@ -53,14 +54,14 @@ export default function LoginPage() {
     const { data, error } = await supabase.auth.signUp({
       email,
       password: senha,
-      options: { data: { full_name: nome } }
+      options: { data: { full_name: nome, nomeguerra } }
     });
     if (!error && data.user) {
       // Insere perfil do usuário na tabela perfil_usuario
       await inserirPerfilUsuario({
         user_id: data.user.id,
         nome,
-        nomeguerra: "",
+        nomeguerra,
         posto: "",
         forca: "",
         om: "",
@@ -267,6 +268,13 @@ export default function LoginPage() {
                 style={inputStyle}
                 value={nome}
                 onChange={e => setNome(e.target.value)}
+              />
+              <input
+                type="text"
+                placeholder="Nome de guerra"
+                style={inputStyle}
+                value={nomeguerra}
+                onChange={e => setNomeguerra(e.target.value)}
               />
               <input
                 type="email"
