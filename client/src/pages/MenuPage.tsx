@@ -7,11 +7,12 @@ const opcoes = [
   { id: "home", label: "Página Inicial" },
   { id: "perfil", label: "Perfil" },
   { id: "seguranca", label: "Redefinir senha" },
-  { id: "excluir", label: "Excluir Conta" },
-  { id: "faleconosco", label: "Fale Conosco" }
+  { id: "manual", label: "Manual" },
+  { id: "faleconosco", label: "Fale Conosco" },
+  { id: "excluir", label: "Excluir Conta" }
 ];
 
-export default function ConfigPage() {
+export default function MenuPage() {
   const [opcaoSelecionada, setOpcaoSelecionada] = useState("perfil");
   const [perfil, setPerfil] = useState({
     nome: "",
@@ -271,7 +272,7 @@ export default function ConfigPage() {
                   setMenuUsuarioAberto(false);
                   navigate("/config");
                 }}
-              >Configurações</button>
+              >Menu</button>
               <div style={{ borderTop: "1px solid #eee" }} />
               <button
                 style={{
@@ -375,6 +376,24 @@ export default function ConfigPage() {
             )}
             {opcaoSelecionada === "faleconosco" && (
               <FaleConoscoPage />
+            )}
+            {opcaoSelecionada === "manual" && (
+              <div style={{ background: "#fff", borderRadius: 10, boxShadow: "0 2px 8px #0001", padding: 24, maxWidth: 600, margin: "0 auto" }}>
+                <h2 style={{ margin: 0, fontSize: 22 }}>Manual do PerguntaProSub</h2>
+                <ul style={{ marginTop: 18, fontSize: 16, color: "#222", lineHeight: 1.7 }}>
+                  <li><b>IA Militar:</b> Anexe normas, regulamentos ou qualquer outro documento e a IA PerguntaProSub te dirá como agir em qualquer situação, baseada na documentação específica.</li>
+                  <li><b>Enviar arquivos:</b> Clique em "+ Novo" no campo de documentos na pagina inicial para anexar arquivos PDF ou TXT (arquivos criptografados deverão ser convertidos para texto antes e serem anexados). O conteúdo será usado para responder suas perguntas.</li>
+                  <li><b>Conversas:</b> Clique em "+ Nova" no campo de conversas para organizar suas dúvidas. Cada conversa mantém seu histórico separado.</li>
+                  <li><b>Perfil:</b> Edite seu nome, nome de guerra, posto, força, OM, celular e e-mail na aba Perfil do Menu. Mantenha os dados sempre atualizados pois eles irão permitir que seus amigos o encontrem pela pesquisa do Chat.</li>
+                  <li><b>Redefinir senha:</b> Altere sua senha na opção "Redefinir senha" do Menu.</li>
+                  <li><b>Excluir conta:</b> Solicite a exclusão da sua conta na opção "Excluir Conta".</li>
+                  <li><b>Fale Conosco:</b> Veja os canais de contato para suporte e dúvidas.</li>
+                  <li><b>Privacidade:</b> Seus dados são protegidos e utilizados apenas para funcionamento da plataforma.</li>
+                </ul>
+                <div style={{ marginTop: 18, color: "#555", fontSize: 15 }}>
+                  Dúvidas adicionais? Fale com a IA ou entre em contato via Whatsapp (21 98364-2119) / email (perguntaprosub@gmail.com).
+                </div>
+              </div>
             )}
           </div>
         </main>

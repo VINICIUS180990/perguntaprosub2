@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import LoginPage from "./pages/LoginPage";
 import MainPage from "./pages/MainPage";
-import ConfigPage from "./pages/ConfigPage";
+import MenuPage from "./pages/MenuPage";
 import RedefinirSenhaPage from "./pages/resetsenha";
 
 export default function App() {
@@ -10,7 +10,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<LoginPage />} />
         <Route path="/main" element={<MainPage />} />
-        <Route path="/config" element={<ConfigPage />} />
+        <Route path="/config" element={<MenuPage />} />
         <Route path="/resetsenha" element={<RedefinirSenhaPage />} />
       </Routes>
     </BrowserRouter>
