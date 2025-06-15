@@ -29,6 +29,7 @@ export default function LoginPage() {
   const [showReset, setShowReset] = useState(false);
   const [resetEmail, setResetEmail] = useState("");
   const [resetMsg, setResetMsg] = useState("");
+  const [lembrar, setLembrar] = useState(false);
 
   // Sempre que o tema mudar, salva a cor no localStorage
   useEffect(() => {
@@ -205,7 +206,7 @@ export default function LoginPage() {
             <>
               <form
                 onSubmit={e => { e.preventDefault(); handleLogin(); }}
-                autoComplete="on"
+                autoComplete="off"
                 style={{ display: "flex", flexDirection: "column", gap: 12 }}
               >
                 <h2 style={{ fontSize: 20, margin: "8px 0", color: "#000" }}>Fazer Login</h2>
@@ -215,7 +216,7 @@ export default function LoginPage() {
                   style={inputStyle}
                   value={email}
                   onChange={e => setEmail(e.target.value)}
-                  autoComplete="email"
+                  autoComplete={lembrar ? "email" : "off"}
                   required
                 />
                 <input
@@ -224,9 +225,18 @@ export default function LoginPage() {
                   style={inputStyle}
                   value={senha}
                   onChange={e => setSenha(e.target.value)}
-                  autoComplete="current-password"
+                  autoComplete={lembrar ? "current-password" : "off"}
                   required
                 />
+                <label style={{ display: "flex", alignItems: "center", fontSize: 15, margin: "-6px 0 6px 0", userSelect: "none" }}>
+                  <input
+                    type="checkbox"
+                    checked={lembrar}
+                    onChange={e => setLembrar(e.target.checked)}
+                    style={{ marginRight: 8 }}
+                  />
+                  Lembrar email e senha neste dispositivo
+                </label>
                 <button style={buttonStyle} type="submit" disabled={loading}>
                   {loading ? "Entrando..." : "Entrar"}
                 </button>
