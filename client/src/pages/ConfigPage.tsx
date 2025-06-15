@@ -25,6 +25,7 @@ export default function ConfigPage() {
   const [headerColor, setHeaderColor] = useState("#fff");
   const [menuUsuarioAberto, setMenuUsuarioAberto] = useState(false);
   const [menuUsuarioPos, setMenuUsuarioPos] = useState<{ top: number; left: number } | null>(null);
+  const [perfilCarregando, setPerfilCarregando] = useState(true);
   const navigate = useNavigate();
 
   // Carrega cor do tema ao abrir a página
@@ -69,6 +70,7 @@ export default function ConfigPage() {
           email: perfilDb?.email || data.user.email || ""
         }));
       }
+      setPerfilCarregando(false);
     });
   }, []);
 
@@ -233,7 +235,7 @@ export default function ConfigPage() {
               });
             }}
           >
-            {perfil.nome ? perfil.nome.split(' ').map(n => n[0]).join('').toUpperCase().slice(0,2) : 'TU'}
+            {perfilCarregando ? '' : (perfil.nome ? perfil.nome.split(' ').map(n => n[0]).join('').toUpperCase().slice(0,2) : '')}
           </span>
           {menuUsuarioAberto && menuUsuarioPos && (
             <div
