@@ -22,14 +22,12 @@ a:hover {
   color: #535bf2;
 }
 
-body, #root {
+body {
   margin: 0;
-  padding: 0;
   display: flex;
   place-items: center;
-  min-width: 100vw;
+  min-width: 320px;
   min-height: 100vh;
-  background: #f7f7f9;
 }
 
 h1 {
@@ -56,95 +54,80 @@ button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
-/* Remover regras responsivas antigas e aplicar base para layout tipo app */
-
-/* Reset básico para mobile */
-body, #root {
-  margin: 0;
-  padding: 0;
-  min-width: 100vw;
-  min-height: 100vh;
-  background: #f7f7f9;
+@media (prefers-color-scheme: light) {
+  :root {
+    color: #213547;
+    background-color: #ffffff;
+  }
+  a:hover {
+    color: #747bff;
+  }
+  button {
+    background-color: #f9f9f9;
+  }
 }
 
-/* Layout app: tudo empilhado, centralizado, com padding */
-.app-container, .main-content, main, .content-box, .manual, .card {
-  width: 100vw !important;
-  max-width: 100vw !important;
-  min-width: 0 !important;
-  margin: 0 auto !important;
-  padding: 16px 8px !important;
-  box-sizing: border-box;
-  border-radius: 0 !important;
-  box-shadow: none !important;
-  background: #fff;
-}
-
-header, .header {
-  width: 100vw !important;
-  min-width: 0 !important;
-  height: 64px !important;
-  padding: 0 8px !important;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: #fff;
-  border-bottom: 1px solid #eee;
-  position: sticky;
-  top: 0;
-  z-index: 10;
-}
-
-aside, .sidebar {
-  display: none !important;
-}
-
-form, .form {
-  width: 100% !important;
-  max-width: 400px;
-  margin: 0 auto;
-  padding: 0 8px !important;
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px #0001;
-}
-
-input, button, select, textarea {
-  font-size: 18px !important;
-  width: 100% !important;
-  box-sizing: border-box;
-  margin-bottom: 12px;
-  border-radius: 8px;
-  padding: 12px 10px;
-}
-
-button {
-  background: #1976d2;
-  color: #fff;
-  border: none;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-button:active {
-  background: #145ea8;
-}
-
-/* Cards e manuais empilhados */
-.card, .manual, .content-box {
-  margin-bottom: 18px !important;
-  border-radius: 12px !important;
-  box-shadow: 0 2px 8px #0001 !important;
-}
-
-/* Ajuste para listas e menus */
-ul, li {
-  padding: 0;
-  margin: 0;
-  list-style: none;
-}
-
-/* Garantir rolagem suave */
-html {
-  scroll-behavior: smooth;
+/* Responsivo para telas pequenas */
+@media (max-width: 700px) {
+  body {
+    padding: 0 !important;
+    min-width: 0;
+  }
+  #root {
+    padding: 0 !important;
+    max-width: 100vw !important;
+  }
+  header, .header {
+    flex-direction: column !important;
+    height: auto !important;
+    padding: 12px 8px !important;
+    min-height: 60px !important;
+  }
+  aside {
+    width: 100vw !important;
+    min-width: 0 !important;
+    border-right: none !important;
+    border-bottom: 1px solid #eee !important;
+    padding: 10px 4px !important;
+    flex-direction: row !important;
+    overflow-x: auto;
+    height: auto !important;
+  }
+  aside nav > div {
+    flex-direction: row !important;
+    gap: 4px !important;
+  }
+  main, .main-content {
+    padding: 0 !important;
+    margin: 0 !important;
+    min-width: 0 !important;
+    width: 100vw !important;
+    max-width: 100vw !important;
+    height: auto !important;
+    box-shadow: none !important;
+  }
+  form, .form {
+    min-width: 0 !important;
+    width: 100% !important;
+    padding: 0 8px !important;
+  }
+  input, button, select, textarea {
+    font-size: 16px !important;
+    width: 100% !important;
+    box-sizing: border-box;
+  }
+  .card, .manual, .content-box {
+    padding: 10px !important;
+    margin: 0 !important;
+    border-radius: 8px !important;
+    box-shadow: none !important;
+    width: 100% !important;
+    max-width: 100vw !important;
+  }
+  .sidebar {
+    width: 100vw !important;
+    min-width: 0 !important;
+    border: none !important;
+    padding: 0 !important;
+  }
 }
