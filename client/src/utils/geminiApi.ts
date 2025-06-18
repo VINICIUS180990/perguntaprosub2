@@ -2,7 +2,8 @@
 // https://ai.google.dev/gemini-api/docs/get-started
 
 const GEMINI_API_KEY = "AIzaSyCiQUHBhv2uESkTfPvkBlQ--je5PoWwZAg";
-const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`;
+// Corrigido para usar o endpoint v1 e modelo gemini-1.5-pro
+const GEMINI_URL = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro:generateContent?key=${GEMINI_API_KEY}`;
 
 export async function geminiChat(prompt: string, historico: {autor: 'user'|'bot', texto: string}[]) {
   // Monta o histórico no formato esperado pela Gemini
