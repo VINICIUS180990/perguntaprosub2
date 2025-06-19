@@ -1,7 +1,7 @@
 // Integração com Gemini API (Google)
 // https://ai.google.dev/gemini-api/docs/get-started
 
-const GEMINI_API_KEY = "AIzaSyCiQUHBhv2uESkTfPvkBlQ--je5PoWwZAg";
+const GEMINI_API_KEY = "AIzaSyAPx6__sK5MRLXYTs6IZpKf5tyeIRxBcuA";
 // Corrigido para usar o endpoint v1 e modelo gemini-1.5-pro
 const GEMINI_URL = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro:generateContent?key=${GEMINI_API_KEY}`;
 
