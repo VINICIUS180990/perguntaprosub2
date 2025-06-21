@@ -209,7 +209,22 @@ export default function MenuPage() {
             <div style={{ fontSize: 12, color: "#000" }}>Sistema de IA para o mundo Militar</div>
           </div>
         </div>
-        <div style={{ display: "flex", alignItems: "center" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <button
+            style={{
+              background: "#1976d2",
+              color: "#fff",
+              border: "none",
+              borderRadius: 6,
+              padding: "4px 14px",
+              fontWeight: 600,
+              fontSize: 14,
+              cursor: "pointer"
+            }}
+            onClick={() => navigate("/chat")}
+          >
+            Bate-Papo
+          </button>
           <span
             style={{
               background: "#1976d2",
