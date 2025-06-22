@@ -4,7 +4,6 @@ import { supabase } from "../supabaseClient";
 import { avisoExclusaoConta } from "../utils/excluirConta";
 
 const opcoes = [
-  { id: "home", label: "Página Inicial" },
   { id: "perfil", label: "Perfil" },
   { id: "seguranca", label: "Redefinir senha" },
   { id: "manual", label: "Manual" },
@@ -272,6 +271,23 @@ export default function MenuPage() {
                 flexDirection: "column"
               }}
             >
+              <button
+                style={{
+                  padding: "12px 18px",
+                  background: "none",
+                  border: "none",
+                  textAlign: "left",
+                  fontWeight: 500,
+                  fontSize: 15,
+                  color: "#222",
+                  cursor: "pointer"
+                }}
+                onClick={() => {
+                  setMenuUsuarioAberto(false);
+                  navigate("/main");
+                }}
+              >Página Inicial</button>
+              <div style={{ borderTop: "1px solid #eee" }} />
               <button
                 style={{
                   padding: "12px 18px",
