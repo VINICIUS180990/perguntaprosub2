@@ -1,11 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../supabaseClient';
+import { enviarMensagem as enviarMsgSupabase, buscarMensagens } from '../utils/chatMessages';
+import type { ChatMessage } from '../utils/chatMessages';
 
-const amigosMock = [
-  { id: '1', nome: 'João Silva' },
-  { id: '2', nome: 'Maria Souza' },
-  { id: '3', nome: 'Carlos Oliveira' }
-];
 const contatosMock = [
   { id: 'a', nome: 'Ana Paula' },
   { id: 'b', nome: 'Bruno Lima' },
@@ -20,16 +17,120 @@ const ChatPage: React.FC = () => {
   const [menuUsuarioAberto, setMenuUsuarioAberto] = useState(false);
   const [menuUsuarioPos, setMenuUsuarioPos] = useState<{ top: number; left: number } | null>(null);
   const [userName, setUserName] = useState('');
+  const [usuariosSupabase, setUsuariosSupabase] = useState<any[]>([]);
+  const [buscandoUsuarios, setBuscandoUsuarios] = useState(false);
+  const [mensagens, setMensagens] = useState<ChatMessage[]>([]);
+  const [inputMensagem, setInputMensagem] = useState('');
+  const [enviando, setEnviando] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
+  const [mostrarPerfil, setMostrarPerfil] = useState(false);
+  const [amigos, setAmigos] = useState<{ id: string, nome: string }[]>([]);
+  const [menuAmigoAberto, setMenuAmigoAberto] = useState<string | null>(null);
+  const [menuAmigoPos, setMenuAmigoPos] = useState<{ top: number; left: number } | null>(null);
+  const [menuConversaAberto, setMenuConversaAberto] = useState<string | null>(null);
+  const [menuConversaPos, setMenuConversaPos] = useState<{ top: number; left: number } | null>(null);
+  const [conversasSupabase, setConversasSupabase] = useState<{ id: string, nome: string }[]>([]);
+  // Corrige exibição do perfil do amigo já adicionado
+  // Adicione um estado para armazenar o perfil do usuário a ser exibido
+  const [perfilUsuarioExibido, setPerfilUsuarioExibido] = useState<any | null>(null);
 
+  // Função para buscar usuários no Supabase
+  async function buscarUsuariosSupabase(termo: string) {
+    setBuscandoUsuarios(true);
+    const { data } = await supabase
+      .from('perfil_usuario')
+      .select('user_id, nome, nomeguerra, email')
+      .or(`nome.ilike.%${termo}%,nomeguerra.ilike.%${termo}%,email.ilike.%${termo}%`);
+    setUsuariosSupabase(data || []);
+    setBuscandoUsuarios(false);
+  }
+
+  // Atualiza busca ao digitar na barra de pesquisa de amigos
+  useEffect(() => {
+    if (pesquisaAmigo.length > 1) {
+      buscarUsuariosSupabase(pesquisaAmigo);
+    } else {
+      setUsuariosSupabase([]);
+    }
+  }, [pesquisaAmigo]);
+
+  // Busca o ID do usuário logado
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
+      setUserId(data?.user?.id || null);
       const nome = data?.user?.user_metadata?.full_name || data?.user?.email || '';
       setUserName(nome);
     });
   }, []);
 
-  const amigosFiltrados = amigosMock.filter(a => a.nome.toLowerCase().includes(pesquisaAmigo.toLowerCase()));
-  const conversasFiltradas = contatosMock.filter(c => c.nome.toLowerCase().includes(pesquisaConversas.toLowerCase()));
+  // Carrega amigos e conversas do Supabase ao abrir
+  useEffect(() => {
+    if (userId) {
+      carregarAmigosSupabase(userId);
+      carregarConversasSupabase(userId);
+    }
+  }, [userId]);
+
+  // Buscar mensagens ao selecionar um amigo
+  useEffect(() => {
+    if (userId && amigoSelecionado) {
+      buscarMensagens(userId, amigoSelecionado).then(setMensagens);
+    } else {
+      setMensagens([]);
+    }
+  }, [userId, amigoSelecionado]);
+
+  // Enviar mensagem
+  async function handleEnviarMensagem(e: React.FormEvent) {
+    e.preventDefault();
+    if (!inputMensagem.trim() || !userId || !amigoSelecionado) return;
+    setEnviando(true);
+    await enviarMsgSupabase(userId, amigoSelecionado, inputMensagem);
+    setInputMensagem('');
+    // Atualiza mensagens
+    buscarMensagens(userId, amigoSelecionado).then(setMensagens);
+    setEnviando(false);
+  }
+
+  // Funções utilitárias para persistência no Supabase
+  async function carregarAmigosSupabase(userId: string) {
+    const { data } = await supabase
+      .from('amigos')
+      .select('amigo_id, nome')
+      .eq('user_id', userId);
+    if (data) setAmigos(data.map(a => ({ id: a.amigo_id, nome: a.nome })));
+  }
+
+  async function handleAdicionarAmigo(amigo: any) {
+    await supabase.from('amigos').upsert({ user_id: userId, amigo_id: amigo.user_id, nome: amigo.nome });
+    setAmigos(prev => [...prev, { id: amigo.user_id, nome: amigo.nome }]);
+  }
+
+  async function handleExcluirAmigo(amigoId: string) {
+    await supabase.from('amigos').delete().eq('user_id', userId).eq('amigo_id', amigoId);
+    setAmigos(prev => prev.filter(a => a.id !== amigoId));
+  }
+
+  async function carregarConversasSupabase(userId: string) {
+    const { data } = await supabase
+      .from('conversas')
+      .select('conversa_id, nome')
+      .eq('user_id', userId);
+    if (data) setConversasSupabase(data.map(c => ({ id: c.conversa_id, nome: c.nome })));
+  }
+
+  async function handleExcluirConversa(conversaId: string) {
+    await supabase.from('conversas').delete().eq('user_id', userId).eq('conversa_id', conversaId);
+    setConversasSupabase(prev => prev.filter(c => c.id !== conversaId));
+  }
+
+  const amigosFiltrados = amigos.filter(a => a.nome.toLowerCase().includes(pesquisaAmigo.toLowerCase()));
+  // Substitua conversasFiltradas por uma junção de conversasSupabase e contatosMock
+  const todasConversas = [
+    ...conversasSupabase,
+    ...contatosMock.filter(c => !conversasSupabase.some(cs => cs.id === c.id))
+  ];
+  const conversasFiltradas = todasConversas.filter(c => c.nome.toLowerCase().includes(pesquisaConversas.toLowerCase()));
 
   // Fecha o menu ao clicar fora
   React.useEffect(() => {
@@ -44,6 +145,34 @@ const ChatPage: React.FC = () => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [menuUsuarioAberto]);
+
+  // Fecha o menu de amigo ao clicar fora
+  React.useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (menuAmigoAberto) {
+        const menu = document.getElementById('menu-amigo');
+        if (menu && !menu.contains(event.target as Node)) {
+          setMenuAmigoAberto(null);
+        }
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [menuAmigoAberto]);
+
+  // Fecha o menu de conversa ao clicar fora
+  React.useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (menuConversaAberto) {
+        const menu = document.getElementById('menu-conversa');
+        if (menu && !menu.contains(event.target as Node)) {
+          setMenuConversaAberto(null);
+        }
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [menuConversaAberto]);
 
   return (
     <div style={{ height: '100vh', width: '100vw', background: '#fff', overflow: 'hidden' }}>
@@ -185,7 +314,7 @@ const ChatPage: React.FC = () => {
               <span style={{ fontWeight: 600, marginBottom: 4 }}>Amigos</span>
               <input
                 type="text"
-                placeholder="Pesquisar amigos..."
+                placeholder="Pesquisar usuários..."
                 value={pesquisaAmigo}
                 onChange={e => setPesquisaAmigo(e.target.value)}
                 style={{
@@ -197,29 +326,145 @@ const ChatPage: React.FC = () => {
                 }}
               />
               <div style={{ maxHeight: 180, overflowY: 'auto', marginTop: 8 }}>
-                {amigosFiltrados.length === 0 && (
-                  <div style={{ color: '#888', fontSize: 13 }}>Nenhum amigo encontrado.</div>
+                {buscandoUsuarios && (
+                  <div style={{ color: '#888', fontSize: 13 }}>Buscando usuários...</div>
                 )}
-                {amigosFiltrados.map(amigo => (
+                {pesquisaAmigo.length > 1 && usuariosSupabase.length === 0 && !buscandoUsuarios && (
+                  <div style={{ color: '#888', fontSize: 13 }}>Nenhum usuário encontrado.</div>
+                )}
+                {usuariosSupabase.map(usuario => (
                   <button
-                    key={amigo.id}
+                    key={usuario.user_id}
                     style={{
-                      background: amigoSelecionado === amigo.id ? '#e3eaff' : '#f7f7f9',
+                      background: amigoSelecionado === usuario.user_id ? '#e3eaff' : '#f7f7f9',
                       borderRadius: 6,
                       padding: '8px 10px',
                       marginBottom: 6,
                       fontSize: 14,
                       fontWeight: 600,
                       color: '#222',
-                      border: amigoSelecionado === amigo.id ? '1.5px solid #1976d2' : '1px solid #eee',
+                      border: amigoSelecionado === usuario.user_id ? '1.5px solid #1976d2' : '1px solid #eee',
                       width: '100%',
                       textAlign: 'left',
                       cursor: 'pointer'
                     }}
-                    onClick={() => setAmigoSelecionado(amigo.id)}
+                    onClick={() => {
+                      setAmigoSelecionado(usuario.user_id);
+                      setConversaSelecionada(null);
+                      setMostrarPerfil(true);
+                      setPerfilUsuarioExibido(usuario);
+                    }}
                   >
-                    {amigo.nome}
+                    {usuario.nome} {usuario.nomeguerra ? `(${usuario.nomeguerra})` : ''}<br />
+                    <span style={{ color: '#888', fontSize: 12 }}>{usuario.email}</span>
                   </button>
+                ))}
+                {pesquisaAmigo.length <= 1 && amigosFiltrados.length === 0 && (
+                  <div style={{ color: '#888', fontSize: 13 }}>Nenhum amigo encontrado.</div>
+                )}
+                {pesquisaAmigo.length <= 1 && amigosFiltrados.map(amigo => (
+                  <div key={amigo.id} style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                    <button
+                      style={{
+                        background: amigoSelecionado === amigo.id ? '#e3eaff' : '#f7f7f9',
+                        borderRadius: 6,
+                        padding: '8px 10px',
+                        marginBottom: 6,
+                        fontSize: 14,
+                        fontWeight: 600,
+                        color: '#222',
+                        border: amigoSelecionado === amigo.id ? '1.5px solid #1976d2' : '1px solid #eee',
+                        width: '100%',
+                        textAlign: 'left',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between'
+                      }}
+                      onClick={() => {
+                        setAmigoSelecionado(amigo.id);
+                        setConversaSelecionada(null);
+                        setMostrarPerfil(true);
+                        // Busca o perfil completo do amigo na lista de usuariosSupabase ou faz uma busca no Supabase
+                        const usuario = usuariosSupabase.find(u => u.user_id === amigo.id);
+                        if (usuario) {
+                          setPerfilUsuarioExibido(usuario);
+                        } else {
+                          // Busca no Supabase se não estiver em cache
+                          supabase
+                            .from('perfil_usuario')
+                            .select('*')
+                            .eq('user_id', amigo.id)
+                            .single()
+                            .then(({ data }) => setPerfilUsuarioExibido(data));
+                        }
+                      }}
+                    >
+                      <span style={{ flex: 1 }}>{amigo.nome}</span>
+                      <span
+                        style={{
+                          marginLeft: 8,
+                          fontSize: 20,
+                          cursor: 'pointer',
+                          color: '#888',
+                          padding: '0 6px',
+                          borderRadius: 4
+                        }}
+                        onClick={e => {
+                          e.stopPropagation();
+                          const rect = (e.target as HTMLElement).getBoundingClientRect();
+                          setMenuAmigoAberto(amigo.id);
+                          setMenuAmigoPos({
+                            top: rect.bottom + window.scrollY,
+                            left: rect.left + window.scrollX
+                          });
+                        }}
+                        title="Mais opções"
+                      >&#8942;</span>
+                    </button>
+                    {menuAmigoAberto === amigo.id && menuAmigoPos && (
+                      <div
+                        id="menu-amigo"
+                        style={{
+                          position: 'fixed',
+                          left: menuAmigoPos.left - 80,
+                          top: menuAmigoPos.top,
+                          background: '#fff',
+                          border: '1px solid #ddd',
+                          borderRadius: 8,
+                          boxShadow: '0 2px 8px #0003',
+                          zIndex: 9999,
+                          minWidth: 100,
+                          fontSize: 15,
+                          padding: 0,
+                          display: 'flex',
+                          flexDirection: 'column'
+                        }}
+                      >
+                        <button
+                          style={{
+                            padding: '10px 18px',
+                            background: 'none',
+                            border: 'none',
+                            textAlign: 'left',
+                            fontWeight: 500,
+                            fontSize: 15,
+                            color: '#d32f2f',
+                            cursor: 'pointer',
+                            borderRadius: 8
+                          }}
+                          onClick={async () => {
+                            await handleExcluirAmigo(amigo.id);
+                            setMenuAmigoAberto(null);
+                            if (amigoSelecionado === amigo.id) {
+                              setAmigoSelecionado(null);
+                              setMostrarPerfil(false);
+                            }
+                          }}
+                        >Excluir</button>
+                      </div>
+                    )}
+                  </div>
                 ))}
               </div>
             </div>
@@ -240,8 +485,70 @@ const ChatPage: React.FC = () => {
             paddingRight: 48
           }}
         >
-          {/* Exibe perfil do amigo ou conversa */}
-          {amigoSelecionado ? (
+          {/* Exibe perfil do amigo pesquisado antes do chat */}
+          {mostrarPerfil && perfilUsuarioExibido && (
+            <div style={{
+              width: '100%',
+              maxWidth: 500,
+              background: '#fff',
+              borderRadius: 12,
+              boxShadow: '0 2px 8px #0001',
+              padding: 32,
+              margin: 24,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 16
+            }}>
+              <h2 style={{ margin: 0 }}>Perfil do Usuário</h2>
+              <div style={{ fontSize: 18, fontWeight: 600 }}>{perfilUsuarioExibido.nome}</div>
+              <div style={{ fontSize: 16, color: '#555' }}>Nome de guerra: {perfilUsuarioExibido.nomeguerra || '-'}</div>
+              <div style={{ fontSize: 16, color: '#555' }}>Email: {perfilUsuarioExibido.email}</div>
+              <div style={{ fontSize: 16, color: '#555' }}>Posto/Graduação: {perfilUsuarioExibido.posto || '-'}</div>
+              <div style={{ fontSize: 16, color: '#555' }}>Força/Instituição: {perfilUsuarioExibido.forca || '-'}</div>
+              <div style={{ fontSize: 16, color: '#555' }}>Organização Militar: {perfilUsuarioExibido.om || '-'}</div>
+              <div style={{ fontSize: 16, color: '#555' }}>Celular: {perfilUsuarioExibido.celular || '-'}</div>
+              <div style={{ display: 'flex', gap: 16, marginTop: 24 }}>
+                <button
+                  style={{
+                    background: amigos.some(a => a.id === perfilUsuarioExibido.user_id) ? '#bbb' : '#1976d2',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: 8,
+                    padding: '10px 32px',
+                    fontWeight: 700,
+                    fontSize: 16,
+                    cursor: amigos.some(a => a.id === perfilUsuarioExibido.user_id) ? 'not-allowed' : 'pointer'
+                  }}
+                  disabled={amigos.some(a => a.id === perfilUsuarioExibido.user_id)}
+                  onClick={() => {
+                    if (!amigos.some(a => a.id === perfilUsuarioExibido.user_id)) {
+                      handleAdicionarAmigo(perfilUsuarioExibido);
+                    }
+                  }}
+                >{amigos.some(a => a.id === perfilUsuarioExibido.user_id) ? 'Adicionado' : 'Adicionar'}</button>
+                <button
+                  style={{
+                    background: '#43a047',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: 8,
+                    padding: '10px 32px',
+                    fontWeight: 700,
+                    fontSize: 16,
+                    cursor: 'pointer'
+                  }}
+                  onClick={() => {
+                    setMostrarPerfil(false);
+                    // O chat só será exibido após fechar o perfil
+                  }}
+                >Iniciar Conversa</button>
+              </div>
+            </div>
+          )}
+          {/* Exibe chat apenas se não estiver mostrando perfil */}
+          {!mostrarPerfil && amigoSelecionado ? (
             <div style={{
               width: '100%',
               maxWidth: 700,
@@ -257,9 +564,61 @@ const ChatPage: React.FC = () => {
               justifyContent: 'center',
               alignItems: 'center'
             }}>
-              <h2>Perfil do Amigo</h2>
-              <div style={{ fontSize: 20, margin: 16 }}>{amigosMock.find(a => a.id === amigoSelecionado)?.nome}</div>
-              <div style={{ color: '#888' }}>[Informações do perfil do amigo aqui]</div>
+              <h2>Chat com {usuariosSupabase.find(u => u.user_id === amigoSelecionado)?.nome}</h2>
+              <div style={{ flex: 1, width: '100%', overflowY: 'auto', marginBottom: 16 }}>
+                {mensagens.length === 0 && (
+                  <div style={{ color: '#888', textAlign: 'center', marginTop: 40 }}>
+                    Inicie a conversa digitando sua mensagem abaixo.
+                  </div>
+                )}
+                {mensagens.map((msg, idx) => (
+                  <div key={msg.id || idx} style={{
+                    marginBottom: 18,
+                    textAlign: msg.remetente_id === userId ? 'right' : 'left'
+                  }}>
+                    <div style={{
+                      display: 'inline-block',
+                      background: msg.remetente_id === userId ? '#1976d2' : '#eee',
+                      color: msg.remetente_id === userId ? '#fff' : '#222',
+                      borderRadius: 8,
+                      padding: '10px 16px',
+                      maxWidth: 420,
+                      fontSize: 15
+                    }}>{msg.texto}</div>
+                  </div>
+                ))}
+              </div>
+              <form style={{ display: 'flex', gap: 8, width: '100%' }} onSubmit={handleEnviarMensagem}>
+                <input
+                  type="text"
+                  value={inputMensagem}
+                  onChange={e => setInputMensagem(e.target.value)}
+                  placeholder="Digite sua mensagem..."
+                  style={{
+                    flex: 1,
+                    padding: '12px 14px',
+                    borderRadius: 8,
+                    border: '1px solid #ccc',
+                    fontSize: 16,
+                    outline: 'none'
+                  }}
+                  disabled={enviando}
+                />
+                <button
+                  type="submit"
+                  style={{
+                    background: enviando ? '#bbb' : '#1976d2',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: 8,
+                    padding: '0 24px',
+                    fontWeight: 700,
+                    fontSize: 16,
+                    cursor: enviando ? 'not-allowed' : 'pointer'
+                  }}
+                  disabled={enviando || !inputMensagem.trim()}
+                >Enviar</button>
+              </form>
             </div>
           ) : conversaSelecionada ? (
             <div style={{
@@ -346,28 +705,92 @@ const ChatPage: React.FC = () => {
                   <div style={{ color: '#888', fontSize: 13 }}>Nenhuma conversa encontrada.</div>
                 )}
                 {conversasFiltradas.map(conversa => (
-                  <button
-                    key={conversa.id}
-                    style={{
-                      background: conversaSelecionada === conversa.id ? '#e3eaff' : '#f7f7f9',
-                      borderRadius: 6,
-                      padding: '8px 10px',
-                      marginBottom: 6,
-                      fontSize: 14,
-                      fontWeight: 600,
-                      color: '#222',
-                      border: conversaSelecionada === conversa.id ? '1.5px solid #1976d2' : '1px solid #eee',
-                      width: '100%',
-                      textAlign: 'left',
-                      cursor: 'pointer'
-                    }}
-                    onClick={() => {
-                      setConversaSelecionada(conversa.id);
-                      setAmigoSelecionado(null);
-                    }}
-                  >
-                    {conversa.nome}
-                  </button>
+                  <div key={conversa.id} style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                    <button
+                      style={{
+                        background: conversaSelecionada === conversa.id ? '#e3eaff' : '#f7f7f9',
+                        borderRadius: 6,
+                        padding: '8px 10px',
+                        marginBottom: 6,
+                        fontSize: 14,
+                        fontWeight: 600,
+                        color: '#222',
+                        border: conversaSelecionada === conversa.id ? '1.5px solid #1976d2' : '1px solid #eee',
+                        width: '100%',
+                        textAlign: 'left',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between'
+                      }}
+                      onClick={() => {
+                        setConversaSelecionada(conversa.id);
+                        setAmigoSelecionado(null);
+                      }}
+                    >
+                      <span style={{ flex: 1 }}>{conversa.nome}</span>
+                      <span
+                        style={{
+                          marginLeft: 8,
+                          fontSize: 20,
+                          cursor: 'pointer',
+                          color: '#888',
+                          padding: '0 6px',
+                          borderRadius: 4
+                        }}
+                        onClick={e => {
+                          e.stopPropagation();
+                          const rect = (e.target as HTMLElement).getBoundingClientRect();
+                          setMenuConversaAberto(conversa.id);
+                          setMenuConversaPos({
+                            top: rect.bottom + window.scrollY,
+                            left: rect.left + window.scrollX
+                          });
+                        }}
+                        title="Mais opções"
+                      >&#8942;</span>
+                    </button>
+                    {menuConversaAberto === conversa.id && menuConversaPos && (
+                      <div
+                        style={{
+                          position: 'fixed',
+                          left: menuConversaPos.left - 80,
+                          top: menuConversaPos.top,
+                          background: '#fff',
+                          border: '1px solid #ddd',
+                          borderRadius: 8,
+                          boxShadow: '0 2px 8px #0003',
+                          zIndex: 9999,
+                          minWidth: 100,
+                          fontSize: 15,
+                          padding: 0,
+                          display: 'flex',
+                          flexDirection: 'column'
+                        }}
+                      >
+                        <button
+                          style={{
+                            padding: '10px 18px',
+                            background: 'none',
+                            border: 'none',
+                            textAlign: 'left',
+                            fontWeight: 500,
+                            fontSize: 15,
+                            color: '#d32f2f',
+                            cursor: 'pointer',
+                            borderRadius: 8
+                          }}
+                          onClick={async () => {
+                            await handleExcluirConversa(conversa.id);
+                            setMenuConversaAberto(null);
+                            if (conversaSelecionada === conversa.id) {
+                              setConversaSelecionada(null);
+                            }
+                          }}
+                        >Excluir</button>
+                      </div>
+                    )}
+                  </div>
                 ))}
               </div>
             </div>
