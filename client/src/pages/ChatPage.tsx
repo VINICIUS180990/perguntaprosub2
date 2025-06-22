@@ -505,6 +505,43 @@ const ChatPage: React.FC = () => {
                             textAlign: 'left',
                             fontWeight: 500,
                             fontSize: 15,
+                            color: '#222',
+                            cursor: 'pointer',
+                            borderRadius: 8
+                          }}
+                          onClick={() => {
+                            setMenuAmigoAberto(null);
+                            setMostrarPerfil(false);
+                            setAmigoSelecionado(amigo.id);
+                            setConversaSelecionada(null);
+                          }}
+                        >Mensagens</button>
+                        <button
+                          style={{
+                            padding: '10px 18px',
+                            background: 'none',
+                            border: 'none',
+                            textAlign: 'left',
+                            fontWeight: 500,
+                            fontSize: 15,
+                            color: '#d32f2f',
+                            cursor: 'pointer',
+                            borderRadius: 8
+                          }}
+                          onClick={async () => {
+                            setMenuAmigoAberto(null);
+                            // Aqui você pode implementar a lógica de bloqueio
+                            alert('Função de bloqueio implementada aqui.');
+                          }}
+                        >Bloquear</button>
+                        <button
+                          style={{
+                            padding: '10px 18px',
+                            background: 'none',
+                            border: 'none',
+                            textAlign: 'left',
+                            fontWeight: 500,
+                            fontSize: 15,
                             color: '#d32f2f',
                             cursor: 'pointer',
                             borderRadius: 8
@@ -515,7 +552,7 @@ const ChatPage: React.FC = () => {
                               setMenuAmigoAberto(null);
                             }
                           }}
-                        >Excluir</button>
+                        >Deixar de seguir</button>
                       </div>
                     )}
                   </div>
@@ -563,35 +600,40 @@ const ChatPage: React.FC = () => {
               <div style={{ fontSize: 16, color: '#555' }}>Força/Instituição: {perfilUsuarioExibido.forca || '-'}</div>
               <div style={{ fontSize: 16, color: '#555' }}>Organização Militar: {perfilUsuarioExibido.om || '-'}</div>
               <div style={{ fontSize: 16, color: '#555' }}>Celular: {perfilUsuarioExibido.celular || '-'}</div>
-              <div style={{ display: 'flex', gap: 16, marginTop: 24 }}>
+              <div style={{ display: 'flex', gap: 10, marginTop: 18 }}>
                 <button
                   style={{
                     background: amigos.some(a => a.id === perfilUsuarioExibido.user_id) ? '#bbb' : '#1976d2',
                     color: '#fff',
                     border: 'none',
                     borderRadius: 8,
-                    padding: '10px 32px',
+                    padding: '8px 16px',
                     fontWeight: 700,
-                    fontSize: 16,
-                    cursor: amigos.some(a => a.id === perfilUsuarioExibido.user_id) ? 'not-allowed' : 'pointer'
+                    fontSize: 14,
+                    cursor: 'pointer',
+                    minWidth: 90
                   }}
-                  disabled={amigos.some(a => a.id === perfilUsuarioExibido.user_id)}
                   onClick={() => {
-                    if (!amigos.some(a => a.id === perfilUsuarioExibido.user_id)) {
+                    if (amigos.some(a => a.id === perfilUsuarioExibido.user_id)) {
+                      handleExcluirAmigo(perfilUsuarioExibido.user_id);
+                    } else {
                       handleAdicionarAmigo(perfilUsuarioExibido);
                     }
                   }}
-                >{amigos.some(a => a.id === perfilUsuarioExibido.user_id) ? 'Adicionado' : 'Adicionar'}</button>
+                >
+                  {amigos.some(a => a.id === perfilUsuarioExibido.user_id) ? 'Deixar de seguir' : 'Seguir'}
+                </button>
                 <button
                   style={{
                     background: '#43a047',
                     color: '#fff',
                     border: 'none',
                     borderRadius: 8,
-                    padding: '10px 32px',
+                    padding: '8px 16px',
                     fontWeight: 700,
-                    fontSize: 16,
-                    cursor: 'pointer'
+                    fontSize: 14,
+                    cursor: 'pointer',
+                    minWidth: 90
                   }}
                   onClick={() => {
                     setMostrarPerfil(false);
@@ -599,6 +641,22 @@ const ChatPage: React.FC = () => {
                     setConversaSelecionada(null);
                   }}
                 >Mensagens</button>
+                <button
+                  style={{
+                    background: '#d32f2f',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: 8,
+                    padding: '8px 16px',
+                    fontWeight: 700,
+                    fontSize: 14,
+                    cursor: 'pointer',
+                    minWidth: 90
+                  }}
+                  onClick={() => {
+                    alert('Função de bloqueio implementada aqui.');
+                  }}
+                >Bloquear</button>
               </div>
             </div>
           )}
