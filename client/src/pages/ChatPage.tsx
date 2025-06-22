@@ -35,6 +35,9 @@ const ChatPage: React.FC = () => {
   const [perfilUsuarioExibido, setPerfilUsuarioExibido] = useState<any | null>(null);
   // Busca cor do tema do localStorage a cada renderização do header
   const [headerColor, setHeaderColor] = useState('#fff');
+  const [conversasNaoLidas, setConversasNaoLidas] = useState<{ [id: string]: boolean }>({});
+  // Controle de último acesso para cada conversa
+  const [ultimoAcesso, setUltimoAcesso] = useState<{ [id: string]: string }>({});
 
   // Função para buscar usuários no Supabase
   async function buscarUsuariosSupabase(termo: string) {
@@ -178,6 +181,72 @@ const ChatPage: React.FC = () => {
     }
   }, [userId, mensagens]);
 
+  // Carrega ultimoAcesso do localStorage ao iniciar
+  useEffect(() => {
+    const salvo = localStorage.getItem('ultimoAcessoChat');
+    if (salvo) {
+      try {
+        setUltimoAcesso(JSON.parse(salvo));
+      } catch {}
+    }
+  }, []);
+  // Salva ultimoAcesso no localStorage sempre que mudar
+  useEffect(() => {
+    localStorage.setItem('ultimoAcessoChat', JSON.stringify(ultimoAcesso));
+  }, [ultimoAcesso]);
+
+  // Função para abrir o chat (janela de mensagens)
+  function abrirChat(id: string) {
+    setAmigoSelecionado(id);
+    setConversaSelecionada(id);
+    setMostrarPerfil(false);
+    setUltimoAcesso(prev => ({
+      ...prev,
+      [id]: new Date().toISOString()
+    }));
+    setConversasNaoLidas(prev => ({ ...prev, [id]: false }));
+  }
+
+  // Detecta chegada de nova mensagem e marca como não lida apenas se for após o último acesso
+  useEffect(() => {
+    if (!userId) return;
+    supabase
+      .from('mensagens')
+      .select('remetente_id, destinatario_id, created_at')
+      .or(`remetente_id.eq.${userId},destinatario_id.eq.${userId}`)
+      .order('created_at', { ascending: false })
+      .then(({ data }) => {
+        if (!data) return;
+        const novasNaoLidas: { [id: string]: boolean } = { ...conversasNaoLidas };
+        data.forEach((msg: any) => {
+          const outroId = msg.remetente_id === userId ? msg.destinatario_id : msg.remetente_id;
+          if (!outroId) return;
+          // Só marca como não lida se a mensagem for mais recente que o último acesso
+          if (
+            outroId !== amigoSelecionado &&
+            (!ultimoAcesso[outroId] || msg.created_at > ultimoAcesso[outroId])
+          ) {
+            novasNaoLidas[outroId] = true;
+          }
+        });
+        setConversasNaoLidas(novasNaoLidas);
+      });
+    // eslint-disable-next-line
+  }, [mensagens, ultimoAcesso]);
+
+  // Certifique-se de que conversasFiltradas está definida antes do return e tipada corretamente
+  const conversasFiltradas: { id: string, nome: string }[] = conversasSupabase.filter((c: { id: string, nome: string }) => c.nome.toLowerCase().includes(pesquisaConversas.toLowerCase()));
+  // Ordena conversas: as com nova mensagem vão para o topo
+  const conversasOrdenadas = [...conversasFiltradas].sort((a, b) => {
+    const aNaoLida = conversasNaoLidas[a.id] ? 1 : 0;
+    const bNaoLida = conversasNaoLidas[b.id] ? 1 : 0;
+    if (aNaoLida !== bNaoLida) return bNaoLida - aNaoLida;
+    return 0;
+  });
+
+  // Certifique-se de que amigosFiltrados está definido antes do return e tipada corretamente
+  const amigosFiltrados: { id: string, nome: string }[] = amigos.filter((a: { nome: string }) => a.nome.toLowerCase().includes(pesquisaAmigo.toLowerCase()));
+
   // Fecha o menu ao clicar fora
   React.useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -220,11 +289,7 @@ const ChatPage: React.FC = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [menuConversaAberto]);
 
-  // Certifique-se de que conversasFiltradas está definida antes do return e tipada corretamente
-  const conversasFiltradas: { id: string, nome: string }[] = conversasSupabase.filter((c: { id: string, nome: string }) => c.nome.toLowerCase().includes(pesquisaConversas.toLowerCase()));
-  // Certifique-se de que amigosFiltrados está definido antes do return e tipada corretamente
-  const amigosFiltrados: { id: string, nome: string }[] = amigos.filter((a: { nome: string }) => a.nome.toLowerCase().includes(pesquisaAmigo.toLowerCase()));
-
+  // Busca cor do tema do localStorage a cada renderização do header
   useEffect(() => {
     const savedColor = localStorage.getItem('paletaCor');
     setHeaderColor(savedColor || '#fff');
@@ -409,6 +474,7 @@ const ChatPage: React.FC = () => {
                       setConversaSelecionada(null);
                       setMostrarPerfil(true);
                       setPerfilUsuarioExibido(usuario);
+                      // NÃO atualize ultimoAcesso ou conversasNaoLidas aqui!
                     }}
                   >
                     {usuario.nome} {usuario.nomeguerra ? `(${usuario.nomeguerra})` : ''}<br />
@@ -813,10 +879,10 @@ const ChatPage: React.FC = () => {
                 }}
               />
               <div style={{ maxHeight: 180, overflowY: 'auto', marginTop: 8 }}>
-                {conversasFiltradas.length === 0 && (
+                {conversasOrdenadas.length === 0 && (
                   <div style={{ color: '#888', fontSize: 13 }}>Nenhuma conversa encontrada.</div>
                 )}
-                {conversasFiltradas.map(conversa => (
+                {conversasOrdenadas.map(conversa => (
                   <div key={conversa.id} style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
                     <button
                       style={{
@@ -833,15 +899,21 @@ const ChatPage: React.FC = () => {
                         cursor: 'pointer',
                         display: 'flex',
                         alignItems: 'center',
-                        justifyContent: 'space-between'
+                        justifyContent: 'flex-start',
+                        position: 'relative'
                       }}
-                      onClick={() => {
-                        setAmigoSelecionado(conversa.id);
-                        setConversaSelecionada(conversa.id);
-                        setMostrarPerfil(false);
-                        // buscarMensagens será chamado automaticamente pelo useEffect acima
-                      }}
+                      onClick={() => abrirChat(conversa.id)}
                     >
+                      {conversasNaoLidas[conversa.id] && (
+                        <span style={{
+                          display: 'inline-block',
+                          width: 10,
+                          height: 10,
+                          borderRadius: '50%',
+                          background: '#2ecc40',
+                          marginRight: 10
+                        }} />
+                      )}
                       <span style={{ flex: 1 }}>{conversa.nome}</span>
                       <span
                         style={{
