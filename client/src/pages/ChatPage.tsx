@@ -67,7 +67,7 @@ const ChatPage: React.FC = () => {
   useEffect(() => {
     if (userId) {
       carregarAmigosSupabase(userId);
-      carregarConversasSupabase(userId);
+      buscarUsuariosComMensagens(userId);
     }
   }, [userId]);
 
@@ -80,14 +80,50 @@ const ChatPage: React.FC = () => {
     }
   }, [userId, amigoSelecionado]);
 
-  // Enviar mensagem
+  // Atualiza mensagens ao selecionar uma conversa
+  useEffect(() => {
+    if (userId && amigoSelecionado) {
+      buscarMensagens(userId, amigoSelecionado).then(setMensagens);
+    } else {
+      setMensagens([]);
+    }
+  }, [userId, amigoSelecionado]);
+
+  // 1. Função para buscar conversas (usuários com quem trocou mensagens)
+  async function buscarConversas(userId: string) {
+    const { data } = await supabase
+      .from('mensagens')
+      .select('remetente_id, destinatario_id')
+      .or(`remetente_id.eq.${userId},destinatario_id.eq.${userId}`);
+    if (!data) return [];
+    const ids = new Set<string>();
+    data.forEach((msg: any) => {
+      if (msg.remetente_id !== userId) ids.add(msg.remetente_id);
+      if (msg.destinatario_id !== userId) ids.add(msg.destinatario_id);
+    });
+    if (ids.size === 0) return [];
+    const { data: perfis } = await supabase
+      .from('perfil_usuario')
+      .select('user_id, nome')
+      .in('user_id', Array.from(ids));
+    return (perfis || []).map((p: any) => ({ id: p.user_id, nome: p.nome }));
+  }
+
+  // 2. Atualiza conversas sempre que mensagens mudam
+  useEffect(() => {
+    if (userId) {
+      buscarConversas(userId).then(setConversasSupabase);
+    }
+  }, [userId, mensagens]);
+
+  // 3. Ao enviar mensagem, salva corretamente no Supabase e atualiza lista
   async function handleEnviarMensagem(e: React.FormEvent) {
     e.preventDefault();
     if (!inputMensagem.trim() || !userId || !amigoSelecionado) return;
     setEnviando(true);
+    // Salva a mensagem no balde 'mensagens' do Supabase, relacionada aos dois usuários
     await enviarMsgSupabase(userId, amigoSelecionado, inputMensagem);
     setInputMensagem('');
-    // Atualiza mensagens
     buscarMensagens(userId, amigoSelecionado).then(setMensagens);
     setEnviando(false);
   }
@@ -111,26 +147,34 @@ const ChatPage: React.FC = () => {
     setAmigos(prev => prev.filter(a => a.id !== amigoId));
   }
 
-  async function carregarConversasSupabase(userId: string) {
+  // Buscar usuários com quem já trocou mensagens
+  async function buscarUsuariosComMensagens(userId: string) {
     const { data } = await supabase
-      .from('conversas')
-      .select('conversa_id, nome')
-      .eq('user_id', userId);
-    if (data) setConversasSupabase(data.map(c => ({ id: c.conversa_id, nome: c.nome })));
+      .from('mensagens')
+      .select('remetente_id, destinatario_id')
+      .or(`remetente_id.eq.${userId},destinatario_id.eq.${userId})`);
+    if (!data) return [];
+    // Extrai todos os IDs de usuários que já conversaram com o userId
+    const ids = new Set();
+    data.forEach((msg: any) => {
+      if (msg.remetente_id !== userId) ids.add(msg.remetente_id);
+      if (msg.destinatario_id !== userId) ids.add(msg.destinatario_id);
+    });
+    if (ids.size === 0) return [];
+    const { data: perfis } = await supabase
+      .from('perfil_usuario')
+      .select('user_id, nome')
+      .in('user_id', Array.from(ids));
+    // Ajusta para o formato esperado
+    return (perfis || []).map((p: any) => ({ id: p.user_id, nome: p.nome }));
   }
 
-  async function handleExcluirConversa(conversaId: string) {
-    await supabase.from('conversas').delete().eq('user_id', userId).eq('conversa_id', conversaId);
-    setConversasSupabase(prev => prev.filter(c => c.id !== conversaId));
-  }
-
-  const amigosFiltrados = amigos.filter(a => a.nome.toLowerCase().includes(pesquisaAmigo.toLowerCase()));
-  // Substitua conversasFiltradas por uma junção de conversasSupabase e contatosMock
-  const todasConversas = [
-    ...conversasSupabase,
-    ...contatosMock.filter(c => !conversasSupabase.some(cs => cs.id === c.id))
-  ];
-  const conversasFiltradas = todasConversas.filter(c => c.nome.toLowerCase().includes(pesquisaConversas.toLowerCase()));
+  // Atualiza lista de conversas ao abrir
+  useEffect(() => {
+    if (userId) {
+      buscarUsuariosComMensagens(userId).then(setConversasSupabase);
+    }
+  }, [userId, mensagens]);
 
   // Fecha o menu ao clicar fora
   React.useEffect(() => {
@@ -173,6 +217,11 @@ const ChatPage: React.FC = () => {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [menuConversaAberto]);
+
+  // Certifique-se de que conversasFiltradas está definida antes do return e tipada corretamente
+  const conversasFiltradas: { id: string, nome: string }[] = conversasSupabase.filter((c: { id: string, nome: string }) => c.nome.toLowerCase().includes(pesquisaConversas.toLowerCase()));
+  // Certifique-se de que amigosFiltrados está definido antes do return e tipada corretamente
+  const amigosFiltrados: { id: string, nome: string }[] = amigos.filter((a: { nome: string }) => a.nome.toLowerCase().includes(pesquisaAmigo.toLowerCase()));
 
   return (
     <div style={{ height: '100vh', width: '100vw', background: '#fff', overflow: 'hidden' }}>
@@ -454,11 +503,9 @@ const ChatPage: React.FC = () => {
                             borderRadius: 8
                           }}
                           onClick={async () => {
-                            await handleExcluirAmigo(amigo.id);
-                            setMenuAmigoAberto(null);
-                            if (amigoSelecionado === amigo.id) {
-                              setAmigoSelecionado(null);
-                              setMostrarPerfil(false);
+                            if (menuAmigoAberto) {
+                              await handleExcluirAmigo(menuAmigoAberto);
+                              setMenuAmigoAberto(null);
                             }
                           }}
                         >Excluir</button>
@@ -541,9 +588,10 @@ const ChatPage: React.FC = () => {
                   }}
                   onClick={() => {
                     setMostrarPerfil(false);
-                    // O chat só será exibido após fechar o perfil
+                    setAmigoSelecionado(perfilUsuarioExibido.user_id);
+                    setConversaSelecionada(null);
                   }}
-                >Iniciar Conversa</button>
+                >Mensagens</button>
               </div>
             </div>
           )}
@@ -686,7 +734,7 @@ const ChatPage: React.FC = () => {
         }}>
           <nav>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 24 }}>
-              <span style={{ fontWeight: 600, marginBottom: 4 }}>Conversas</span>
+              <span style={{ fontWeight: 600, marginBottom: 4 }}>Mensagens</span>
               <input
                 type="text"
                 placeholder="Pesquisar conversas..."
@@ -724,8 +772,10 @@ const ChatPage: React.FC = () => {
                         justifyContent: 'space-between'
                       }}
                       onClick={() => {
+                        setAmigoSelecionado(conversa.id);
                         setConversaSelecionada(conversa.id);
-                        setAmigoSelecionado(null);
+                        setMostrarPerfil(false);
+                        // buscarMensagens será chamado automaticamente pelo useEffect acima
                       }}
                     >
                       <span style={{ flex: 1 }}>{conversa.nome}</span>
@@ -781,11 +831,7 @@ const ChatPage: React.FC = () => {
                             borderRadius: 8
                           }}
                           onClick={async () => {
-                            await handleExcluirConversa(conversa.id);
                             setMenuConversaAberto(null);
-                            if (conversaSelecionada === conversa.id) {
-                              setConversaSelecionada(null);
-                            }
                           }}
                         >Excluir</button>
                       </div>
