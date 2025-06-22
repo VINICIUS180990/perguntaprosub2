@@ -413,7 +413,7 @@ export default function MenuPage() {
                 <h2 style={{ margin: 0, fontSize: 22 }}>Manual do PerguntaProSub</h2>
                 <ul style={{ marginTop: 18, fontSize: 16, color: "#222", lineHeight: 1.7 }}>
                   <li><b>IA Militar:</b> Anexe normas, regulamentos ou qualquer outro documento e a IA PerguntaProSub te dirá como agir em qualquer situação, baseada na documentação específica.</li>
-                  <li><b>Enviar arquivos:</b> Clique em "+ Novo" no campo de documentos na pagina inicial para anexar arquivos PDF ou TXT (arquivos criptografados deverão ser convertidos para texto antes e serem anexados). O conteúdo será usado para responder suas perguntas.</li>
+                  <li><b>Enviar arquivos:</b> Clique em "+ Novo" no campo de documentos na pagina inicial para anexar seus arquivos (arquivos criptografados deverão ser descriptografadosantes e serem anexados). O conteúdo será usado para responder suas perguntas.</li>
                   <li><b>Conversas:</b> Clique em "+ Nova" no campo de conversas para organizar suas dúvidas. Cada conversa mantém seu histórico separado.</li>
                   <li><b>Perfil:</b> Edite seu nome, nome de guerra, posto, força, OM, celular e e-mail na aba Perfil do Menu. Mantenha os dados sempre atualizados pois eles irão permitir que seus amigos o encontrem pela pesquisa do Chat.</li>
                   <li><b>Redefinir senha:</b> Altere sua senha na opção "Redefinir senha" do Menu.</li>
