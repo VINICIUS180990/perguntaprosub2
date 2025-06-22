@@ -33,6 +33,8 @@ const ChatPage: React.FC = () => {
   // Corrige exibição do perfil do amigo já adicionado
   // Adicione um estado para armazenar o perfil do usuário a ser exibido
   const [perfilUsuarioExibido, setPerfilUsuarioExibido] = useState<any | null>(null);
+  // Busca cor do tema do localStorage a cada renderização do header
+  const [headerColor, setHeaderColor] = useState('#fff');
 
   // Função para buscar usuários no Supabase
   async function buscarUsuariosSupabase(termo: string) {
@@ -223,12 +225,17 @@ const ChatPage: React.FC = () => {
   // Certifique-se de que amigosFiltrados está definido antes do return e tipada corretamente
   const amigosFiltrados: { id: string, nome: string }[] = amigos.filter((a: { nome: string }) => a.nome.toLowerCase().includes(pesquisaAmigo.toLowerCase()));
 
+  useEffect(() => {
+    const savedColor = localStorage.getItem('paletaCor');
+    setHeaderColor(savedColor || '#fff');
+  }, []);
+
   return (
-    <div style={{ height: '100vh', width: '100vw', background: '#fff', overflow: 'hidden' }}>
+    <div style={{ height: '100vh', width: '100vw', background: headerColor, overflow: 'hidden' }}>
       <header style={{
         width: '100%',
         height: 96,
-        background: '#fff',
+        background: headerColor,
         borderBottom: '1px solid #eee',
         display: 'flex',
         alignItems: 'center',
