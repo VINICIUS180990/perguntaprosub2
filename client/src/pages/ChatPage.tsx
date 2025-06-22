@@ -208,7 +208,7 @@ const ChatPage: React.FC = () => {
   React.useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (menuConversaAberto) {
-        const menu = document.getElementById('menu-conversa');
+        const menu = document.querySelector('[id^="menu-conversa"], [id^="menu-conversa-"]');
         if (menu && !menu.contains(event.target as Node)) {
           setMenuConversaAberto(null);
         }
@@ -612,7 +612,6 @@ const ChatPage: React.FC = () => {
               justifyContent: 'center',
               alignItems: 'center'
             }}>
-              <h2>Chat com {usuariosSupabase.find(u => u.user_id === amigoSelecionado)?.nome}</h2>
               <div style={{ flex: 1, width: '100%', overflowY: 'auto', marginBottom: 16 }}>
                 {mensagens.length === 0 && (
                   <div style={{ color: '#888', textAlign: 'center', marginTop: 40 }}>
@@ -802,6 +801,7 @@ const ChatPage: React.FC = () => {
                     </button>
                     {menuConversaAberto === conversa.id && menuConversaPos && (
                       <div
+                        id={`menu-conversa-${conversa.id}`}
                         style={{
                           position: 'fixed',
                           left: menuConversaPos.left - 80,
@@ -818,6 +818,36 @@ const ChatPage: React.FC = () => {
                           flexDirection: 'column'
                         }}
                       >
+                        <button
+                          style={{
+                            padding: '10px 18px',
+                            background: 'none',
+                            border: 'none',
+                            textAlign: 'left',
+                            fontWeight: 500,
+                            fontSize: 15,
+                            color: '#222',
+                            cursor: 'pointer',
+                            borderRadius: 8
+                          }}
+                          onClick={async () => {
+                            setMenuConversaAberto(null);
+                            setMostrarPerfil(true);
+                            // Busca o perfil do usuário da conversa
+                            let perfil = usuariosSupabase.find(u => u.user_id === conversa.id);
+                            if (!perfil) {
+                              const { data } = await supabase
+                                .from('perfil_usuario')
+                                .select('*')
+                                .eq('user_id', conversa.id)
+                                .single();
+                              perfil = data;
+                            }
+                            setPerfilUsuarioExibido(perfil);
+                            setAmigoSelecionado(conversa.id);
+                            setConversaSelecionada(null);
+                          }}
+                        >Perfil</button>
                         <button
                           style={{
                             padding: '10px 18px',
