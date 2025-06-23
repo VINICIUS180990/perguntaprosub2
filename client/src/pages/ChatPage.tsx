@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../supabaseClient';
-import { enviarMensagem as enviarMsgSupabase, buscarMensagens } from '../utils/chatMessages';
+import { enviarMensagem as enviarMsgSupabase, buscarMensagens, removerMensagensParaUsuario } from '../utils/chatMessages';
 import type { ChatMessage } from '../utils/chatMessages';
 
 const contatosMock = [
@@ -76,7 +76,7 @@ const ChatPage: React.FC = () => {
   // Buscar mensagens ao selecionar um amigo
   useEffect(() => {
     if (userId && amigoSelecionado) {
-      buscarMensagens(userId, amigoSelecionado).then(setMensagens);
+      buscarMensagens(userId, amigoSelecionado, userId).then(setMensagens);
     } else {
       setMensagens([]);
     }
@@ -85,7 +85,7 @@ const ChatPage: React.FC = () => {
   // Atualiza mensagens ao selecionar uma conversa
   useEffect(() => {
     if (userId && amigoSelecionado) {
-      buscarMensagens(userId, amigoSelecionado).then(setMensagens);
+      buscarMensagens(userId, amigoSelecionado, userId).then(setMensagens);
     } else {
       setMensagens([]);
     }
@@ -95,13 +95,16 @@ const ChatPage: React.FC = () => {
   async function buscarConversas(userId: string) {
     const { data } = await supabase
       .from('mensagens')
-      .select('remetente_id, destinatario_id')
+      .select('remetente_id, destinatario_id, removido_por')
       .or(`remetente_id.eq.${userId},destinatario_id.eq.${userId}`);
     if (!data) return [];
     const ids = new Set<string>();
     data.forEach((msg: any) => {
-      if (msg.remetente_id !== userId) ids.add(msg.remetente_id);
-      if (msg.destinatario_id !== userId) ids.add(msg.destinatario_id);
+      // Só adiciona se a mensagem NÃO foi removida pelo usuário logado
+      if (!msg.removido_por || !msg.removido_por.includes(userId)) {
+        if (msg.remetente_id !== userId) ids.add(msg.remetente_id);
+        if (msg.destinatario_id !== userId) ids.add(msg.destinatario_id);
+      }
     });
     if (ids.size === 0) return [];
     const { data: perfis } = await supabase
@@ -126,7 +129,7 @@ const ChatPage: React.FC = () => {
     // Salva a mensagem no balde 'mensagens' do Supabase, relacionada aos dois usuários
     await enviarMsgSupabase(userId, amigoSelecionado, inputMensagem);
     setInputMensagem('');
-    buscarMensagens(userId, amigoSelecionado).then(setMensagens);
+    buscarMensagens(userId, amigoSelecionado, userId).then(setMensagens);
     setEnviando(false);
   }
 
@@ -153,14 +156,15 @@ const ChatPage: React.FC = () => {
   async function buscarUsuariosComMensagens(userId: string) {
     const { data } = await supabase
       .from('mensagens')
-      .select('remetente_id, destinatario_id')
-      .or(`remetente_id.eq.${userId},destinatario_id.eq.${userId})`);
+      .select('remetente_id, destinatario_id, removido_por')
+      .or(`remetente_id.eq.${userId},destinatario_id.eq.${userId}`);
     if (!data) return [];
-    // Extrai todos os IDs de usuários que já conversaram com o userId
     const ids = new Set();
     data.forEach((msg: any) => {
-      if (msg.remetente_id !== userId) ids.add(msg.remetente_id);
-      if (msg.destinatario_id !== userId) ids.add(msg.destinatario_id);
+      if (!msg.removido_por || !msg.removido_por.includes(userId)) {
+        if (msg.remetente_id !== userId) ids.add(msg.remetente_id);
+        if (msg.destinatario_id !== userId) ids.add(msg.destinatario_id);
+      }
     });
     if (ids.size === 0) return [];
     const { data: perfis } = await supabase
@@ -602,8 +606,8 @@ const ChatPage: React.FC = () => {
               justifyContent: 'center',
               gap: 16
             }}>
-              <h2 style={{ margin: 0 }}>Perfil do Usuário</h2>
-              <div style={{ fontSize: 18, fontWeight: 600 }}>{perfilUsuarioExibido.nome}</div>
+              <h2 style={{ margin: 0, color: '#222', textShadow: '0 1px 4px #fff' }}>Perfil do Usuário</h2>
+              <div style={{ fontSize: 18, fontWeight: 600, color: '#222', textShadow: '0 1px 4px #fff' }}>{perfilUsuarioExibido.nome}</div>
               <div style={{ fontSize: 16, color: '#555' }}>Nome de guerra: {perfilUsuarioExibido.nomeguerra || '-'}</div>
               <div style={{ fontSize: 16, color: '#555' }}>Email: {perfilUsuarioExibido.email}</div>
               <div style={{ fontSize: 16, color: '#555' }}>Posto/Graduação: {perfilUsuarioExibido.posto || '-'}</div>
@@ -934,16 +938,8 @@ const ChatPage: React.FC = () => {
                           onClick={async () => {
                             if (!userId) return;
                             // Excluir todas as mensagens entre o usuário logado e o contato selecionado
-                            const { error } = await supabase
-                              .from('mensagens')
-                              .delete()
-                              .or(`and(remetente_id.eq.${userId},destinatario_id.eq.${conversa.id}),and(remetente_id.eq.${conversa.id},destinatario_id.eq.${userId})`);
-                            if (error) {
-                              alert('Erro ao excluir mensagens: ' + error.message);
-                              return;
-                            }
+                            await removerMensagensParaUsuario(userId, conversa.id, userId);
                             setMenuConversaAberto(null);
-                            // Atualiza a lista de conversas e mensagens
                             buscarConversas(userId).then(setConversasSupabase);
                             if (amigoSelecionado === conversa.id) {
                               setMensagens([]);
