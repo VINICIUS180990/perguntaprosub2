@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../supabaseClient';
-import { enviarMensagem as enviarMsgSupabase, buscarMensagens, removerMensagensParaUsuario } from '../utils/chatMessages';
+import { enviarMensagem as enviarMsgSupabase, buscarMensagens, removerMensagensParaUsuario, marcarMensagensComoLidas } from '../utils/chatMessages';
 import type { ChatMessage } from '../utils/chatMessages';
 
 const contatosMock = [
@@ -35,6 +35,7 @@ const ChatPage: React.FC = () => {
   const [perfilUsuarioExibido, setPerfilUsuarioExibido] = useState<any | null>(null);
   // Busca cor do tema do localStorage a cada renderização do header
   const [headerColor, setHeaderColor] = useState('#fff');
+  const [conversasNaoLidas, setConversasNaoLidas] = useState<{ [id: string]: boolean }>({});
 
   // Função para buscar usuários no Supabase
   async function buscarUsuariosSupabase(termo: string) {
@@ -77,6 +78,7 @@ const ChatPage: React.FC = () => {
   useEffect(() => {
     if (userId && amigoSelecionado) {
       buscarMensagens(userId, amigoSelecionado, userId).then(setMensagens);
+      marcarMensagensComoLidas(amigoSelecionado, userId, userId); // Marca como lidas ao abrir
     } else {
       setMensagens([]);
     }
@@ -86,6 +88,7 @@ const ChatPage: React.FC = () => {
   useEffect(() => {
     if (userId && amigoSelecionado) {
       buscarMensagens(userId, amigoSelecionado, userId).then(setMensagens);
+      marcarMensagensComoLidas(amigoSelecionado, userId, userId);
     } else {
       setMensagens([]);
     }
@@ -242,6 +245,27 @@ const ChatPage: React.FC = () => {
     const savedColor = localStorage.getItem('paletaCor');
     setHeaderColor(savedColor || '#fff');
   }, []);
+
+  // Atualiza o status de não lida ao buscar conversas
+  useEffect(() => {
+    if (!userId || conversasSupabase.length === 0) return;
+    async function fetchNaoLidas() {
+      const status: { [id: string]: boolean } = {};
+      for (const conversa of conversasSupabase) {
+        // Busca se existe pelo menos uma mensagem não lida para o usuário logado nesta conversa
+        const { data } = await supabase
+          .from('mensagens')
+          .select('id')
+          .eq('remetente_id', conversa.id)
+          .eq('destinatario_id', userId)
+          .or('lida_por.is.null,lida_por.not.cs.{"' + userId + '"}')
+          .limit(1);
+        status[conversa.id] = !!(data && data.length > 0);
+      }
+      setConversasNaoLidas(status);
+    }
+    fetchNaoLidas();
+  }, [conversasSupabase, userId]);
 
   return (
     <div style={{ height: '100vh', width: '100vw', background: headerColor, overflow: 'hidden' }}>
@@ -830,127 +854,143 @@ const ChatPage: React.FC = () => {
                 {conversasFiltradas.length === 0 && (
                   <div style={{ color: '#888', fontSize: 13 }}>Nenhuma conversa encontrada.</div>
                 )}
-                {conversasFiltradas.map(conversa => (
-                  <div key={conversa.id} style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
-                    <button
-                      style={{
-                        background: conversaSelecionada === conversa.id ? '#e3eaff' : '#f7f7f9',
-                        borderRadius: 6,
-                        padding: '8px 10px',
-                        marginBottom: 6,
-                        fontSize: 14,
-                        fontWeight: 600,
-                        color: '#222',
-                        border: conversaSelecionada === conversa.id ? '1.5px solid #1976d2' : '1px solid #eee',
-                        width: '100%',
-                        textAlign: 'left',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'flex-start',
-                        position: 'relative'
-                      }}
-                      onClick={() => abrirChat(conversa.id)}
-                    >
-                      <span style={{ flex: 1 }}>{conversa.nome}</span>
-                      <span
+                {conversasFiltradas.map(conversa => {
+                  return (
+                    <div key={conversa.id} style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                      <button
                         style={{
-                          marginLeft: 8,
-                          fontSize: 20,
+                          background: conversaSelecionada === conversa.id ? '#e3eaff' : '#f7f7f9',
+                          borderRadius: 6,
+                          padding: '8px 10px',
+                          marginBottom: 6,
+                          fontSize: 14,
+                          fontWeight: 600,
+                          color: '#222',
+                          border: conversaSelecionada === conversa.id ? '1.5px solid #1976d2' : '1px solid #eee',
+                          width: '100%',
+                          textAlign: 'left',
                           cursor: 'pointer',
-                          color: '#888',
-                          padding: '0 6px',
-                          borderRadius: 4
-                        }}
-                        onClick={e => {
-                          e.stopPropagation();
-                          const rect = (e.target as HTMLElement).getBoundingClientRect();
-                          setMenuConversaAberto(conversa.id);
-                          setMenuConversaPos({
-                            top: rect.bottom + window.scrollY,
-                            left: rect.left + window.scrollX
-                          });
-                        }}
-                        title="Mais opções"
-                      >&#8942;</span>
-                    </button>
-                    {menuConversaAberto === conversa.id && menuConversaPos && (
-                      <div
-                        id={`menu-conversa-${conversa.id}`}
-                        style={{
-                          position: 'fixed',
-                          left: menuConversaPos.left - 80,
-                          top: menuConversaPos.top,
-                          background: '#fff',
-                          border: '1px solid #ddd',
-                          borderRadius: 8,
-                          boxShadow: '0 2px 8px #0003',
-                          zIndex: 9999,
-                          minWidth: 100,
-                          fontSize: 15,
-                          padding: 0,
                           display: 'flex',
-                          flexDirection: 'column'
+                          alignItems: 'center',
+                          justifyContent: 'flex-start',
+                          position: 'relative'
+                        }}
+                        onClick={() => {
+                          abrirChat(conversa.id);
+                          setConversasNaoLidas(prev => ({ ...prev, [conversa.id]: false }));
                         }}
                       >
-                        <button
+                        {/* Bolinha verde de não lida */}
+                        {conversasNaoLidas[conversa.id] && (
+                          <span style={{
+                            display: 'inline-block',
+                            width: 12,
+                            height: 12,
+                            borderRadius: '50%',
+                            background: '#43a047',
+                            marginRight: 8
+                          }}></span>
+                        )}
+                        <span style={{ flex: 1 }}>{conversa.nome}</span>
+                        <span
                           style={{
-                            padding: '10px 18px',
-                            background: 'none',
-                            border: 'none',
-                            textAlign: 'left',
-                            fontWeight: 500,
-                            fontSize: 15,
-                            color: '#222',
+                            marginLeft: 8,
+                            fontSize: 20,
                             cursor: 'pointer',
-                            borderRadius: 8
+                            color: '#888',
+                            padding: '0 6px',
+                            borderRadius: 4
                           }}
-                          onClick={async () => {
-                            setMenuConversaAberto(null);
-                            setMostrarPerfil(true);
-                            // Busca o perfil do usuário da conversa
-                            let perfil = usuariosSupabase.find(u => u.user_id === conversa.id);
-                            if (!perfil) {
-                              const { data } = await supabase
-                                .from('perfil_usuario')
-                                .select('*')
-                                .eq('user_id', conversa.id)
-                                .single();
-                              perfil = data;
-                            }
-                            setPerfilUsuarioExibido(perfil);
-                            setAmigoSelecionado(conversa.id);
-                            setConversaSelecionada(null);
+                          onClick={e => {
+                            e.stopPropagation();
+                            const rect = (e.target as HTMLElement).getBoundingClientRect();
+                            setMenuConversaAberto(conversa.id);
+                            setMenuConversaPos({
+                              top: rect.bottom + window.scrollY,
+                              left: rect.left + window.scrollX
+                            });
                           }}
-                        >Perfil</button>
-                        <button
+                          title="Mais opções"
+                        >&#8942;</span>
+                      </button>
+                      {menuConversaAberto === conversa.id && menuConversaPos && (
+                        <div
+                          id={`menu-conversa-${conversa.id}`}
                           style={{
-                            padding: '10px 18px',
-                            background: 'none',
-                            border: 'none',
-                            textAlign: 'left',
-                            fontWeight: 500,
+                            position: 'fixed',
+                            left: menuConversaPos.left - 80,
+                            top: menuConversaPos.top,
+                            background: '#fff',
+                            border: '1px solid #ddd',
+                            borderRadius: 8,
+                            boxShadow: '0 2px 8px #0003',
+                            zIndex: 9999,
+                            minWidth: 100,
                             fontSize: 15,
-                            color: '#d32f2f',
-                            cursor: 'pointer',
-                            borderRadius: 8
+                            padding: 0,
+                            display: 'flex',
+                            flexDirection: 'column'
                           }}
-                          onClick={async () => {
-                            if (!userId) return;
-                            // Excluir todas as mensagens entre o usuário logado e o contato selecionado
-                            await removerMensagensParaUsuario(userId, conversa.id, userId);
-                            setMenuConversaAberto(null);
-                            buscarConversas(userId).then(setConversasSupabase);
-                            if (amigoSelecionado === conversa.id) {
-                              setMensagens([]);
-                              setAmigoSelecionado(null);
-                            }
-                          }}
-                        >Excluir</button>
-                      </div>
-                    )}
-                  </div>
-                ))}
+                        >
+                          <button
+                            style={{
+                              padding: '10px 18px',
+                              background: 'none',
+                              border: 'none',
+                              textAlign: 'left',
+                              fontWeight: 500,
+                              fontSize: 15,
+                              color: '#222',
+                              cursor: 'pointer',
+                              borderRadius: 8
+                            }}
+                            onClick={async () => {
+                              setMenuConversaAberto(null);
+                              setMostrarPerfil(true);
+                              // Busca o perfil do usuário da conversa
+                              let perfil = usuariosSupabase.find(u => u.user_id === conversa.id);
+                              if (!perfil) {
+                                const { data } = await supabase
+                                  .from('perfil_usuario')
+                                  .select('*')
+                                  .eq('user_id', conversa.id)
+                                  .single();
+                                perfil = data;
+                              }
+                              setPerfilUsuarioExibido(perfil);
+                              setAmigoSelecionado(conversa.id);
+                              setConversaSelecionada(null);
+                            }}
+                          >Perfil</button>
+                          <button
+                            style={{
+                              padding: '10px 18px',
+                              background: 'none',
+                              border: 'none',
+                              textAlign: 'left',
+                              fontWeight: 500,
+                              fontSize: 15,
+                              color: '#d32f2f',
+                              cursor: 'pointer',
+                              borderRadius: 8
+                            }}
+                            onClick={async () => {
+                              if (!userId) return;
+                              // Excluir todas as mensagens entre o usuário logado e o contato selecionado
+                              await removerMensagensParaUsuario(userId, conversa.id, userId);
+                              setMenuConversaAberto(null);
+                              buscarConversas(userId).then(setConversasSupabase);
+                              if (amigoSelecionado === conversa.id) {
+                                setMensagens([]);
+                                setAmigoSelecionado(null);
+                              }
+                            }}
+                          >Excluir</button>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </nav>

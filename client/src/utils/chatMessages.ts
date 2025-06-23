@@ -7,6 +7,7 @@ export type ChatMessage = {
   texto: string;
   created_at?: string;
   removido_por?: string[];
+  lida_por?: string[];
 };
 
 export async function enviarMensagem(remetente_id: string, destinatario_id: string, texto: string) {
@@ -26,6 +27,26 @@ export async function buscarMensagens(remetente_id: string, destinatario_id: str
   if (error) throw error;
   // Filtra mensagens que não foram removidas pelo usuário logado
   return (data as ChatMessage[]).filter(msg => !msg.removido_por || !msg.removido_por.includes(userId));
+}
+
+export async function marcarMensagensComoLidas(remetente_id: string, destinatario_id: string, userId: string) {
+  // Busca todas as mensagens recebidas pelo userId que ainda não estão marcadas como lidas por ele
+  const { data, error } = await supabase
+    .from('mensagens')
+    .select('id, lida_por, destinatario_id')
+    .or(`and(remetente_id.eq.${remetente_id},destinatario_id.eq.${destinatario_id}),and(remetente_id.eq.${destinatario_id},destinatario_id.eq.${remetente_id})`);
+  if (error) throw error;
+  if (!data) return;
+  for (const msg of data) {
+    // Só marca como lida se o userId for o destinatário e ainda não estiver em lida_por
+    const lidaPor = Array.isArray(msg.lida_por) ? msg.lida_por : [];
+    if (msg.destinatario_id === userId && !lidaPor.includes(userId)) {
+      await supabase
+        .from('mensagens')
+        .update({ lida_por: [...lidaPor, userId] })
+        .eq('id', msg.id);
+    }
+  }
 }
 
 export async function removerMensagensParaUsuario(remetente_id: string, destinatario_id: string, userId: string) {
