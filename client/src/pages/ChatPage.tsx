@@ -630,7 +630,7 @@ const ChatPage: React.FC = () => {
               justifyContent: 'center',
               gap: 16
             }}>
-              <h2 style={{ margin: 0, color: '#222', textShadow: '0 1px 4px #fff' }}>Perfil do Usuário</h2>
+              <h2 style={{ margin: 0, color: 'var(--color-title, #1976d2)', textShadow: '0 1px 4px #fff' }}>Perfil do Usuário</h2>
               <div style={{ fontSize: 18, fontWeight: 600, color: '#222', textShadow: '0 1px 4px #fff' }}>{perfilUsuarioExibido.nome}</div>
               <div style={{ fontSize: 16, color: '#555' }}>Nome de guerra: {perfilUsuarioExibido.nomeguerra || '-'}</div>
               <div style={{ fontSize: 16, color: '#555' }}>Email: {perfilUsuarioExibido.email}</div>

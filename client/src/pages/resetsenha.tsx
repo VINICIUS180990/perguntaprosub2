@@ -35,7 +35,7 @@ export default function RedefinirSenhaPage() {
   return (
     <div style={{ minHeight: "100vh", width: "100vw", display: "flex", alignItems: "center", justifyContent: "center", background: "#f7f7f9" }}>
       <div style={{ width: 380, background: "#fff", borderRadius: 12, boxShadow: "0 2px 8px #0001", padding: 32, display: "flex", flexDirection: "column", alignItems: "center" }}>
-        <h2 style={{ margin: 0, fontSize: 22 }}>Redefinir senha</h2>
+        <h2 style={{ margin: 0, fontSize: 22, color: 'var(--color-title, #1976d2)' }}>Redefinir senha</h2>
         <form onSubmit={handleAlterarSenha} style={{ display: "flex", flexDirection: "column", gap: 16, marginTop: 18, width: "100%" }} autoComplete="off">
           <input
             type="password"

@@ -383,7 +383,7 @@ export default function MenuPage() {
           <div style={{ width: "100%", maxWidth: 700, minHeight: 400, background: "#f7f7f9", borderRadius: 12, boxShadow: "0 2px 8px #0001", padding: 32, margin: 24 }}>
             {opcaoSelecionada === "perfil" && (
               <form style={{ display: "flex", flexDirection: "column", gap: 16 }} onSubmit={handleSalvarPerfil}>
-                <h2 style={{ margin: 0, fontSize: 22 }}>Perfil do Usuário</h2>
+                <h2 style={{ margin: 0, fontSize: 22, color: 'var(--color-title, #1976d2)' }}>Perfil do Usuário</h2>
                 <input type="text" placeholder="Nome completo" value={perfil.nome} onChange={e => setPerfil({ ...perfil, nome: e.target.value })} style={{ padding: 10, borderRadius: 6, border: "1px solid #ccc", fontSize: 16 }} required />
                 <input type="text" placeholder="Nome de guerra" value={perfil.nomeguerra} onChange={e => setPerfil({ ...perfil, nomeguerra: e.target.value })} style={{ padding: 10, borderRadius: 6, border: "1px solid #ccc", fontSize: 16 }} />
                 <input type="text" placeholder="Posto/Graduação" value={perfil.posto} onChange={e => setPerfil({ ...perfil, posto: e.target.value })} style={{ padding: 10, borderRadius: 6, border: "1px solid #ccc", fontSize: 16 }} />
@@ -410,7 +410,7 @@ export default function MenuPage() {
             )}
             {opcaoSelecionada === "manual" && (
               <div style={{ background: "#fff", borderRadius: 10, boxShadow: "0 2px 8px #0001", padding: 24, maxWidth: 600, margin: "0 auto" }}>
-                <h2 style={{ margin: 0, fontSize: 22 }}>Manual do PerguntaProSub</h2>
+                <h2 style={{ margin: 0, fontSize: 22, color: 'var(--color-title, #1976d2)' }}>Manual do PerguntaProSub</h2>
                 <ul style={{ marginTop: 18, fontSize: 16, color: "#222", lineHeight: 1.7 }}>
                   <li><b>IA Militar:</b> Anexe normas, regulamentos ou qualquer outro documento e a IA PerguntaProSub te dirá como agir em qualquer situação, baseada na documentação específica.</li>
                   <li><b>Enviar arquivos:</b> Clique em "+ Novo" no campo de documentos na pagina inicial para anexar seus arquivos (arquivos criptografados deverão ser descriptografadosantes e serem anexados). O conteúdo será usado para responder suas perguntas.</li>
