@@ -5,9 +5,11 @@ import { avisoExclusaoConta } from "../utils/excluirConta";
 
 const opcoes = [
   { id: "perfil", label: "Perfil" },
+  { id: "sobre", label: "Sobre" },
+  { id: "termos", label: "Termos de Uso" },
+  { id: "contato", label: "Contato" },
+  { id: "privacidade", label: "Política de Privacidade" },
   { id: "seguranca", label: "Redefinir senha" },
-  { id: "manual", label: "Manual" },
-  { id: "faleconosco", label: "Fale Conosco" },
   { id: "excluir", label: "Excluir Conta" }
 ];
 
@@ -338,9 +340,19 @@ export default function MenuPage() {
         }}>
           <nav>
             <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-              {opcoes.map(opcao => (
+              {opcoes.map((opcao) => (
                 <button
                   key={opcao.id}
+                  onClick={() => {
+                    setOpcaoSelecionada(opcao.id);
+                    if (opcao.id === "privacidade") navigate("/privacidade");
+                    else if (opcao.id === "sobre") navigate("/sobre");
+                    else if (opcao.id === "termos") navigate("/termos");
+                    else if (opcao.id === "contato") navigate("/contato");
+                    else if (opcao.id === "home") navigate("/main");
+                    else if (opcao.id === "seguranca") navigate("/resetsenha");
+                    // ...demais navegações já existentes...
+                  }}
                   style={{
                     padding: "12px 10px",
                     background: opcaoSelecionada === opcao.id ? "#e3eaff" : "#f7f7f9",
@@ -351,15 +363,6 @@ export default function MenuPage() {
                     color: "#222",
                     cursor: "pointer",
                     textAlign: "left"
-                  }}
-                  onClick={() => {
-                    if (opcao.id === "home") {
-                      navigate("/main");
-                    } else if (opcao.id === "seguranca") {
-                      navigate("/resetsenha");
-                    } else {
-                      setOpcaoSelecionada(opcao.id);
-                    }
                   }}
                 >
                   {opcao.label}
@@ -383,7 +386,7 @@ export default function MenuPage() {
           <div style={{ width: "100%", maxWidth: 700, minHeight: 400, background: "#f7f7f9", borderRadius: 12, boxShadow: "0 2px 8px #0001", padding: 32, margin: 24 }}>
             {opcaoSelecionada === "perfil" && (
               <form style={{ display: "flex", flexDirection: "column", gap: 16 }} onSubmit={handleSalvarPerfil}>
-                <h2 style={{ margin: 0, fontSize: 22, color: 'var(--color-title, #1976d2)' }}>Perfil do Usuário</h2>
+                <h2 style={{ margin: 0, fontSize: 22, color: 'var(--color-title, #1976d2)', textAlign: 'center', width: '100%' }}>Perfil do Usuário</h2>
                 <input type="text" placeholder="Nome completo" value={perfil.nome} onChange={e => setPerfil({ ...perfil, nome: e.target.value })} style={{ padding: 10, borderRadius: 6, border: "1px solid #ccc", fontSize: 16 }} required />
                 <input type="text" placeholder="Nome de guerra" value={perfil.nomeguerra} onChange={e => setPerfil({ ...perfil, nomeguerra: e.target.value })} style={{ padding: 10, borderRadius: 6, border: "1px solid #ccc", fontSize: 16 }} />
                 <input type="text" placeholder="Posto/Graduação" value={perfil.posto} onChange={e => setPerfil({ ...perfil, posto: e.target.value })} style={{ padding: 10, borderRadius: 6, border: "1px solid #ccc", fontSize: 16 }} />
@@ -407,24 +410,6 @@ export default function MenuPage() {
             )}
             {opcaoSelecionada === "faleconosco" && (
               <FaleConoscoPage />
-            )}
-            {opcaoSelecionada === "manual" && (
-              <div style={{ background: "#fff", borderRadius: 10, boxShadow: "0 2px 8px #0001", padding: 24, maxWidth: 600, margin: "0 auto" }}>
-                <h2 style={{ margin: 0, fontSize: 22, color: 'var(--color-title, #1976d2)' }}>Manual do PerguntaProSub</h2>
-                <ul style={{ marginTop: 18, fontSize: 16, color: "#222", lineHeight: 1.7 }}>
-                  <li><b>IA Militar:</b> Anexe normas, regulamentos ou qualquer outro documento e a IA PerguntaProSub te dirá como agir em qualquer situação, baseada na documentação específica.</li>
-                  <li><b>Enviar arquivos:</b> Clique em "+ Novo" no campo de documentos na pagina inicial para anexar seus arquivos (arquivos criptografados deverão ser descriptografadosantes e serem anexados). O conteúdo será usado para responder suas perguntas.</li>
-                  <li><b>Conversas:</b> Clique em "+ Nova" no campo de conversas para organizar suas dúvidas. Cada conversa mantém seu histórico separado.</li>
-                  <li><b>Perfil:</b> Edite seu nome, nome de guerra, posto, força, OM, celular e e-mail na aba Perfil do Menu. Mantenha os dados sempre atualizados pois eles irão permitir que seus amigos o encontrem pela pesquisa do Chat.</li>
-                  <li><b>Redefinir senha:</b> Altere sua senha na opção "Redefinir senha" do Menu.</li>
-                  <li><b>Excluir conta:</b> Solicite a exclusão da sua conta na opção "Excluir Conta".</li>
-                  <li><b>Fale Conosco:</b> Veja os canais de contato para suporte e dúvidas.</li>
-                  <li><b>Privacidade:</b> Seus dados são protegidos e utilizados apenas para funcionamento da plataforma.</li>
-                </ul>
-                <div style={{ marginTop: 18, color: "#555", fontSize: 15 }}>
-                  Dúvidas adicionais? Fale com a IA ou entre em contato via Whatsapp (21 98364-2119) / email (perguntaprosub@gmail.com).
-                </div>
-              </div>
             )}
           </div>
         </main>

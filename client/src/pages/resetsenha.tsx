@@ -64,12 +64,20 @@ export default function RedefinirSenhaPage() {
           </button>
           {mensagem && <div style={{ color: mensagem.includes("sucesso") ? "green" : "red", marginTop: 6 }}>{mensagem}</div>}
         </form>
-        <button
-          onClick={() => navigate("/main")}
-          style={{ marginTop: 24, background: "#eee", color: "#222", border: "none", borderRadius: 6, padding: "8px 18px", fontSize: 15, fontWeight: 500, cursor: "pointer" }}
-        >
-          Pagina Inicial
-        </button>
+        <div style={{ display: 'flex', flexDirection: 'row', gap: 12, marginTop: 24 }}>
+          <button
+            onClick={() => navigate("/main")}
+            style={{ background: "#eee", color: "#222", border: "none", borderRadius: 6, padding: "8px 18px", fontSize: 15, fontWeight: 500, cursor: "pointer" }}
+          >
+            Pagina Inicial
+          </button>
+          <button
+            onClick={() => navigate("/config")}
+            style={{ background: "#eee", color: "#222", border: "none", borderRadius: 6, padding: "8px 18px", fontSize: 15, fontWeight: 500, cursor: "pointer" }}
+          >
+            Menu
+          </button>
+        </div>
       </div>
     </div>
   );
