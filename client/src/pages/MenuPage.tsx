@@ -160,13 +160,7 @@ export default function MenuPage() {
       setFotoPerfilUrl(publicData.publicUrl);
     }
     // Atualiza a url da foto no perfil do usuário (salva o caminho, não a publicUrl)
-    console.log('Atualizando perfil_usuario:', { foto: filePath, userId });
-    const { error: updateError } = await supabase.from('perfil_usuario').update({ foto: filePath }).eq('user_id', userId);
-    if (updateError) {
-      alert('Erro ao atualizar foto do perfil: ' + updateError.message + '\n' + JSON.stringify(updateError, null, 2));
-      setUploading(false);
-      return;
-    }
+    await supabase.from('perfil_usuario').update({ foto: filePath }).eq('user_id', userId);
     // Força reload do perfil após upload da foto para garantir consistência
     const { data: perfilDb } = await supabase
       .from('perfil_usuario')
@@ -481,20 +475,20 @@ export default function MenuPage() {
               <form style={{ display: "flex", flexDirection: "column", gap: 16 }} onSubmit={handleSalvarPerfil}>
                 <h2 style={{ margin: 0, fontSize: 22, color: 'var(--color-title, #1976d2)', textAlign: 'center', width: '100%' }}>Perfil do Usuário</h2>
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 12 }}>
-                  {/* Foto do perfil */}
-                  <div style={{ width: 96, height: 96, borderRadius: '50%', marginBottom: 8, position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#eee' }}>
-                    {fotoPerfilUrl && showFotoPerfil && !fotoPerfilUrl.includes('null') && !fotoPerfilUrl.includes('undefined') && !fotoPerfilUrl.includes('error') ? (
-                      <img
-                        src={fotoPerfilUrl + '?t=' + Date.now()}
-                        alt=""
-                        style={{ width: 96, height: 96, borderRadius: '50%', objectFit: 'cover', border: '2px solid #1976d2', position: 'absolute', top: 0, left: 0 }}
-                        onError={() => setShowFotoPerfil(false)}
-                        draggable={false}
-                      />
-                    ) : (
+                  {fotoPerfilUrl && !fotoPerfilUrl.includes('null') && !fotoPerfilUrl.includes('undefined') && !fotoPerfilUrl.includes('error') && showFotoPerfil ? (
+                    <img
+                      src={fotoPerfilUrl + '?t=' + Date.now()}
+                      alt="Foto do perfil"
+                      style={{ width: 96, height: 96, borderRadius: '50%', objectFit: 'cover', border: '2px solid #1976d2', marginBottom: 8 }}
+                      onError={() => {
+                        setShowFotoPerfil(false);
+                      }}
+                    />
+                  ) : (
+                    <div style={{ width: 96, height: 96, borderRadius: '50%', background: '#eee', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#888', fontSize: 40, marginBottom: 8 }}>
                       <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="none" viewBox="0 0 24 24"><path fill="#888" d="M12 12.75a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm0 1.5c-2.1 0-6.25 1.05-6.25 3.15v.6c0 .41.34.75.75.75h11c.41 0 .75-.34.75-.75v-.6c0-2.1-4.15-3.15-6.25-3.15Z"/></svg>
-                    )}
-                  </div>
+                    </div>
+                  )}
                   <label style={{ cursor: 'pointer', color: '#1976d2', fontWeight: 500 }}>
                     {uploading ? 'Enviando...' : 'Alterar foto'}
                     <input type="file" accept="image/*" style={{ display: 'none' }} onChange={handleUploadFoto} disabled={uploading} />

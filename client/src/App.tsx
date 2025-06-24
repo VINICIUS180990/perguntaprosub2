@@ -8,12 +8,14 @@ import ContatoPage from "./pages/ContatoPage";
 import PrivacidadePage from "./pages/PrivacidadePage";
 import SobrePage from "./pages/SobrePage";
 import TermosPage from "./pages/TermosPage";
+import LandingPage from "./pages/LandingPage";
 
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<LoginPage />} />
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/login" element={<LoginPage />} />
         <Route path="/main" element={<MainPage />} />
         <Route path="/config" element={<MenuPage />} />
         <Route path="/resetsenha" element={<RedefinirSenhaPage />} />

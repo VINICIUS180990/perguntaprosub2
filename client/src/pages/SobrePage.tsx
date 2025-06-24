@@ -1,7 +1,4 @@
-import { useNavigate } from "react-router-dom";
-
 export default function SobrePage() {
-  const navigate = useNavigate();
   return (
     <div style={{ minHeight: "100vh", width: "100vw", display: "flex", alignItems: "center", justifyContent: "center", background: "#f7f7f9" }}>
       <div style={{ width: 600, background: "#fff", color: "#222", borderRadius: 12, boxShadow: "0 2px 8px #0001", padding: 32, display: "flex", flexDirection: "column", alignItems: "center" }}>
@@ -20,20 +17,6 @@ export default function SobrePage() {
         <p style={{ margin: '24px 0 0 0', textAlign: 'center', fontWeight: 500 }}>
           Dúvidas adicionais? Fale com a IA ou entre em contato via Whatsapp (21 98364-2119) / email (perguntaprosub@gmail.com).
         </p>
-        <div style={{ display: 'flex', flexDirection: 'row', gap: 12, marginTop: 32 }}>
-          <button
-            onClick={() => navigate("/main")}
-            style={{ background: "#eee", color: "#222", border: "none", borderRadius: 6, padding: "8px 18px", fontSize: 15, fontWeight: 500, cursor: "pointer" }}
-          >
-            Pagina Inicial
-          </button>
-          <button
-            onClick={() => navigate("/config")}
-            style={{ background: "#eee", color: "#222", border: "none", borderRadius: 6, padding: "8px 18px", fontSize: 15, fontWeight: 500, cursor: "pointer" }}
-          >
-            Menu
-          </button>
-        </div>
       </div>
     </div>
   );

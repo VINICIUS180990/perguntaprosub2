@@ -1,7 +1,4 @@
-import { useNavigate } from "react-router-dom";
-
 export default function ContatoPage() {
-  const navigate = useNavigate();
   return (
     <div style={{ minHeight: "100vh", width: "100vw", display: "flex", alignItems: "center", justifyContent: "center", background: "#f7f7f9" }}>
       <div style={{ width: 380, background: "#fff", color: "#222", borderRadius: 12, boxShadow: "0 2px 8px #0001", padding: 32, display: "flex", flexDirection: "column", alignItems: "center" }}>
@@ -9,20 +6,6 @@ export default function ContatoPage() {
         <div style={{ margin: '24px 0 0 0', textAlign: 'center', width: '100%' }}>
           <p style={{ margin: 0 }}><b>Whatsapp:</b> <a href="https://wa.me/5521983642119" target="_blank" rel="noopener noreferrer">(21) 98364-2119</a></p>
           <p style={{ margin: '12px 0 0 0' }}><b>Email:</b> <a href="mailto:PERGUNTAPROSUB@GMAIL.COM">PERGUNTAPROSUB@GMAIL.COM</a></p>
-        </div>
-        <div style={{ display: 'flex', flexDirection: 'row', gap: 12, marginTop: 32 }}>
-          <button
-            onClick={() => navigate("/main")}
-            style={{ background: "#eee", color: "#222", border: "none", borderRadius: 6, padding: "8px 18px", fontSize: 15, fontWeight: 500, cursor: "pointer" }}
-          >
-            Pagina Inicial
-          </button>
-          <button
-            onClick={() => navigate("/config")}
-            style={{ background: "#eee", color: "#222", border: "none", borderRadius: 6, padding: "8px 18px", fontSize: 15, fontWeight: 500, cursor: "pointer" }}
-          >
-            Menu
-          </button>
         </div>
       </div>
     </div>
