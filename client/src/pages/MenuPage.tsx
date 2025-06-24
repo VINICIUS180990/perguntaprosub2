@@ -22,12 +22,16 @@ export default function MenuPage() {
     forca: "",
     om: "",
     celular: "",
-    email: ""
+    email: "",
+    foto: "" // Corrigido: tipo string
   });
   const [headerColor, setHeaderColor] = useState("#fff");
   const [menuUsuarioAberto, setMenuUsuarioAberto] = useState(false);
   const [menuUsuarioPos, setMenuUsuarioPos] = useState<{ top: number; left: number } | null>(null);
   const [perfilCarregando, setPerfilCarregando] = useState(true);
+  const [fotoPerfilUrl, setFotoPerfilUrl] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [showFotoPerfil, setShowFotoPerfil] = useState(true);
   const navigate = useNavigate();
 
   // Carrega cor do tema ao abrir a página
@@ -36,17 +40,16 @@ export default function MenuPage() {
     setHeaderColor(savedColor || "#fff");
   }, []);
 
-  // Carrega nome, email e perfil do usuário autenticado ao abrir a página
+  // Carrega nome, email, perfil e foto do usuário autenticado ao abrir a página
   useEffect(() => {
+    setShowFotoPerfil(true); // Sempre tenta mostrar a foto ao recarregar
     supabase.auth.getUser().then(async ({ data }) => {
       if (data?.user) {
-        // Busca perfil salvo no banco
         let { data: perfilDb } = await supabase
           .from("perfil_usuario")
           .select("*")
           .eq("user_id", data.user.id)
           .single();
-        // Se não existir, cria com dados do Auth
         if (!perfilDb) {
           const novoPerfil = {
             user_id: data.user.id,
@@ -56,21 +59,42 @@ export default function MenuPage() {
             forca: "",
             om: "",
             celular: "",
-            email: data.user.email || ""
+            email: data.user.email || "",
+            foto: ""
           };
           await supabase.from("perfil_usuario").insert(novoPerfil);
           perfilDb = novoPerfil;
         }
-        setPerfil(perfil => ({
-          ...perfil,
+        setPerfil({
           nome: perfilDb?.nome || data.user.user_metadata?.full_name || "",
           nomeguerra: perfilDb?.nomeguerra || "",
           posto: perfilDb?.posto || "",
           forca: perfilDb?.forca || "",
           om: perfilDb?.om || "",
           celular: perfilDb?.celular || "",
-          email: perfilDb?.email || data.user.email || ""
-        }));
+          email: perfilDb?.email || data.user.email || "",
+          foto: perfilDb?.foto || ""
+        });
+        // Gera uma URL pública se houver foto
+        if (perfilDb?.foto) {
+          const path = perfilDb.foto;
+          const { data: publicData } = supabase.storage.from('fotos-perfil').getPublicUrl(path);
+          setFotoPerfilUrl(publicData?.publicUrl || null);
+        } else {
+          setFotoPerfilUrl(null);
+        }
+      } else {
+        setPerfil({
+          nome: "",
+          nomeguerra: "",
+          posto: "",
+          forca: "",
+          om: "",
+          celular: "",
+          email: "",
+          foto: ""
+        });
+        setFotoPerfilUrl(null);
       }
       setPerfilCarregando(false);
     });
@@ -82,18 +106,87 @@ export default function MenuPage() {
     const { data: userData } = await supabase.auth.getUser();
     const user = userData?.user;
     if (!user) return alert("Usuário não autenticado!");
-    // Upsert (cria ou atualiza) na tabela 'perfil_usuario', garantindo conflito por user_id
+    // Prepara objeto só com campos válidos
+    const perfilToSave = {
+      user_id: user.id,
+      nome: perfil.nome || "",
+      nomeguerra: perfil.nomeguerra || "",
+      posto: perfil.posto || "",
+      forca: perfil.forca || "",
+      om: perfil.om || "",
+      celular: perfil.celular || "",
+      email: perfil.email || "",
+      foto: perfil.foto || ""
+    };
+    console.log('Enviando para upsert:', perfilToSave);
     const { error } = await supabase.from("perfil_usuario").upsert([
-      {
-        user_id: user.id,
-        ...perfil
-      }
+      perfilToSave
     ], { onConflict: 'user_id' });
     if (error) {
-      alert("Erro ao salvar perfil: " + error.message);
+      alert("Erro ao salvar perfil: " + error.message + '\n' + JSON.stringify(error, null, 2));
       return;
     }
     alert("Perfil salvo com sucesso!");
+  }
+
+  // Função para upload da foto
+  async function handleUploadFoto(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    const user = await supabase.auth.getUser();
+    const userId = user.data?.user?.id;
+    if (!userId) {
+      setUploading(false);
+      return;
+    }
+    const fileExt = file.name.split('.').pop();
+    const filePath = `${userId}/foto-perfil.${fileExt}`;
+    // Remove arquivo anterior se existir
+    await supabase.storage.from('fotos-perfil').remove([`${userId}/foto-perfil.jpg`, `${userId}/foto-perfil.png`, `${userId}/foto-perfil.jpeg`, `${userId}/foto-perfil.webp`]);
+    const { error: uploadError } = await supabase.storage.from('fotos-perfil').upload(filePath, file, { upsert: true, contentType: file.type });
+    if (uploadError) {
+      alert('Erro ao fazer upload da foto: ' + uploadError.message);
+      setUploading(false);
+      return;
+    }
+    // Gera URL pública após upload
+    const { data: publicData } = supabase.storage.from('fotos-perfil').getPublicUrl(filePath);
+    console.log(filePath, publicData?.publicUrl); // Corrigido: filePath representa o caminho da foto
+    if (!publicData?.publicUrl) {
+      alert('Erro ao gerar URL da foto: URL inválida');
+      setFotoPerfilUrl(null);
+    } else {
+      setFotoPerfilUrl(publicData.publicUrl);
+    }
+    // Atualiza a url da foto no perfil do usuário (salva o caminho, não a publicUrl)
+    console.log('Atualizando perfil_usuario:', { foto: filePath, userId });
+    const { error: updateError } = await supabase.from('perfil_usuario').update({ foto: filePath }).eq('user_id', userId);
+    if (updateError) {
+      alert('Erro ao atualizar foto do perfil: ' + updateError.message + '\n' + JSON.stringify(updateError, null, 2));
+      setUploading(false);
+      return;
+    }
+    // Força reload do perfil após upload da foto para garantir consistência
+    const { data: perfilDb } = await supabase
+      .from('perfil_usuario')
+      .select('*')
+      .eq('user_id', userId)
+      .single();
+    if (perfilDb) {
+      setPerfil(perfil => ({
+        ...perfil,
+        nome: perfilDb.nome || '',
+        nomeguerra: perfilDb.nomeguerra || '',
+        posto: perfilDb.posto || '',
+        forca: perfilDb.forca || '',
+        om: perfilDb.om || '',
+        celular: perfilDb.celular || '',
+        email: perfilDb.email || '',
+        foto: perfilDb.foto || ''
+      }));
+    }
+    setUploading(false);
   }
 
   // Formulário de alteração de senha
@@ -387,6 +480,26 @@ export default function MenuPage() {
             {opcaoSelecionada === "perfil" && (
               <form style={{ display: "flex", flexDirection: "column", gap: 16 }} onSubmit={handleSalvarPerfil}>
                 <h2 style={{ margin: 0, fontSize: 22, color: 'var(--color-title, #1976d2)', textAlign: 'center', width: '100%' }}>Perfil do Usuário</h2>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 12 }}>
+                  {fotoPerfilUrl && !fotoPerfilUrl.includes('null') && !fotoPerfilUrl.includes('undefined') && !fotoPerfilUrl.includes('error') && showFotoPerfil ? (
+                    <img
+                      src={fotoPerfilUrl + '?t=' + Date.now()}
+                      alt="Foto do perfil"
+                      style={{ width: 96, height: 96, borderRadius: '50%', objectFit: 'cover', border: '2px solid #1976d2', marginBottom: 8 }}
+                      onError={() => {
+                        setShowFotoPerfil(false);
+                      }}
+                    />
+                  ) : (
+                    <div style={{ width: 96, height: 96, borderRadius: '50%', background: '#eee', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#888', fontSize: 40, marginBottom: 8 }}>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="none" viewBox="0 0 24 24"><path fill="#888" d="M12 12.75a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm0 1.5c-2.1 0-6.25 1.05-6.25 3.15v.6c0 .41.34.75.75.75h11c.41 0 .75-.34.75-.75v-.6c0-2.1-4.15-3.15-6.25-3.15Z"/></svg>
+                    </div>
+                  )}
+                  <label style={{ cursor: 'pointer', color: '#1976d2', fontWeight: 500 }}>
+                    {uploading ? 'Enviando...' : 'Alterar foto'}
+                    <input type="file" accept="image/*" style={{ display: 'none' }} onChange={handleUploadFoto} disabled={uploading} />
+                  </label>
+                </div>
                 <input type="text" placeholder="Nome completo" value={perfil.nome} onChange={e => setPerfil({ ...perfil, nome: e.target.value })} style={{ padding: 10, borderRadius: 6, border: "1px solid #ccc", fontSize: 16 }} required />
                 <input type="text" placeholder="Nome de guerra" value={perfil.nomeguerra} onChange={e => setPerfil({ ...perfil, nomeguerra: e.target.value })} style={{ padding: 10, borderRadius: 6, border: "1px solid #ccc", fontSize: 16 }} />
                 <input type="text" placeholder="Posto/Graduação" value={perfil.posto} onChange={e => setPerfil({ ...perfil, posto: e.target.value })} style={{ padding: 10, borderRadius: 6, border: "1px solid #ccc", fontSize: 16 }} />
