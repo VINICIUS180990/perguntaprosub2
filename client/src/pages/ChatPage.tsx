@@ -631,6 +631,20 @@ const ChatPage: React.FC = () => {
               gap: 16
             }}>
               <h2 style={{ margin: 0, color: 'var(--color-title, #1976d2)', textShadow: '0 1px 4px #fff' }}>Perfil do Usuário</h2>
+              {/* Foto do perfil */}
+              <div style={{ width: 96, height: 96, borderRadius: '50%', marginBottom: 8, position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#eee' }}>
+                {perfilUsuarioExibido.foto && supabase.storage.from('fotos-perfil').getPublicUrl(perfilUsuarioExibido.foto).data.publicUrl && !supabase.storage.from('fotos-perfil').getPublicUrl(perfilUsuarioExibido.foto).data.publicUrl.includes('null') && !supabase.storage.from('fotos-perfil').getPublicUrl(perfilUsuarioExibido.foto).data.publicUrl.includes('undefined') && !supabase.storage.from('fotos-perfil').getPublicUrl(perfilUsuarioExibido.foto).data.publicUrl.includes('error') ? (
+                  <img
+                    src={supabase.storage.from('fotos-perfil').getPublicUrl(perfilUsuarioExibido.foto).data.publicUrl + '?t=' + Date.now()}
+                    alt=""
+                    style={{ width: 96, height: 96, borderRadius: '50%', objectFit: 'cover', border: '2px solid #1976d2', position: 'absolute', top: 0, left: 0 }}
+                    onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                    draggable={false}
+                  />
+                ) : (
+                  <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="none" viewBox="0 0 24 24"><path fill="#888" d="M12 12.75a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm0 1.5c-2.1 0-6.25 1.05-6.25 3.15v.6c0 .41.34.75.75.75h11c.41 0 .75-.34.75-.75v-.6c0-2.1-4.15-3.15-6.25-3.15Z"/></svg>
+                )}
+              </div>
               <div style={{ fontSize: 18, fontWeight: 600, color: '#222', textShadow: '0 1px 4px #fff' }}>{perfilUsuarioExibido.nome}</div>
               <div style={{ fontSize: 16, color: '#555' }}>Nome de guerra: {perfilUsuarioExibido.nomeguerra || '-'}</div>
               <div style={{ fontSize: 16, color: '#555' }}>Email: {perfilUsuarioExibido.email}</div>
