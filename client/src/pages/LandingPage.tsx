@@ -46,7 +46,10 @@ export default function LandingPage() {
   const [enviando, setEnviando] = useState(false);
   const inputMensagemRef = useRef<HTMLInputElement>(null);
   const mensagensEndRef = useRef<HTMLDivElement>(null);
-  const [arquivoSelecionado, setArquivoSelecionado] = useState<string | null>(null);
+  const [arquivoSelecionado, setArquivoSelecionado] = useState<string | null>(() => {
+    const saved = sessionStorage.getItem("arquivoSelecionado");
+    return saved || null;
+  });
   // Estado do modal de tema
   const [showTemaModal, setShowTemaModal] = useState(false);
   const [temaSelecionado, setTemaSelecionado] = useState<string | null>(null);
@@ -76,15 +79,30 @@ export default function LandingPage() {
     sessionStorage.setItem("conversas", JSON.stringify(conversas));
   }, [conversas]);
   useEffect(() => {
-    sessionStorage.setItem("mensagens", JSON.stringify(mensagens));
-  }, [mensagens]);
+    if (conversaAtiva) {
+      sessionStorage.setItem(`mensagens_${conversaAtiva}`, JSON.stringify(mensagens));
+    }
+  }, [mensagens, conversaAtiva]);
+  useEffect(() => {
+    if (arquivoSelecionado) {
+      sessionStorage.setItem("arquivoSelecionado", arquivoSelecionado);
+    } else {
+      sessionStorage.removeItem("arquivoSelecionado");
+    }
+  }, [arquivoSelecionado]);
 
   // Limpa tudo ao fechar/atualizar a aba
   useEffect(() => {
     const clearSession = () => {
       sessionStorage.removeItem("arquivos");
       sessionStorage.removeItem("conversas");
-      sessionStorage.removeItem("mensagens");
+      sessionStorage.removeItem("arquivoSelecionado");
+      // Remove todas as mensagens das conversas
+      Object.keys(sessionStorage).forEach(key => {
+        if (key.startsWith("mensagens_")) {
+          sessionStorage.removeItem(key);
+        }
+      });
     };
     window.addEventListener("beforeunload", clearSession);
     return () => window.removeEventListener("beforeunload", clearSession);
@@ -225,34 +243,53 @@ export default function LandingPage() {
   }
   // Função para buscar contexto dos documentos anexos (qualquer formato)
   async function buscarContextoPergunta(): Promise<string | null> {
-    if (!arquivoSelecionado) {
+    // Aguarda mais tempo para garantir que os estados estejam sincronizados
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    // Tenta novamente se não houver arquivos carregados na primeira tentativa
+    const arquivosAtuais: Arquivo[] = arquivos.length > 0 ? arquivos : JSON.parse(sessionStorage.getItem("arquivos") || "[]");
+    const arquivoAtualSelecionado = arquivoSelecionado || sessionStorage.getItem("arquivoSelecionado");
+    
+    console.log("Debug - arquivoSelecionado:", arquivoAtualSelecionado);
+    console.log("Debug - arquivos disponíveis:", arquivosAtuais.map((a: Arquivo) => a.nome));
+    
+    if (!arquivoAtualSelecionado) {
       // Nenhum arquivo selecionado: IA deve pedir para o usuário escolher
+      console.log("Debug - Nenhum arquivo selecionado");
       return null;
     }
     // Busca apenas o arquivo selecionado
-    const arquivoObj = arquivos.find(a => a.nome === arquivoSelecionado);
+    const arquivoObj = arquivosAtuais.find((a: Arquivo) => a.nome === arquivoAtualSelecionado);
+    console.log("Debug - arquivo encontrado:", arquivoObj ? "SIM" : "NÃO");
+    
     if (!arquivoObj) return null;
     // Recupera o arquivo do sessionStorage (DataURL)
     const url = arquivoObj.url;
     let texto = "";
     try {
       if (url.startsWith("data:application/pdf")) {
+        console.log("Debug - Processando PDF");
         const response = await fetch(url);
         const blob = await response.blob();
         texto = await extrairTextoPDF(blob);
       } else if (url.startsWith("data:application/vnd.openxmlformats-officedocument.wordprocessingml.document")) {
+        console.log("Debug - Processando DOCX");
         const response = await fetch(url);
         const blob = await response.blob();
         texto = await extrairTextoDOCX(blob);
       } else if (url.startsWith("data:text/plain")) {
+        console.log("Debug - Processando TXT");
         const response = await fetch(url);
         texto = await response.text();
       } else {
+        console.log("Debug - Formato não suportado:", url.substring(0, 50));
         return null;
       }
     } catch (e) {
+      console.log("Debug - Erro ao processar arquivo:", e);
       return null;
     }
+    console.log("Debug - Texto extraído (primeiros 100 chars):", texto.substring(0, 100));
     return `Arquivo selecionado: ${arquivoObj.nome}\n${texto}`;
   }
 
@@ -314,12 +351,17 @@ As formas de contato oficiais são pelo email perguntaprosub@gmail.com e pelo wh
 
     // Busca contexto nos documentos
     const contexto = await buscarContextoPergunta();
+    console.log("Debug - Contexto retornado:", contexto ? "TEM CONTEXTO" : "SEM CONTEXTO");
+    console.log("Debug - Tamanho do contexto:", contexto ? contexto.length : 0);
+    
     let contextoPrompt = "";
     if (contexto) {
       contextoPrompt = `Conteúdo do arquivo selecionado (use para responder):\n${contexto}\n\n`;
     } else {
       contextoPrompt = "Nenhum arquivo foi selecionado para pesquisa. Por favor, peça ao usuário para selecionar um arquivo na lista de anexos antes de continuar a consulta.\n\n";
     }
+    
+    console.log("Debug - Prompt final sendo enviado para IA:", contextoPrompt.substring(0, 200));
 
     try {
       const respostaGemini = await geminiChat(systemPrompt + contextoPrompt, historicoApi);
@@ -688,6 +730,13 @@ As formas de contato oficiais são pelo email perguntaprosub@gmail.com e pelo wh
                       onClick={e => {
                         if ((e.target as HTMLElement).closest('button')) return;
                         setConversaAtiva(conversa.id);
+                        // Carregar mensagens da conversa
+                        const mensagensSalvas = sessionStorage.getItem(`mensagens_${conversa.id}`);
+                        if (mensagensSalvas) {
+                          setMensagens(JSON.parse(mensagensSalvas));
+                        } else {
+                          setMensagens([]);
+                        }
                       }}
                     >
                       <span style={{ color: "#222", flex: 1 }}>{conversa.nome}</span>
@@ -850,12 +899,17 @@ As formas de contato oficiais são pelo email perguntaprosub@gmail.com e pelo wh
 
                   // Busca contexto nos documentos
                   const contexto = await buscarContextoPergunta();
+                  console.log("Debug FORM - Contexto retornado:", contexto ? "TEM CONTEXTO" : "SEM CONTEXTO");
+                  console.log("Debug FORM - Tamanho do contexto:", contexto ? contexto.length : 0);
+                  
                   let contextoPrompt = "";
                   if (contexto) {
                     contextoPrompt = `Conteúdo do arquivo selecionado (use para responder):\n${contexto}\n\n`;
                   } else {
                     contextoPrompt = "Nenhum arquivo foi selecionado para pesquisa. Por favor, peça ao usuário para selecionar um arquivo na lista de anexos antes de continuar a consulta.\n\n";
                   }
+                  
+                  console.log("Debug FORM - Prompt final sendo enviado para IA:", contextoPrompt.substring(0, 200));
 
                   try {
                     const respostaGemini = await geminiChat(systemPrompt + contextoPrompt, historicoApi);
@@ -864,7 +918,7 @@ As formas de contato oficiais são pelo email perguntaprosub@gmail.com e pelo wh
                     setMensagens(prev => [...prev, { autor: 'bot' as const, texto: `Erro ao consultar a Gemini: ${err}` }]);
                   }
                   setEnviando(false);
-                }, 100);
+                }, 300);
               }}>
                 <input
                   ref={inputMensagemRef}
