@@ -172,7 +172,7 @@ export default function LandingPage() {
     const nome = prompt("Nome da nova conversa:");
     if (!nome) return;
     const novaId = Date.now().toString();
-    setConversas([...conversas, { nome, id: novaId }]);
+    setConversas([{ nome, id: novaId }, ...conversas]);
     setConversaAtiva(novaId);
     const saudacao = { autor: 'bot' as const, texto: 'A princípio é NÃO boysinho(a)! Mas diga lá, qual a sua onça?' };
     setMensagens([saudacao]);
@@ -804,7 +804,7 @@ As formas de contato oficiais são pelo email perguntaprosub@gmail.com e pelo wh
                 // Cria nova conversa automaticamente
                 const novaId = Date.now().toString();
                 const nome = `Conversa ${conversas.length + 1}`;
-                setConversas([...conversas, { nome, id: novaId }]);
+                setConversas([{ nome, id: novaId }, ...conversas]);
                 setConversaAtiva(novaId);
                 const saudacao = { autor: 'bot' as const, texto: 'A princípio é NÃO boysinho(a)! Mas diga lá, qual a sua onça?' };
                 const novaMensagemUsuario = { autor: 'user' as const, texto: inputMensagem };
