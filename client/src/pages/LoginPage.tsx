@@ -243,8 +243,11 @@ export default function LoginPage() {
                   </a>
                 </div>
                 {showReset && (
-                  <div style={{ background: "#fff", border: "1px solid #ddd", borderRadius: 8, padding: 20, marginTop: 16, boxShadow: "0 2px 8px #0002", maxWidth: 340 }}>
-                    <form onSubmit={handleResetPassword}>
+                  <div
+                    style={{ background: "#fff", border: "1px solid #ddd", borderRadius: 8, padding: 20, marginTop: 16, boxShadow: "0 2px 8px #0002", maxWidth: 340 }}
+                    onClick={() => setShowReset(false)}
+                  >
+                    <form onClick={e => e.stopPropagation()} onSubmit={handleResetPassword}>
                       <div style={{ fontWeight: 600, marginBottom: 8 }}>Redefinir senha</div>
                       <input
                         type="email"

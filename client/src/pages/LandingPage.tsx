@@ -405,26 +405,45 @@ As formas de contato oficiais são pelo email perguntaprosub@gmail.com e pelo wh
               </svg>
             </span>
             {menuConfigAberto && (
-              <div style={{
-                position: "absolute",
-                right: 0,
-                top: 44,
-                background: "#fff",
-                border: "1px solid #ddd",
-                borderRadius: 8,
-                boxShadow: "0 2px 8px #0003",
-                zIndex: 9999,
-                minWidth: 180,
-                fontSize: 15,
-                padding: 0,
-                display: "flex",
-                flexDirection: "column"
-              }}>
+              <div
+                style={{
+                  position: "fixed",
+                  right: 32,
+                  top: 90,
+                  background: "#fff",
+                  border: "1px solid #ddd",
+                  borderRadius: 8,
+                  boxShadow: "0 2px 8px #0003",
+                  zIndex: 9999,
+                  minWidth: 180,
+                  fontSize: 15,
+                  padding: 0,
+                  display: "flex",
+                  flexDirection: "column"
+                }}
+                ref={menuRef}
+                onClick={e => e.stopPropagation()}
+              >
                 <button style={menuBtnStyle} onClick={() => { setMenuConfigAberto(false); window.location.href = 'http://localhost:5175/sobre'; }}>Sobre</button>
                 <button style={menuBtnStyle} onClick={() => { setMenuConfigAberto(false); window.location.href = 'http://localhost:5175/termos'; }}>Termos de Uso</button>
                 <button style={menuBtnStyle} onClick={() => { setMenuConfigAberto(false); window.location.href = 'http://localhost:5175/contato'; }}>Contato</button>
                 <button style={menuBtnStyle} onClick={() => { setMenuConfigAberto(false); window.location.href = 'http://localhost:5175/privacidade'; }}>Política de Privacidade</button>
               </div>
+            )}
+            {/* Fecha o menu ao clicar fora */}
+            {menuConfigAberto && (
+              <div
+                style={{
+                  position: "fixed",
+                  top: 0,
+                  left: 0,
+                  width: "100vw",
+                  height: "100vh",
+                  zIndex: 9998,
+                  background: "transparent"
+                }}
+                onClick={() => setMenuConfigAberto(false)}
+              />
             )}
           </div>
         </div>
@@ -903,31 +922,37 @@ As formas de contato oficiais são pelo email perguntaprosub@gmail.com e pelo wh
       </div>
       {/* Modal de escolha de tema */}
       {showTemaModal && (
-        <div style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          width: "100vw",
-          height: "100vh",
-          background: "rgba(0,0,0,0.18)",
-          zIndex: 99999,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center"
-        }}>
-          <div style={{
-            background: "#fff",
-            borderRadius: 18,
-            boxShadow: "0 4px 32px #0002",
-            padding: "38px 32px 32px 32px",
-            minWidth: 540,
-            maxWidth: 650,
-            width: 600,
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100vw",
+            height: "100vh",
+            background: "rgba(0,0,0,0.18)",
+            zIndex: 99999,
             display: "flex",
-            flexDirection: "column",
             alignItems: "center",
-            position: "relative"
-          }}>
+            justifyContent: "center"
+          }}
+          onClick={() => setShowTemaModal(false)}
+        >
+          <div
+            style={{
+              background: "#fff",
+              borderRadius: 18,
+              boxShadow: "0 4px 32px #0002",
+              padding: "38px 32px 32px 32px",
+              minWidth: 540,
+              maxWidth: 650,
+              width: 600,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              position: "relative"
+            }}
+            onClick={e => e.stopPropagation()}
+          >
             <img
               src="/simbolo.png"
               alt="Símbolo"
