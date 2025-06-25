@@ -162,9 +162,15 @@ export default function LandingPage() {
       const url = reader.result as string;
       setArquivos(prev => {
         const novosArquivos = [...prev, { nome: file.name, url }];
-        processarArquivoSelecionado(file.name); // Seleciona e processa automaticamente o novo arquivo
         return novosArquivos;
       });
+      
+      // Aguarda um pequeno delay para garantir que o estado seja atualizado, 
+      // então seleciona e processa automaticamente o novo arquivo
+      setTimeout(() => {
+        processarArquivoSelecionado(file.name);
+      }, 100);
+      
       setLoading(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
     };
@@ -245,8 +251,16 @@ export default function LandingPage() {
   async function processarArquivoSelecionado(nome: string) {
     setArquivoSelecionado(nome);
     
-    // Busca o contexto do arquivo selecionado imediatamente
-    const arquivoObj = arquivos.find(a => a.nome === nome);
+    // Aguarda um pouco para garantir que os estados estejam sincronizados
+    await new Promise(resolve => setTimeout(resolve, 200));
+    
+    // Busca o arquivo nos estados atuais ou no sessionStorage
+    const arquivosAtuais = arquivos.length > 0 ? arquivos : JSON.parse(sessionStorage.getItem("arquivos") || "[]");
+    const arquivoObj = arquivosAtuais.find((a: any) => a.nome === nome);
+    
+    console.log("Debug - Processando arquivo:", nome);
+    console.log("Debug - Arquivo encontrado:", arquivoObj ? "SIM" : "NÃO");
+    
     if (!arquivoObj) return;
     
     let texto = "";
