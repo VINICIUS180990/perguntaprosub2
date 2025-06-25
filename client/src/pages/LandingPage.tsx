@@ -162,7 +162,7 @@ export default function LandingPage() {
       const url = reader.result as string;
       setArquivos(prev => {
         const novosArquivos = [...prev, { nome: file.name, url }];
-        setArquivoSelecionado(file.name); // Seleciona automaticamente o novo arquivo
+        processarArquivoSelecionado(file.name); // Seleciona e processa automaticamente o novo arquivo
         return novosArquivos;
       });
       setLoading(false);
@@ -241,6 +241,40 @@ export default function LandingPage() {
     const { value } = await mammoth.extractRawText({ arrayBuffer });
     return value;
   }
+  // Função para processar arquivo imediatamente quando selecionado
+  async function processarArquivoSelecionado(nome: string) {
+    setArquivoSelecionado(nome);
+    
+    // Busca o contexto do arquivo selecionado imediatamente
+    const arquivoObj = arquivos.find(a => a.nome === nome);
+    if (!arquivoObj) return;
+    
+    let texto = "";
+    try {
+      if (arquivoObj.url.startsWith("data:application/pdf")) {
+        console.log("Debug - Pré-carregando PDF");
+        const response = await fetch(arquivoObj.url);
+        const blob = await response.blob();
+        texto = await extrairTextoPDF(blob);
+      } else if (arquivoObj.url.startsWith("data:application/vnd.openxmlformats-officedocument.wordprocessingml.document")) {
+        console.log("Debug - Pré-carregando DOCX");
+        const response = await fetch(arquivoObj.url);
+        const blob = await response.blob();
+        texto = await extrairTextoDOCX(blob);
+      } else if (arquivoObj.url.startsWith("data:text/plain")) {
+        console.log("Debug - Pré-carregando TXT");
+        const response = await fetch(arquivoObj.url);
+        texto = await response.text();
+      } else {
+        console.log("Debug - Formato não suportado para pré-carregamento:", arquivoObj.url.substring(0, 50));
+        return;
+      }
+      console.log(`Debug - Arquivo pré-carregado: ${nome} | Tamanho: ${texto.length} caracteres`);
+    } catch (e) {
+      console.log("Debug - Erro ao pré-carregar arquivo:", e);
+    }
+  }
+
   // Função para buscar contexto dos documentos anexos (qualquer formato)
   async function buscarContextoPergunta(): Promise<string | null> {
     // Aguarda mais tempo para garantir que os estados estejam sincronizados
@@ -600,7 +634,7 @@ As formas de contato oficiais são pelo email perguntaprosub@gmail.com e pelo wh
                       type="radio"
                       name="arquivo-pesquisa"
                       checked={arquivoSelecionado === arq.nome}
-                      onChange={() => setArquivoSelecionado(arq.nome)}
+                      onChange={() => processarArquivoSelecionado(arq.nome)}
                       style={{ marginRight: 8 }}
                       title="Selecionar para pesquisa"
                     />
@@ -888,7 +922,7 @@ Se a resposta envolver tabelas, transcreva o conteúdo da tabela relevante em te
 Se o usuário pedir um procedimento, detalhe apenas o que está no documento, sem adicionar etapas externas.
 Seja sempre o PerguntaProSub, o Suboficial virtual pronto para ajudar o usuário em qualquer missão dentro da plataforma.
 Se não houver nenhum documento selecionado no campo de documentos, peça ao usuário para selecionar um arquivo na lista de anexos antes de continuar a consulta ou, caso já tenha selecionado, peça para o usuario aguardar alguns segundos enquanto o sistema interpreta o documento.
-
+Não exagere nos jargões militares, mantenha uma linguagem acessível e amigável.
 Se o usuário fizer perguntas que não tenham relação com documentos, normas ou funcionalidades do sistema, converse normalmente, use bom humor, piadas leves e descontração, mantendo sempre o respeito.
 
 Manual de uso do PerguntaProSub:
