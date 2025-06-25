@@ -142,7 +142,11 @@ export default function LandingPage() {
     const reader = new FileReader();
     reader.onload = () => {
       const url = reader.result as string;
-      setArquivos(prev => [...prev, { nome: file.name, url }]);
+      setArquivos(prev => {
+        const novosArquivos = [...prev, { nome: file.name, url }];
+        setArquivoSelecionado(file.name); // Seleciona automaticamente o novo arquivo
+        return novosArquivos;
+      });
       setLoading(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
     };
@@ -253,11 +257,21 @@ export default function LandingPage() {
   }
 
   // Função para enviar mensagem para a Gemini
-  async function enviarMensagem() {
-    if (!inputMensagem.trim()) return;
-    const novaMensagem = { autor: 'user' as const, texto: inputMensagem };
-    const mensagensAtualizadas = [...mensagens, novaMensagem];
-    setMensagens(mensagensAtualizadas);
+  async function enviarMensagem(mensagemTexto?: string) {
+    let mensagensAtualizadas = mensagens;
+    
+    // Se foi passado um texto de mensagem, adiciona uma nova mensagem do usuário
+    if (mensagemTexto?.trim()) {
+      const novaMensagem = { autor: 'user' as const, texto: mensagemTexto };
+      mensagensAtualizadas = [...mensagens, novaMensagem];
+      setMensagens(mensagensAtualizadas);
+    }
+    
+    // Se não há mensagens ou a última mensagem já é do bot, não faz nada
+    if (mensagensAtualizadas.length === 0 || mensagensAtualizadas[mensagensAtualizadas.length - 1].autor === 'bot') {
+      return;
+    }
+    
     setEnviando(true);
 
     // Monta o histórico para Gemini
@@ -316,7 +330,6 @@ As formas de contato oficiais são pelo email perguntaprosub@gmail.com e pelo wh
       setMensagens(mensagensComBot);
     }
     setEnviando(false);
-    setInputMensagem("");
   }
 
   // Foca no input após enviar mensagem
@@ -855,7 +868,7 @@ As formas de contato oficiais são pelo email perguntaprosub@gmail.com e pelo wh
                 ))}
                 <div ref={mensagensEndRef} />
               </div>
-              <form style={{ display: "flex", gap: 8 }} onSubmit={e => { e.preventDefault(); enviarMensagem(); }}>
+              <form style={{ display: "flex", gap: 8 }} onSubmit={e => { e.preventDefault(); if (inputMensagem.trim()) { enviarMensagem(inputMensagem); setInputMensagem(""); } }}>
                 <input
                   ref={inputMensagemRef}
                   type="text"
