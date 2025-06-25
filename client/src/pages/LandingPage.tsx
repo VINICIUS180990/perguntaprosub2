@@ -14,7 +14,7 @@ type Conversa = { id: string; nome: string };
 type Mensagem = { autor: 'user' | 'bot'; texto: string };
 
 export default function LandingPage() {
-  const [headerColor] = useState("#fff");
+  const [headerColor, setHeaderColor] = useState("#fff");
   const [showDocMenu, setShowDocMenu] = useState(false);
   const [loading, setLoading] = useState(false);
   const [arquivos, setArquivos] = useState<Arquivo[]>(() => {
@@ -47,6 +47,26 @@ export default function LandingPage() {
   const inputMensagemRef = useRef<HTMLInputElement>(null);
   const mensagensEndRef = useRef<HTMLDivElement>(null);
   const [arquivoSelecionado, setArquivoSelecionado] = useState<string | null>(null);
+  // Estado do modal de tema
+  const [showTemaModal, setShowTemaModal] = useState(false);
+  const [temaSelecionado, setTemaSelecionado] = useState<string | null>(null);
+
+  // Mapeamento de cor do header para cada tema
+  const headerCores: Record<string, string> = {
+    "Marinha": "#e5e5e5",
+    "Exército": "#4d5c2b",
+    "Aeronáutica": "#305a91",
+    "Polícia": "#666666",
+    "Bombeiro": "#b08c3e"
+  };
+
+  const temas = [
+    { nome: "Marinha", cor: "#e5e5e5", borda: "#bbb" },
+    { nome: "Exército", cor: "#4d5c2b", borda: "#0d47a1" },
+    { nome: "Aeronáutica", cor: "#305a91", borda: "#2e7d32" },
+    { nome: "Polícia", cor: "#666666", borda: "#c62828" },
+    { nome: "Bombeiro", cor: "#b08c3e", borda: "#f57f17" },
+  ];
 
   // Salva arquivos, conversas e mensagens na sessionStorage
   useEffect(() => {
@@ -320,6 +340,17 @@ As formas de contato oficiais são pelo email perguntaprosub@gmail.com e pelo wh
     borderRadius: 0,
     transition: "background 0.2s",
   } as React.CSSProperties;
+
+  function handleEscolherTema(tema: string) {
+    setTemaSelecionado(tema);
+    setHeaderColor(headerCores[tema] || "#fff");
+    setShowTemaModal(false);
+  }
+
+  useEffect(() => {
+    const timer = setTimeout(() => setShowTemaModal(true), 2000);
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
     <div style={{ height: "100vh", width: "100vw", background: headerColor, overflow: "hidden" }}>
@@ -870,6 +901,73 @@ As formas de contato oficiais são pelo email perguntaprosub@gmail.com e pelo wh
           </footer>
         </main>
       </div>
+      {/* Modal de escolha de tema */}
+      {showTemaModal && (
+        <div style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          width: "100vw",
+          height: "100vh",
+          background: "rgba(0,0,0,0.18)",
+          zIndex: 99999,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center"
+        }}>
+          <div style={{
+            background: "#fff",
+            borderRadius: 18,
+            boxShadow: "0 4px 32px #0002",
+            padding: "38px 32px 32px 32px",
+            minWidth: 540,
+            maxWidth: 650,
+            width: 600,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            position: "relative"
+          }}>
+            <img
+              src="/simbolo.png"
+              alt="Símbolo"
+              style={{ width: 120, height: 120, marginBottom: 12, borderRadius: "50%" }}
+            />
+            <div style={{ fontWeight: 700, fontSize: 32, color: "#000", marginBottom: 0, textAlign: "center" }}>PerguntaProSub</div>
+            <div style={{ height: 12 }} />
+            <div style={{ color: "#000", fontWeight: 500, marginBottom: 8, fontSize: 18, textAlign: "center" }}>
+              Tá na onça né Boysinho?
+            </div>
+            <div style={{ color: "#000", marginBottom: 24, fontSize: 14, textAlign: "center" }}>
+              A primeira Inteligência Artificial voltada para o Universo Militar!
+            </div>
+            <div style={{ fontWeight: 600, marginBottom: 12, color: "#000" }}>Escolha seu tema:</div>
+            <div style={{ display: "flex", justifyContent: "center", gap: 32, marginBottom: 8 }}>
+              {temas.map((t) => (
+                <div key={t.nome} style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                  <button
+                    style={{
+                      width: 48,
+                      height: 48,
+                      borderRadius: "50%",
+                      border: temaSelecionado === t.nome ? `3px solid ${t.borda}` : `2px solid #bbb`,
+                      background: t.cor,
+                      cursor: "pointer",
+                      marginBottom: 6,
+                      boxShadow: "0 1px 4px #0001",
+                      outline: "none",
+                      transition: "border 0.2s"
+                    }}
+                    onClick={() => handleEscolherTema(t.nome)}
+                    title={t.nome}
+                  />
+                  <span style={{ color: "#222", fontSize: 15, fontWeight: 500, textAlign: "center", marginTop: 2 }}>{t.nome}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
