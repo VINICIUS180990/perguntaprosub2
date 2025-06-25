@@ -73,7 +73,7 @@ export default function LoginPage() {
     if (error) {
       alert("Erro ao criar conta: " + error.message);
     } else {
-      alert("Conta criada! Verifique seu email para confirmar.");
+      alert("Conta criada! Verifique seu email para mais informações.");
       setTab("login");
     }
   }
