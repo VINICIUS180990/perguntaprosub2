@@ -447,49 +447,6 @@ export default function LoginPage() {
               <button style={buttonStyle} onClick={handleRegister} disabled={loading}>
                 {loading ? "Cadastrando..." : "Cadastrar"}
               </button>
-              {/* Botão de teste temporário */}
-              <button 
-                style={{...buttonStyle, background: "#ff6b35", marginTop: 5}}
-                onClick={async () => {
-                  console.log("=== TESTE DE CONEXÃO SUPABASE ===");
-                  
-                  try {
-                    // Teste 1: Verificar se consegue conectar
-                    const { data: session } = await supabase.auth.getSession();
-                    console.log("Sessão atual:", session);
-                    
-                    // Teste 2: Verificar se consegue acessar auth
-                    const { data: user } = await supabase.auth.getUser();
-                    console.log("Usuário atual:", user);
-                    
-                    // Teste 3: Tentar um signup simples
-                    const testEmail = "teste123@exemplo.com";
-                    const { data, error } = await supabase.auth.signUp({
-                      email: testEmail,
-                      password: "123456789"
-                    });
-                    
-                    console.log("Resultado teste signup:", { data, error });
-                    
-                    if (error) {
-                      alert(`Erro no teste: ${error.message}`);
-                    } else {
-                      alert("Teste OK! Verifique o console para detalhes.");
-                    }
-                    
-                    // Limpar teste se criou usuário
-                    if (data.user) {
-                      await supabase.auth.admin.deleteUser(data.user.id);
-                    }
-                    
-                  } catch (err) {
-                    console.error("Erro no teste:", err);
-                    alert(`Erro inesperado: ${err}`);
-                  }
-                }}
-              >
-                🔧 Teste Conexão
-              </button>
             </>
           )}
         </div>
