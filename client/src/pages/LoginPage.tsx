@@ -50,31 +50,99 @@ export default function LoginPage() {
   }
 
   async function handleRegister() {
-    setLoading(true);
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password: senha,
-      options: { data: { full_name: nome, nomeguerra } }
-    });
-    if (!error && data.user) {
-      // Insere perfil do usuário na tabela perfil_usuario
-      await inserirPerfilUsuario({
-        user_id: data.user.id,
-        nome,
-        nomeguerra,
-        posto: "",
-        forca: "",
-        om: "",
-        celular: "",
-        email
-      });
+    if (!email || !senha || !nome || !nomeguerra) {
+      alert("Por favor, preencha todos os campos obrigatórios.");
+      return;
     }
-    setLoading(false);
-    if (error) {
-      alert("Erro ao criar conta: " + error.message);
-    } else {
-      alert("Conta criada! Verifique seu email para mais informações.");
-      setTab("login");
+
+    if (senha.length < 6) {
+      alert("A senha deve ter pelo menos 6 caracteres.");
+      return;
+    }
+
+    setLoading(true);
+    
+    try {
+      console.log("=== DEBUG REGISTRO ===");
+      console.log("Email:", email);
+      console.log("Nome:", nome);
+      console.log("Nome de guerra:", nomeguerra);
+      
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password: senha,
+        options: { 
+          data: { 
+            full_name: nome, 
+            nomeguerra: nomeguerra 
+          } 
+        }
+      });
+      
+      console.log("Resposta do signUp:", { data, error });
+      
+      if (error) {
+        console.error("Erro no signUp:", error);
+        let errorMessage = "Erro ao criar conta: ";
+        
+        if (error.message.includes("already registered")) {
+          errorMessage = "Este email já está cadastrado. Tente fazer login ou redefinir a senha.";
+        } else if (error.message.includes("invalid email")) {
+          errorMessage = "Email inválido. Verifique o formato do email.";
+        } else if (error.message.includes("password")) {
+          errorMessage = "Senha muito fraca. Use pelo menos 6 caracteres.";
+        } else {
+          errorMessage += error.message;
+        }
+        
+        alert(errorMessage);
+        setLoading(false);
+        return;
+      }
+      
+      if (data.user) {
+        console.log("Usuário criado:", data.user);
+        
+        // Insere perfil do usuário na tabela perfil_usuario
+        try {
+          const perfilResult = await inserirPerfilUsuario({
+            user_id: data.user.id,
+            nome,
+            nomeguerra,
+            posto: "",
+            forca: "",
+            om: "",
+            celular: "",
+            email
+          });
+          
+          console.log("Resultado inserção perfil:", perfilResult);
+          
+          if (perfilResult.error) {
+            console.error("Erro ao inserir perfil:", perfilResult.error);
+            // Não bloqueia o cadastro, mas registra o erro
+          }
+        } catch (profileError) {
+          console.error("Erro inesperado ao inserir perfil:", profileError);
+        }
+        
+        alert("Conta criada com sucesso! Verifique seu email para confirmar o cadastro.");
+        setTab("login");
+        // Limpar campos
+        setEmail("");
+        setSenha("");
+        setNome("");
+        setNomeguerra("");
+      } else {
+        console.warn("signUp retornou sucesso mas sem usuário");
+        alert("Houve um problema no cadastro. Tente novamente.");
+      }
+      
+    } catch (unexpectedError) {
+      console.error("Erro inesperado no registro:", unexpectedError);
+      alert("Erro inesperado. Tente novamente.");
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -378,6 +446,49 @@ export default function LoginPage() {
               />
               <button style={buttonStyle} onClick={handleRegister} disabled={loading}>
                 {loading ? "Cadastrando..." : "Cadastrar"}
+              </button>
+              {/* Botão de teste temporário */}
+              <button 
+                style={{...buttonStyle, background: "#ff6b35", marginTop: 5}}
+                onClick={async () => {
+                  console.log("=== TESTE DE CONEXÃO SUPABASE ===");
+                  
+                  try {
+                    // Teste 1: Verificar se consegue conectar
+                    const { data: session } = await supabase.auth.getSession();
+                    console.log("Sessão atual:", session);
+                    
+                    // Teste 2: Verificar se consegue acessar auth
+                    const { data: user } = await supabase.auth.getUser();
+                    console.log("Usuário atual:", user);
+                    
+                    // Teste 3: Tentar um signup simples
+                    const testEmail = "teste123@exemplo.com";
+                    const { data, error } = await supabase.auth.signUp({
+                      email: testEmail,
+                      password: "123456789"
+                    });
+                    
+                    console.log("Resultado teste signup:", { data, error });
+                    
+                    if (error) {
+                      alert(`Erro no teste: ${error.message}`);
+                    } else {
+                      alert("Teste OK! Verifique o console para detalhes.");
+                    }
+                    
+                    // Limpar teste se criou usuário
+                    if (data.user) {
+                      await supabase.auth.admin.deleteUser(data.user.id);
+                    }
+                    
+                  } catch (err) {
+                    console.error("Erro no teste:", err);
+                    alert(`Erro inesperado: ${err}`);
+                  }
+                }}
+              >
+                🔧 Teste Conexão
               </button>
             </>
           )}
