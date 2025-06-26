@@ -81,17 +81,78 @@ export default function LoginPage() {
   async function handleResetPassword(e: React.FormEvent) {
     e.preventDefault();
     setResetMsg("");
+    
     if (!resetEmail) {
       setResetMsg("Digite seu email para redefinir a senha.");
       return;
     }
-    const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
-      redirectTo: window.location.origin + "/reset"
-    });
-    if (error) {
-      setResetMsg("Erro ao enviar email de redefinição: " + error.message);
-    } else {
-      setResetMsg("Enviamos um link de redefinição para seu email.");
+    
+    // Validação básica de email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(resetEmail)) {
+      setResetMsg("Por favor, digite um email válido.");
+      return;
+    }
+    
+    setResetMsg("⏳ Enviando email...");
+    
+    try {
+      console.log("=== DEBUG RESET PASSWORD ===");
+      console.log("Email:", resetEmail);
+      console.log("URL de redirecionamento:", `${window.location.origin}/resetsenha`);
+      
+      // Primeiro, vamos verificar se o usuário existe
+      const { data: users, error: listError } = await supabase.auth.admin.listUsers();
+      if (listError) {
+        console.log("Erro ao listar usuários (normal se não for admin):", listError);
+      } else {
+        const userExists = users.users.some(user => user.email === resetEmail);
+        console.log("Usuário existe no sistema:", userExists);
+      }
+      
+      const { data, error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
+        redirectTo: `${window.location.origin}/resetsenha`
+      });
+      
+      console.log("Resposta do Supabase:", { data, error });
+      
+      if (error) {
+        console.error("Erro detalhado:", {
+          message: error.message,
+          status: error.status,
+          name: error.name
+        });
+        
+        // Mensagens de erro mais específicas baseadas no tipo de erro
+        if (error.message.includes("rate limit") || error.message.includes("too many")) {
+          setResetMsg("❌ Muitas tentativas. Aguarde alguns minutos antes de tentar novamente.");
+        } else if (error.message.includes("Invalid email")) {
+          setResetMsg("❌ Email inválido. Verifique o endereço digitado.");
+        } else if (error.message.includes("not found") || error.message.includes("User not found")) {
+          setResetMsg("❌ Email não encontrado. Verifique se você tem uma conta com este email.");
+        } else if (error.message.includes("For security purposes")) {
+          setResetMsg("⚠️ Por segurança, aguarde alguns minutos antes de tentar novamente.");
+        } else if (error.message.includes("Email not confirmed")) {
+          setResetMsg("❌ Email não confirmado. Verifique se confirmou seu cadastro primeiro.");
+        } else {
+          setResetMsg(`❌ Erro: ${error.message}`);
+        }
+      } else {
+        console.log("✅ Email de reset enviado com sucesso!");
+        console.log("Data retornada:", data);
+        
+        setResetMsg("✅ Email enviado com sucesso! 📧\n\nVerifique:\n• Caixa de entrada\n• Pasta de spam/lixo eletrônico\n• Pode demorar até 5 minutos para chegar");
+        setResetEmail("");
+        
+        // Fecha o modal após 8 segundos para dar tempo de ler
+        setTimeout(() => {
+          setShowReset(false);
+          setResetMsg("");
+        }, 8000);
+      }
+    } catch (err) {
+      console.error("Erro inesperado completo:", err);
+      setResetMsg(`❌ Erro inesperado: ${err}. Tente novamente.`);
     }
   }
 
@@ -203,11 +264,7 @@ export default function LoginPage() {
           </div>
           {tab === "login" ? (
             <>
-              <form
-                onSubmit={e => { e.preventDefault(); handleLogin(); }}
-                autoComplete="on"
-                style={{ display: "flex", flexDirection: "column", gap: 12 }}
-              >
+              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                 <h2 style={{ fontSize: 20, margin: "8px 0", color: "#000" }}>Fazer Login</h2>
                 <input
                   type="email"
@@ -215,6 +272,7 @@ export default function LoginPage() {
                   style={inputStyle}
                   value={email}
                   onChange={e => setEmail(e.target.value)}
+                  onKeyDown={e => e.key === 'Enter' && handleLogin()}
                   autoComplete="email"
                   required
                 />
@@ -224,10 +282,15 @@ export default function LoginPage() {
                   style={inputStyle}
                   value={senha}
                   onChange={e => setSenha(e.target.value)}
+                  onKeyDown={e => e.key === 'Enter' && handleLogin()}
                   autoComplete="current-password"
                   required
                 />
-                <button style={buttonStyle} type="submit" disabled={loading}>
+                <button 
+                  style={buttonStyle} 
+                  onClick={handleLogin} 
+                  disabled={loading}
+                >
                   {loading ? "Entrando..." : "Entrar"}
                 </button>
                 <div style={{ marginTop: 8, textAlign: "right" }}>
@@ -263,14 +326,24 @@ export default function LoginPage() {
                       >
                         Enviar link de redefinição
                       </button>
-                      {resetMsg && <div style={{ color: resetMsg.includes("Enviamos") ? "green" : "red", marginTop: 8 }}>{resetMsg}</div>}
+                      {resetMsg && (
+                        <div style={{ 
+                          color: resetMsg.includes("✅") ? "green" : resetMsg.includes("❌") ? "red" : resetMsg.includes("⚠️") ? "orange" : "blue", 
+                          marginTop: 8, 
+                          fontSize: 13,
+                          lineHeight: 1.4,
+                          whiteSpace: "pre-line"
+                        }}>
+                          {resetMsg}
+                        </div>
+                      )}
                       <div style={{ marginTop: 10, textAlign: "center" }}>
                         <a href="#" style={{ color: "#1976d2", fontSize: 13 }} onClick={e => { e.preventDefault(); setShowReset(false); }}>Voltar</a>
                       </div>
                     </form>
                   </div>
                 )}
-              </form>
+              </div>
             </>
           ) : (
             <>
