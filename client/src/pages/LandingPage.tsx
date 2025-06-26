@@ -583,7 +583,10 @@ As formas de contato oficiais são pelo email perguntaprosub@gmail.com e pelo wh
                     fontSize: 14,
                     cursor: "pointer"
                   }}
-                  onClick={handleFileClick}
+                  onClick={() => {
+                    alert("Atenção: Arquivos criptografados deverão ser descriptografados antes de serem anexados. Só serão aceitos arquivos PDF e TXT (converta qualquer outro tipo de arquivo em PDF para poder analisá-los).");
+                    handleFileClick();
+                  }}
                   disabled={loading}
                 >
                   + Novo
