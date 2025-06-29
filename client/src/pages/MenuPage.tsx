@@ -478,7 +478,7 @@ export default function MenuPage() {
                   {fotoPerfilUrl && !fotoPerfilUrl.includes('null') && !fotoPerfilUrl.includes('undefined') && !fotoPerfilUrl.includes('error') && showFotoPerfil ? (
                     <img
                       src={fotoPerfilUrl + '?t=' + Date.now()}
-                      alt="Foto do perfil"
+                      alt=" "
                       style={{ width: 96, height: 96, borderRadius: '50%', objectFit: 'cover', border: '2px solid #1976d2', marginBottom: 8 }}
                       onError={() => {
                         setShowFotoPerfil(false);

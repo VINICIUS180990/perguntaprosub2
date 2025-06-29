@@ -453,12 +453,27 @@ As formas de contato oficiais são pelo email perguntaprosub@gmail.com e pelo wh
   function handleEscolherTema(tema: string) {
     setTemaSelecionado(tema);
     setHeaderColor(headerCores[tema] || "#fff");
+    // Salva o tema escolhido no localStorage para todas as páginas
+    localStorage.setItem("paletaCor", headerCores[tema] || "#fff");
+    localStorage.setItem("temaSelecionado", tema);
     setShowTemaModal(false);
   }
 
   useEffect(() => {
     const timer = setTimeout(() => setShowTemaModal(true), 2000);
     return () => clearTimeout(timer);
+  }, []);
+
+  // Carrega cor do tema salvo no localStorage
+  useEffect(() => {
+    const savedColor = localStorage.getItem("paletaCor");
+    const savedTheme = localStorage.getItem("temaSelecionado");
+    if (savedColor) {
+      setHeaderColor(savedColor);
+    }
+    if (savedTheme) {
+      setTemaSelecionado(savedTheme);
+    }
   }, []);
 
   return (

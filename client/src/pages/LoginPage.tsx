@@ -2,25 +2,9 @@ import { useState, useEffect } from "react";
 import { supabase } from "../supabaseClient";
 import { inserirPerfilUsuario } from "../utils/perfilUsuario";
 
-const coresTema: Record<string, string> = {
-  marinha: "#e5e5e5",
-  exercito: "#4d5c2b",
-  aeronautica: "#305a91",
-  policia: "#666666",
-  bombeiro: "#b08c3e",
-};
-
-const nomesTema: Record<string, string> = {
-  marinha: "Marinha",
-  exercito: "Exército",
-  aeronautica: "Aeronáutica",
-  policia: "Polícia",
-  bombeiro: "Bombeiro",
-};
-
 export default function LoginPage() {
   const [tab, setTab] = useState<"login" | "register">("login");
-  const [tema, setTema] = useState<keyof typeof coresTema>("marinha");
+  const [headerColor, setHeaderColor] = useState("#fff");
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [nome, setNome] = useState("");
@@ -30,10 +14,13 @@ export default function LoginPage() {
   const [resetEmail, setResetEmail] = useState("");
   const [resetMsg, setResetMsg] = useState("");
 
-  // Sempre que o tema mudar, salva a cor no localStorage
+  // Carrega cor do tema salvo no localStorage
   useEffect(() => {
-    localStorage.setItem("paletaCor", coresTema[tema]);
-  }, [tema]);
+    const savedColor = localStorage.getItem("paletaCor");
+    if (savedColor) {
+      setHeaderColor(savedColor);
+    }
+  }, []);
 
   async function handleLogin() {
     setLoading(true);
@@ -229,7 +216,7 @@ export default function LoginPage() {
       style={{
         minHeight: "100vh",
         minWidth: "100vw",
-        background: coresTema[tema],
+        background: headerColor,
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -258,33 +245,6 @@ export default function LoginPage() {
         </div>
         <div style={{ color: "#000", marginBottom: 24, fontSize: 14, textAlign: "center" }}>
           A primeira Inteligência Artificial voltada para o Universo Militar!
-        </div>
-        {/* Paleta de temas */}
-        <div style={{ margin: "0 0 24px 0", textAlign: "center" }}>
-          <div style={{ fontWeight: 600, marginBottom: 12, color: "#000" }}>Escolha seu tema:</div>
-          <div style={{ display: "flex", justifyContent: "center", gap: 32 }}>
-            {Object.keys(coresTema).map((key) => (
-              <div key={key} style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-                <button
-                  style={{
-                    width: 44,
-                    height: 44,
-                    borderRadius: "50%",
-                    border: tema === key ? "3px solid #1976d2" : "2px solid #bbb",
-                    background: coresTema[key],
-                    cursor: "pointer",
-                    marginBottom: 6,
-                    boxShadow: "0 1px 4px #0001",
-                  }}
-                  onClick={() => setTema(key as keyof typeof coresTema)}
-                  title={nomesTema[key]}
-                />
-                <span style={{ color: "#000", fontSize: 13, fontWeight: 500, textAlign: "center" }}>
-                  {nomesTema[key]}
-                </span>
-              </div>
-            ))}
-          </div>
         </div>
         {/* Card de login/cadastro */}
         <div
