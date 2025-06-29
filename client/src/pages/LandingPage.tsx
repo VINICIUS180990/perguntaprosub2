@@ -533,10 +533,10 @@ As formas de contato oficiais são pelo email perguntaprosub@gmail.com e pelo wh
                 ref={menuRef}
                 onClick={e => e.stopPropagation()}
               >
-                <button style={menuBtnStyle} onClick={() => { setMenuConfigAberto(false); window.location.href = 'https://perguntaprosub.vercel.app/sobre'; }}>Sobre</button>
-                <button style={menuBtnStyle} onClick={() => { setMenuConfigAberto(false); window.location.href = 'https://perguntaprosub.vercel.app/termos'; }}>Termos de Uso</button>
-                <button style={menuBtnStyle} onClick={() => { setMenuConfigAberto(false); window.location.href = 'https://perguntaprosub.vercel.app/contato'; }}>Contato</button>
-                <button style={menuBtnStyle} onClick={() => { setMenuConfigAberto(false); window.location.href = 'https://perguntaprosub.vercel.app/privacidade'; }}>Política de Privacidade</button>
+                <button style={menuBtnStyle} onClick={() => { setMenuConfigAberto(false); navigate('/sobre'); }}>Sobre</button>
+                <button style={menuBtnStyle} onClick={() => { setMenuConfigAberto(false); navigate('/termos'); }}>Termos de Uso</button>
+                <button style={menuBtnStyle} onClick={() => { setMenuConfigAberto(false); navigate('/contato'); }}>Contato</button>
+                <button style={menuBtnStyle} onClick={() => { setMenuConfigAberto(false); navigate('/privacidade'); }}>Política de Privacidade</button>
               </div>
             )}
             {/* Fecha o menu ao clicar fora */}
