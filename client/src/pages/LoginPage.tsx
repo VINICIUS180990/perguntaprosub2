@@ -250,7 +250,7 @@ export default function LoginPage() {
           style={{ width: 160, height: 160, marginBottom: 16, borderRadius: "50%" }}
         />
         <h1 style={{ color: "#000", fontWeight: 700, fontSize: 32, marginBottom: 0, textAlign: "center" }}>
-          PerguntaProSub
+          PerguntaProSubIA
         </h1>
         <div style={{ height: 16 }} />
         <div style={{ color: "#000", fontWeight: 500, marginBottom: 8, fontSize: 18, textAlign: "center" }}>
@@ -453,7 +453,7 @@ export default function LoginPage() {
         <div style={{ color: "#000", fontSize: 13, marginTop: 16, textAlign: "center" }}>
           Sistema de IA para consulta de normas
           <br />
-          © 2025 PerguntaProSub
+          © 2025 PerguntaProSubIA
         </div>
       </div>
     </div>

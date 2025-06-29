@@ -481,7 +481,7 @@ As formas de contato oficiais são pelo email perguntaprosub@gmail.com e pelo wh
         <div style={{ display: "flex", alignItems: "center" }}>
           <img src="/simbolo.png" alt="Logo" style={{ width: 72, height: 72, borderRadius: "50%", marginRight: 14 }} />
           <div>
-            <div style={{ fontWeight: 700, fontSize: 18, color: "#000" }}>PerguntaProSub</div>
+            <div style={{ fontWeight: 700, fontSize: 18, color: "#000" }}>PerguntaProSubIA</div>
             <div style={{ fontSize: 12, color: "#000" }}>Sistema de IA para o mundo Militar</div>
           </div>
         </div>
@@ -991,7 +991,7 @@ As formas de contato oficiais são pelo email perguntaprosub@gmail.com e pelo wh
                 />
               </form>
               <div style={{ color: '#888', fontSize: 15, marginTop: 18, textAlign: 'center' }}>
-                O PerguntaproSub pode cometer erros. Considere verificar informações importantes.
+                O PerguntaproSubIA pode cometer erros. Considere verificar informações importantes.
               </div>
             </div>
           )}
@@ -1136,7 +1136,7 @@ As formas de contato oficiais são pelo email perguntaprosub@gmail.com e pelo wh
               alt="Símbolo"
               style={{ width: 120, height: 120, marginBottom: 12, borderRadius: "50%" }}
             />
-            <div style={{ fontWeight: 700, fontSize: 32, color: "#000", marginBottom: 0, textAlign: "center" }}>PerguntaProSub</div>
+            <div style={{ fontWeight: 700, fontSize: 32, color: "#000", marginBottom: 0, textAlign: "center" }}>PerguntaProSubIA</div>
             <div style={{ height: 12 }} />
             <div style={{ color: "#000", fontWeight: 500, marginBottom: 8, fontSize: 18, textAlign: "center" }}>
               Tá na onça né Boysinho?
