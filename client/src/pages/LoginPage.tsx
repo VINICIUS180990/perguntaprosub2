@@ -113,7 +113,7 @@ export default function LoginPage() {
           console.error("Erro inesperado ao inserir perfil:", profileError);
         }
         
-        alert("Conta criada com sucesso! Verifique seu email para confirmar o cadastro.");
+        alert("Sua solicitação de elegibilidade foi enviada! Dentro de até 24h a sua solicitação será respondida. Verifique seu email para confirmar o cadastro.");
         setTab("login");
         // Limpar campos
         setEmail("");
@@ -241,7 +241,6 @@ export default function LoginPage() {
         </h1>
         <div style={{ height: 16 }} />
         <div style={{ color: "#000", fontWeight: 500, marginBottom: 8, fontSize: 18, textAlign: "center" }}>
-          Tá na onça né Boysinho?
         </div>
         <div style={{ color: "#000", marginBottom: 24, fontSize: 14, textAlign: "center" }}>
           A primeira Inteligência Artificial voltada para o Universo Militar!
@@ -287,7 +286,7 @@ export default function LoginPage() {
                 cursor: "pointer",
               }}
             >
-              Criar Conta
+              Cadastro
             </button>
           </div>
           {tab === "login" ? (
@@ -375,7 +374,7 @@ export default function LoginPage() {
             </>
           ) : (
             <>
-              <h2 style={{ fontSize: 20, margin: "8px 0", color: "#000" }}>Criar Conta</h2>
+              <h2 style={{ fontSize: 20, margin: "8px 0", color: "#000" }}>Consultar elegibilidade para cadastro</h2>
               <input
                 type="text"
                 placeholder="Nome completo"

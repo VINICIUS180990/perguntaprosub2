@@ -198,7 +198,7 @@ export default function LandingPage() {
     const novaId = Date.now().toString();
     setConversas([{ nome, id: novaId }, ...conversas]);
     setConversaAtiva(novaId);
-    const saudacao = { autor: 'bot' as const, texto: 'A princípio é NÃO boysinho(a)! Mas diga lá, qual a sua onça?' };
+    const saudacao = { autor: 'bot' as const, texto: 'A princípio é NÃO!rs Mas diga lá, qual a sua onça?' };
     setMensagens([saudacao]);
   }
 
@@ -522,10 +522,11 @@ As formas de contato oficiais são pelo email perguntaprosub@gmail.com e pelo wh
               title="Configurações"
               onClick={() => setMenuConfigAberto(v => !v)}
             >
-              {/* Ícone de engrenagem simples SVG */}
+              {/* Ícone de menu com 3 tracinhos horizontais */}
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2"/>
-                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06A1.65 1.65 0 0 0 15 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 8.6 15a1.65 1.65 0 0 0-1.82-.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 15 8.6a1.65 1.65 0 0 0 1.82.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 15z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <line x1="3" y1="6" x2="21" y2="6" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                <line x1="3" y1="12" x2="21" y2="12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                <line x1="3" y1="18" x2="21" y2="18" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
               </svg>
             </span>
             {menuConfigAberto && (
@@ -921,7 +922,7 @@ As formas de contato oficiais são pelo email perguntaprosub@gmail.com e pelo wh
                 const nome = `Conversa ${conversas.length + 1}`;
                 setConversas([{ nome, id: novaId }, ...conversas]);
                 setConversaAtiva(novaId);
-                const saudacao = { autor: 'bot' as const, texto: 'A princípio é NÃO boysinho(a)! Mas diga lá, qual a sua onça?' };
+                const saudacao = { autor: 'bot' as const, texto: 'A princípio é NÃO!rs Mas diga lá, qual a sua onça?' };
                 const novaMensagemUsuario = { autor: 'user' as const, texto: inputMensagem };
                 const novasMensagens = [saudacao, novaMensagemUsuario];
                 setMensagens(novasMensagens);
