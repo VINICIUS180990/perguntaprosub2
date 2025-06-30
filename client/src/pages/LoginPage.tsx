@@ -113,7 +113,7 @@ export default function LoginPage() {
           console.error("Erro inesperado ao inserir perfil:", profileError);
         }
         
-        alert("Sua solicitação de elegibilidade foi enviada! Dentro de até 24h a sua solicitação será respondida. Verifique seu email para confirmar o cadastro.");
+        alert("Sua solicitação de elegibilidade foi enviada! Em até 24h a sua solicitação será respondida. Verifique seu email para confirmar o cadastro.");
         setTab("login");
         // Limpar campos
         setEmail("");
