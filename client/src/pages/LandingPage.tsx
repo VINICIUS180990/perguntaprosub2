@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import * as pdfjsLib from "pdfjs-dist/legacy/build/pdf";
 pdfjsLib.GlobalWorkerOptions.workerSrc = "/pdf.worker.mjs";
 import mammoth from "mammoth";
-import { geminiChat } from "../utils/geminiApi";
+import { sendLandingPageMessage } from "../api";
 
 const ACCEPTED_FORMATS = ".pdf,.txt";
 
@@ -341,7 +341,7 @@ export default function LandingPage() {
     return `Arquivo selecionado: ${arquivoObj.nome}\n${texto}`;
   }
 
-  // Função para enviar mensagem para a Gemini
+  // Função para enviar mensagem para a API de IA
   async function enviarMensagem(mensagemTexto?: string) {
     let mensagensAtualizadas = mensagens;
     
@@ -365,63 +365,30 @@ export default function LandingPage() {
     
     setEnviando(true);
 
-    // Monta o histórico para Gemini
+    // Monta o histórico para a API
     const historicoApi = mensagensAtualizadas.map(m => ({
       autor: m.autor,
       texto: m.texto
     }));
-
-    // System prompt para Gemini
-    const systemPrompt = `Você é o próprio PerguntaProSub, uma IA militar brasileira especializada em responder dúvidas e orientar usuários sobre o funcionamento da plataforma PerguntaProSub. Fale sempre em primeira pessoa, como se você fosse o próprio sistema.
-
-Quando for se dirigir ao usuário o chame de "Militar".
-Responda de forma direta, prática, sempre educado, prestativo, bem humorado e até um pouco cômico quando julgar cabível.
-Se nenhum documento for encaminhado, peça para o usuário selecionar o arquivo que deverá ser analisado no campo "documentos".
-Se o usuário tiver dúvidas sobre cadastro, login, redefinição de senha, configurações, exclusão de conta, anexar arquivos ou qualquer funcionalidade, explique o passo a passo de forma clara e objetiva usando as informações do manual de uso do PerguntaProSub q está no final desse prompt ou direciona-lo para o manual que fica no campo "menu" no botão azul com as iniais do usuario no canto superior direito.
-Se não encontrar a resposta nos documentos anexos, diga que não encontrou. Se a mensagem do usuário não fizer sentido, responda apenas: 'Não entendi, pode repetir por favor?'.
-Responda exclusivamente com base no(s) documento(s) anexado(s).
-Ignore completamente qualquer conhecimento prévio, mesmo que você “lembre” de outras versões, leis ou informações. Não utilize nada além do que está no documento anexado.
-Se não encontrar a resposta, diga: "Não encontrei essa informação no documento fornecido."
-Não use conhecimento prévio, não invente informações e não faça suposições.
-Sempre cite o trecho exato do documento ao responder perguntas específicas.
-Se a resposta envolver tabelas, transcreva o conteúdo da tabela relevante em texto.
-Se o usuário pedir um procedimento, detalhe apenas o que está no documento, sem adicionar etapas externas.
-Seja sempre o PerguntaProSub, o Suboficial virtual pronto para ajudar o usuário em qualquer missão dentro da plataforma.
-
-Se o usuário fizer perguntas que não tenham relação com documentos, normas ou funcionalidades do sistema, converse normalmente, use bom humor, piadas leves e descontração, mantendo sempre o respeito.
-
-Manual de uso do PerguntaProSub:
-
-O usuário pode anexar arquivos para que você pesquise e responda perguntas com base nesses documentos no capo "documentos", mas deverá selecionar um dos documentos para vc poder ter acesso a esse documento.
-O usuário pode criar ou excluir conversas para organizar suas dúvidas no campo "conversas".
-O usuário pode redefinir sua senha, editar seu perfil (incluindo nome de guerra), e excluir sua conta no menu que fica o botão azul com as iniais do usuario no canto superior direito.
-As formas de contato oficiais são pelo email perguntaprosub@gmail.com e pelo whatsapp (21)98364-2119.`;
 
     // Busca contexto nos documentos
     const contexto = await buscarContextoPergunta();
     console.log("Debug - Contexto retornado:", contexto ? "TEM CONTEXTO" : "SEM CONTEXTO");
     console.log("Debug - Tamanho do contexto:", contexto ? contexto.length : 0);
     
-    let contextoPrompt = "";
-    if (contexto) {
-      contextoPrompt = `Conteúdo do arquivo selecionado (use para responder):\n${contexto}\n\n`;
-    } else {
-      contextoPrompt = "Nenhum arquivo foi selecionado para pesquisa. Por favor, peça ao usuário para selecionar um arquivo na lista de anexos antes de continuar a consulta.\n\n";
-    }
-    
-    console.log("Debug - Prompt final sendo enviado para IA:", contextoPrompt.substring(0, 200));
+    console.log("Debug - Prompt final sendo enviado para IA:", contexto ? contexto.substring(0, 200) : "SEM CONTEXTO");
 
     try {
-      const respostaGemini = await geminiChat(systemPrompt + contextoPrompt, historicoApi);
+      const respostaIA = await sendLandingPageMessage(historicoApi, contexto);
       const mensagensComBot = [
         ...mensagensAtualizadas,
-        { autor: 'bot' as const, texto: respostaGemini }
+        { autor: 'bot' as const, texto: respostaIA }
       ];
       setMensagens(mensagensComBot);
     } catch (err) {
       const mensagensComBot = [
         ...mensagensAtualizadas,
-        { autor: 'bot' as const, texto: `Erro ao consultar a Gemini: ${err}` }
+        { autor: 'bot' as const, texto: `Erro ao consultar a API de IA: ${err}` }
       ];
       setMensagens(mensagensComBot);
     }
@@ -932,58 +899,24 @@ As formas de contato oficiais são pelo email perguntaprosub@gmail.com e pelo wh
                 setTimeout(async () => {
                   setEnviando(true);
                   
-                  // Monta o histórico para Gemini
+                  // Monta o histórico para a API
                   const historicoApi = novasMensagens.map(m => ({
                     autor: m.autor,
                     texto: m.texto
                   }));
-
-                  // System prompt para Gemini
-                  const systemPrompt = `Você é o próprio PerguntaProSub, uma IA militar brasileira especializada em responder dúvidas e orientar usuários sobre o funcionamento da plataforma PerguntaProSub. Fale sempre em primeira pessoa, como se você fosse o próprio sistema.
-
-Quando for se dirigir ao usuário o chame de "Militar".
-Responda de forma direta, prática, sempre educado, prestativo, bem humorado e até um pouco cômico quando julgar cabível.
-Se nenhum documento for encaminhado, peça para o usuário selecionar o arquivo que deverá ser analisado no campo "documentos".
-Se o usuário tiver dúvidas sobre cadastro, login, redefinição de senha, configurações, exclusão de conta, anexar arquivos ou qualquer funcionalidade, explique o passo a passo de forma clara e objetiva usando as informações do manual de uso do PerguntaProSub q está no final desse prompt ou direciona-lo para o manual que fica no campo "menu" no botão azul com as iniais do usuario no canto superior direito.
-Se não encontrar a resposta nos documentos anexos, diga que não encontrou. Se a mensagem do usuário não fizer sentido, responda apenas: 'Não entendi, pode repetir por favor?'.
-Responda exclusivamente com base no(s) documento(s) anexado(s).
-Ignore completamente qualquer conhecimento prévio, mesmo que você "lembre" de outras versões, leis ou informações. Não utilize nada além do que está no documento anexado.
-Se não encontrar a resposta, diga: "Não encontrei essa informação no documento fornecido."
-Não use conhecimento prévio, não invente informações e não faça suposições.
-Sempre cite o trecho exato do documento ao responder perguntas específicas.
-Se a resposta envolver tabelas, transcreva o conteúdo da tabela relevante em texto.
-Se o usuário pedir um procedimento, detalhe apenas o que está no documento, sem adicionar etapas externas.
-Seja sempre o PerguntaProSub, o Suboficial virtual pronto para ajudar o usuário em qualquer missão dentro da plataforma.
-Se não houver nenhum documento selecionado no campo de documentos, peça ao usuário para selecionar um arquivo na lista de anexos antes de continuar a consulta ou, caso já tenha selecionado, peça para o usuario aguardar alguns segundos enquanto o sistema interpreta o documento.
-Não exagere nos jargões militares, mantenha uma linguagem acessível e amigável.
-Se o usuário fizer perguntas que não tenham relação com documentos, normas ou funcionalidades do sistema, converse normalmente, use bom humor, piadas leves e descontração, mantendo sempre o respeito.
-
-Manual de uso do PerguntaProSub:
-
-O usuário pode anexar arquivos para que você pesquise e responda perguntas com base nesses documentos no capo "documentos", mas deverá selecionar um dos documentos para vc poder ter acesso a esse documento.
-O usuário pode criar ou excluir conversas para organizar suas dúvidas no campo "conversas".
-O usuário pode redefinir sua senha, editar seu perfil (incluindo nome de guerra), e excluir sua conta no menu que fica o botão azul com as iniais do usuario no canto superior direito.
-As formas de contato oficiais são pelo email perguntaprosub@gmail.com e pelo whatsapp (21)98364-2119.`;
 
                   // Busca contexto nos documentos
                   const contexto = await buscarContextoPergunta();
                   console.log("Debug FORM - Contexto retornado:", contexto ? "TEM CONTEXTO" : "SEM CONTEXTO");
                   console.log("Debug FORM - Tamanho do contexto:", contexto ? contexto.length : 0);
                   
-                  let contextoPrompt = "";
-                  if (contexto) {
-                    contextoPrompt = `Conteúdo do arquivo selecionado (use para responder):\n${contexto}\n\n`;
-                  } else {
-                    contextoPrompt = "Nenhum arquivo foi selecionado para pesquisa. Por favor, peça ao usuário para selecionar um arquivo na lista de anexos antes de continuar a consulta.\n\n";
-                  }
-                  
-                  console.log("Debug FORM - Prompt final sendo enviado para IA:", contextoPrompt.substring(0, 200));
+                  console.log("Debug FORM - Prompt final sendo enviado para IA:", contexto ? contexto.substring(0, 200) : "SEM CONTEXTO");
 
                   try {
-                    const respostaGemini = await geminiChat(systemPrompt + contextoPrompt, historicoApi);
-                    setMensagens(prev => [...prev, { autor: 'bot' as const, texto: respostaGemini }]);
+                    const respostaIA = await sendLandingPageMessage(historicoApi, contexto);
+                    setMensagens(prev => [...prev, { autor: 'bot' as const, texto: respostaIA }]);
                   } catch (err) {
-                    setMensagens(prev => [...prev, { autor: 'bot' as const, texto: `Erro ao consultar a Gemini: ${err}` }]);
+                    setMensagens(prev => [...prev, { autor: 'bot' as const, texto: `Erro ao consultar a API de IA: ${err}` }]);
                   }
                   setEnviando(false);
                 }, 300);
