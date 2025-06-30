@@ -1001,7 +1001,8 @@ As formas de contato oficiais são pelo email perguntaprosub@gmail.com e pelo wh
                     border: "1.5px solid #1976d2",
                     fontSize: 18,
                     outline: "none",
-                    background: "#fff"
+                    background: "#fff",
+                    color: "#000"
                   }}
                   disabled={enviando}
                 />
