@@ -3,6 +3,7 @@
  */
 
 import type { MessageHistory } from './chat';
+import { calculateGeminiCost } from './pricing';
 
 /**
  * Comprime o histórico de mensagens mantendo apenas o essencial
@@ -72,15 +73,8 @@ export function estimateTokens(text: string): number {
 }
 
 /**
- * Calcula custo estimado em dólares (baseado no preço do Gemini)
+ * Calcula custo estimado em dólares (baseado no preço atual do Gemini)
  */
 export function estimateCost(inputTokens: number, outputTokens: number = 100): number {
-  // Preços aproximados do Gemini 1.5 Pro (valores podem mudar)
-  const INPUT_COST_PER_1M_TOKENS = 3.50; // $3.50 per 1M input tokens
-  const OUTPUT_COST_PER_1M_TOKENS = 10.50; // $10.50 per 1M output tokens
-  
-  const inputCost = (inputTokens / 1_000_000) * INPUT_COST_PER_1M_TOKENS;
-  const outputCost = (outputTokens / 1_000_000) * OUTPUT_COST_PER_1M_TOKENS;
-  
-  return inputCost + outputCost;
+  return calculateGeminiCost(inputTokens, outputTokens);
 }

@@ -35,6 +35,14 @@ export {
   intelligentDocumentSearch
 } from './preprocessing';
 export { costMonitor } from './costMonitor';
+export { 
+  GEMINI_PRICING,
+  calculateGeminiCost,
+  formatCost,
+  calculateSavings,
+  isCostWithinBudget,
+  suggestOptimizations
+} from './pricing';
 export { debugMonitor, useChunkDebug } from './debug';
 export type { DocumentChunk } from './chunking';
 export type { ProcessingOptions } from './preprocessing';

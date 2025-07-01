@@ -2,6 +2,8 @@
  * Monitor de custos em tempo real
  */
 
+import { calculateGeminiCost, formatCost, GEMINI_PRICING } from './pricing';
+
 interface CostEntry {
   timestamp: number;
   inputTokens: number;
@@ -64,8 +66,8 @@ class CostMonitor {
     // Calcula custo que seria gasto sem cache
     const costWithoutCache = sessionCosts.reduce((sum, c) => {
       if (c.cached) {
-        // Estima o custo que teria se não fosse cache
-        const estimatedCost = (c.inputTokens / 1_000_000) * 3.50 + (c.outputTokens / 1_000_000) * 10.50;
+        // Estima o custo que teria se não fosse cache (usando preços atuais do Gemini)
+        const estimatedCost = calculateGeminiCost(c.inputTokens, c.outputTokens);
         return sum + estimatedCost;
       }
       return sum + c.cost;
@@ -119,16 +121,22 @@ class CostMonitor {
   printReport(): void {
     const stats = this.getSessionStats();
     
-    console.log('\n📊 RELATÓRIO DE CUSTOS DA API');
-    console.log('═══════════════════════════════');
-    console.log(`💸 Custo total da sessão: $${stats.totalCost.toFixed(6)}`);
-    console.log(`💰 Economia com cache: $${stats.costSaved.toFixed(6)}`);
+    console.log('\n📊 RELATÓRIO DE CUSTOS DA API GEMINI');
+    console.log('═══════════════════════════════════════');
+    console.log(`💸 Custo total da sessão: ${formatCost(stats.totalCost)}`);
+    console.log(`💰 Economia com cache: ${formatCost(stats.costSaved)}`);
     console.log(`📞 Total de chamadas: ${stats.totalCalls}`);
     console.log(`⚡ Chamadas em cache: ${stats.cachedCalls} (${(stats.cacheHitRate * 100).toFixed(1)}%)`);
     console.log(`🔤 Tokens de entrada: ${stats.totalInputTokens.toLocaleString()}`);
     console.log(`🔤 Tokens de saída: ${stats.totalOutputTokens.toLocaleString()}`);
-    console.log(`📈 Custo médio por chamada: $${stats.averageCostPerCall.toFixed(6)}`);
-    console.log('═══════════════════════════════\n');
+    console.log(`📈 Custo médio por chamada: ${formatCost(stats.averageCostPerCall)}`);
+    
+    // Alerta se estiver próximo do limite
+    if (stats.totalCost > GEMINI_PRICING.DEFAULT_COST_ALERT_THRESHOLD) {
+      console.log(`⚠️  ATENÇÃO: Custo da sessão excedeu ${formatCost(GEMINI_PRICING.DEFAULT_COST_ALERT_THRESHOLD)}`);
+    }
+    
+    console.log('═══════════════════════════════════════\n');
   }
 
   /**
@@ -142,13 +150,69 @@ class CostMonitor {
   /**
    * Alerta se o custo estiver alto
    */
-  checkCostAlert(threshold: number = 0.01): boolean {
+  checkCostAlert(threshold: number = GEMINI_PRICING.DEFAULT_COST_ALERT_THRESHOLD): boolean {
     const stats = this.getSessionStats();
     if (stats.totalCost > threshold) {
-      console.warn(`⚠️ ALERTA: Custo da sessão (${stats.totalCost.toFixed(6)}) excedeu o limite de $${threshold}`);
+      console.warn(`⚠️ ALERTA: Custo da sessão (${formatCost(stats.totalCost)}) excedeu o limite de ${formatCost(threshold)}`);
       return true;
     }
     return false;
+  }
+
+  /**
+   * Análise detalhada de custos com sugestões
+   */
+  analyzeAndSuggest(): {
+    analysis: string;
+    suggestions: string[];
+    costBreakdown: {
+      inputCost: number;
+      outputCost: number;
+      totalCost: number;
+    };
+  } {
+    const stats = this.getSessionStats();
+    
+    // Calcula breakdown de custos
+    const inputCost = (stats.totalInputTokens / 1_000_000) * GEMINI_PRICING.INPUT_COST_PER_1M_TOKENS;
+    const outputCost = (stats.totalOutputTokens / 1_000_000) * GEMINI_PRICING.OUTPUT_COST_PER_1M_TOKENS;
+    
+    // Análise textual
+    let analysis = `Sessão atual: ${stats.totalCalls} chamadas, ${formatCost(stats.totalCost)} gasto total.\n`;
+    analysis += `Cache salvou ${formatCost(stats.costSaved)} (${(stats.cacheHitRate * 100).toFixed(1)}% hit rate).\n`;
+    
+    // Sugestões baseadas no uso
+    const suggestions: string[] = [];
+    
+    if (stats.cacheHitRate < 0.3) {
+      suggestions.push('📋 Implementar cache mais agressivo - taxa atual muito baixa');
+    }
+    
+    if (stats.totalInputTokens / stats.totalCalls > GEMINI_PRICING.RECOMMENDED_MAX_TOKENS) {
+      suggestions.push('✂️ Reduzir tamanho médio das entradas com chunking inteligente');
+    }
+    
+    if (outputCost > inputCost * 2) {
+      suggestions.push('🎯 Usar prompts mais específicos para respostas mais concisas');
+    }
+    
+    if (stats.totalCost > GEMINI_PRICING.HIGH_USAGE_THRESHOLD) {
+      suggestions.push('⚠️ Alto uso detectado - considere otimizações adicionais');
+    }
+    
+    if (suggestions.length === 0) {
+      suggestions.push('✅ Uso eficiente da API - continue assim!');
+    }
+    
+    return {
+      analysis,
+      suggestions,
+      costBreakdown: {
+        inputCost,
+        outputCost,
+        totalCost: stats.totalCost
+      }
+    };
   }
 }
 

@@ -198,7 +198,7 @@ export default function LandingPage() {
     const novaId = Date.now().toString();
     setConversas([{ nome, id: novaId }, ...conversas]);
     setConversaAtiva(novaId);
-    const saudacao = { autor: 'bot' as const, texto: 'A princípio é NÃO!rs Mas diga lá, qual a sua onça?' };
+    const saudacao = { autor: 'bot' as const, texto: 'A princípio é NÃO Militar! Mas diga lá, qual a sua onça?' };
     setMensagens([saudacao]);
   }
 
@@ -567,7 +567,7 @@ export default function LandingPage() {
                     cursor: "pointer"
                   }}
                   onClick={() => {
-                    alert("Atenção: Arquivos criptografados deverão ser descriptografados antes de serem anexados. Só serão aceitos arquivos PDF e TXT (converta qualquer outro tipo de arquivo em PDF para poder analisá-los).");
+                    alert("Atenção: Arquivos criptografados deverão ser descriptografados antes de serem anexados. Só serão aceitos arquivos PDF e TXT (converta para PDF qualquer outro tipo de arquivo para poder anexá-los).");
                     handleFileClick();
                   }}
                   disabled={loading}
