@@ -6,10 +6,10 @@ export default function TermosPage() {
         
         <div style={{ textAlign: 'left', lineHeight: 1.6, fontSize: 15, width: '100%' }}>
           <h3 style={{ color: '#1976d2', marginTop: 20 }}>1. Aceitação dos Termos</h3>
-          <p>Ao utilizar o PerguntaProSubIA, você concorda com todos os termos e condições descritos neste documento. O uso da plataforma implica na aceitação integral destes termos.</p>
+          <p>Ao utilizar o PerguntaProSub, você concorda com todos os termos e condições descritos neste documento. O uso da plataforma implica na aceitação integral destes termos.</p>
 
           <h3 style={{ color: '#1976d2', marginTop: 20 }}>2. Descrição do Serviço</h3>
-          <p>O PerguntaProSubIA é uma plataforma de consulta de normas através de inteligência artificial, permitindo upload de documentos e consultas personalizadas sobre regulamentos e normas institucionais.</p>
+          <p>O PerguntaProSub é uma plataforma de consulta de normas através de inteligência artificial, permitindo upload de documentos e consultas personalizadas sobre regulamentos e normas institucionais.</p>
 
           <h3 style={{ color: '#1976d2', marginTop: 20 }}>3. Uso Responsável</h3>
           <p>É proibido na plataforma:</p>

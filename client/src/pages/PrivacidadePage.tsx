@@ -5,7 +5,7 @@ export default function PrivacidadePage() {
         <h2 style={{ margin: 0, fontSize: 24, color: 'var(--color-title, #1976d2)', marginBottom: 24 }}>Política de Privacidade</h2>
         <div style={{ textAlign: 'left', lineHeight: 1.6, fontSize: 15 }}>
           <h3 style={{ color: '#1976d2', marginTop: 20 }}>1. Coleta de Informações</h3>
-          <p>O PerguntaProSubIA coleta apenas as informações necessárias para funcionamento da plataforma de consultas:</p>
+          <p>O PerguntaProSub coleta apenas as informações necessárias para funcionamento da plataforma de consultas:</p>
           <ul>
             <li>Dados de cadastro: nome, e-mail e senha criptografada</li>
             <li>Documentos anexados temporariamente para processamento</li>

@@ -286,7 +286,7 @@ const ChatPage: React.FC = () => {
         <div style={{ display: 'flex', alignItems: 'center' }}>
           <img src="/simbolo.png" alt="Logo" style={{ width: 72, height: 72, borderRadius: '50%', marginRight: 14 }} />
           <div>
-            <div style={{ fontWeight: 700, fontSize: 18, color: '#000' }}>PerguntaProSubIA</div>
+            <div style={{ fontWeight: 700, fontSize: 18, color: '#000' }}>PerguntaProSub</div>
             <div style={{ fontSize: 12, color: '#000' }}>Sistema de IA para o mundo Militar</div>
           </div>
         </div>

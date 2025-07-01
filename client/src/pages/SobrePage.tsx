@@ -2,7 +2,7 @@ export default function SobrePage() {
   return (
     <div style={{ minHeight: "100vh", width: "100vw", display: "flex", alignItems: "center", justifyContent: "center", background: "#f7f7f9", padding: "20px" }}>
       <div style={{ width: "100%", maxWidth: 800, background: "#fff", color: "#222", borderRadius: 12, boxShadow: "0 2px 8px #0001", padding: 32, display: "flex", flexDirection: "column", alignItems: "center" }}>
-        <h2 style={{ margin: 0, fontSize: 24, color: 'var(--color-title, #1976d2)', marginBottom: 24 }}>Sobre o PerguntaProSubIA</h2>
+        <h2 style={{ margin: 0, fontSize: 24, color: 'var(--color-title, #1976d2)', marginBottom: 24 }}>Sobre o PerguntaProSub</h2>
         
         <p style={{ margin: '0 0 24px 0', textAlign: 'center', fontSize: 16, lineHeight: 1.6 }}>
           Sua ferramenta inteligente para consultas de normas militares e de segurança pública.
@@ -15,7 +15,7 @@ export default function SobrePage() {
 
           <h3 style={{ color: '#1976d2', marginTop: 20 }}>🚀 Funcionalidades</h3>
           <ul style={{ margin: '12px 0', padding: '0 0 0 20px', lineHeight: 1.8 }}>
-            <li><b>IA Militar:</b> Anexe normas, regulamentos ou qualquer outro documento e o PerguntaProSubIA te dirá como agir em qualquer situação, baseada na documentação específica.</li>
+            <li><b>IA Militar:</b> Anexe normas, regulamentos ou qualquer outro documento e o PerguntaProSub te dirá como agir em qualquer situação, baseada na documentação específica.</li>
             <li><b>Upload de Documentos:</b> Clique em "+ Novo" no campo de documentos na página inicial para anexar seus arquivos (PDF, DOCX). O conteúdo será usado para responder suas perguntas.</li>
             <li><b>Organização de Conversas:</b> Clique em "+ Nova" no campo de conversas para organizar suas dúvidas. Cada conversa mantém seu histórico separado.</li>
             <li><b>Chat em Tempo Real:</b> Clique em "Bate-papo" no canto superior direito do seu perfil e converse instantaneamente com outros usuários de forma segura e privada.</li>

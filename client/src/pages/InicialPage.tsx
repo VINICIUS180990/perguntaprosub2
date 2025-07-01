@@ -82,7 +82,7 @@ export default function InicialPage() {
               PerguntaProSub
             </div>
             <div style={{ fontSize: 12, color: "#000" }}>
-              Todos juntos em uma só Missão
+              Sistema de IA para o mundo Militar
             </div>
           </div>
         </div>
@@ -267,7 +267,7 @@ export default function InicialPage() {
             lineHeight: "1.6",
             marginBottom: "32px"
           }}>
-            A primeira rede social voltada para militares das Forças Armadas e de Segurança. 
+            A primeira Inteligência Artificial totalmente integrada a uma revolucionária Rede de Comunicação voltada para Militares das Forças Armadas e de Segurança. 
             Converse, compartilhe experiências e construa sua rede profissional.
           </p>
           <button 
