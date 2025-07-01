@@ -3,6 +3,61 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "../supabaseClient";
 import { avisoExclusaoConta } from "../utils/excluirConta";
 
+// Hook customizado para verificar conversas não lidas
+function useConversasNaoLidas() {
+  const [temConversasNaoLidas, setTemConversasNaoLidas] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
+
+  // Buscar ID do usuário logado
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      setUserId(data?.user?.id || null);
+    });
+  }, []);
+
+  // Verificar mensagens não lidas
+  useEffect(() => {
+    if (!userId) return;
+
+    async function verificarMensagensNaoLidas() {
+      // Busca se existe pelo menos uma mensagem não lida para o usuário logado
+      const { data } = await supabase
+        .from('mensagens')
+        .select('id')
+        .eq('destinatario_id', userId)
+        .or('lida_por.is.null,lida_por.not.cs.{"' + userId + '"}')
+        .limit(1);
+      
+      setTemConversasNaoLidas(!!(data && data.length > 0));
+    }
+
+    verificarMensagensNaoLidas();
+
+    // Configurar subscription para atualizações em tempo real
+    const subscription = supabase
+      .channel('mensagens-nao-lidas')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'mensagens',
+          filter: `destinatario_id=eq.${userId}`
+        },
+        () => {
+          verificarMensagensNaoLidas();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [userId]);
+
+  return temConversasNaoLidas;
+}
+
 const opcoes = [
   { id: "perfil", label: "Perfil" },
   { id: "sobre", label: "Sobre" },
@@ -33,6 +88,7 @@ export default function MenuPage() {
   const [uploading, setUploading] = useState(false);
   const [showFotoPerfil, setShowFotoPerfil] = useState(true);
   const navigate = useNavigate();
+  const temConversasNaoLidas = useConversasNaoLidas();
 
   // Carrega cor do tema ao abrir a página
   useEffect(() => {
@@ -298,21 +354,38 @@ export default function MenuPage() {
           </div>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <button
-            style={{
-              background: "#1976d2",
-              color: "#fff",
-              border: "none",
-              borderRadius: 6,
-              padding: "4px 14px",
-              fontWeight: 600,
-              fontSize: 14,
-              cursor: "pointer"
-            }}
-            onClick={() => navigate("/chat")}
-          >
-            Bate-Papo
-          </button>
+          <div style={{ position: "relative" }}>
+            <button
+              style={{
+                background: "#1976d2",
+                color: "#fff",
+                border: "none",
+                borderRadius: 6,
+                padding: "4px 14px",
+                fontWeight: 600,
+                fontSize: 14,
+                cursor: "pointer"
+              }}
+              onClick={() => navigate("/chat")}
+            >
+              Bate-Papo
+            </button>
+            {temConversasNaoLidas && (
+              <div
+                style={{
+                  position: "absolute",
+                  top: -4,
+                  right: -4,
+                  width: 12,
+                  height: 12,
+                  borderRadius: "50%",
+                  background: "#4CAF50",
+                  border: "2px solid #fff",
+                  zIndex: 1
+                }}
+              />
+            )}
+          </div>
           <span
             style={{
               background: "#1976d2",
