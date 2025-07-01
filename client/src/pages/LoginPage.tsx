@@ -404,7 +404,7 @@ export default function LoginPage() {
                 onChange={e => setSenha(e.target.value)}
               />
               <button style={buttonStyle} onClick={handleRegister} disabled={loading}>
-                {loading ? "Cadastrando..." : "Cadastrar"}
+                {loading ? "Cadastrando..." : "Enviar consulta"}
               </button>
             </>
           )}

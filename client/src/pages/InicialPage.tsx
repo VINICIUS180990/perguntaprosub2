@@ -251,15 +251,15 @@ export default function InicialPage() {
         <div style={{
           textAlign: "center",
           maxWidth: "800px",
-          marginBottom: "48px"
+          marginBottom: "12px"
         }}>
           <h1 style={{
-            fontSize: "48px",
+            fontSize: "44px",
             fontWeight: "bold",
             color: "#1976d2",
             marginBottom: "16px"
           }}>
-            Todos juntos em uma só Missão
+            TODOS JUNTOS EM UMA SÓ MISSÃO
           </h1>
           <p style={{
             fontSize: "20px",
@@ -284,8 +284,97 @@ export default function InicialPage() {
             }}
             onClick={() => navigate("/login")}
           >
-            Começar Agora
+            Consultar elegibilidade para cadastro
           </button>
+        </div>
+
+        {/* Destaque IA PerguntaProSub */}
+        <div style={{
+          width: "100%",
+          maxWidth: "1400px",
+          textAlign: "center",
+          marginBottom: "32px"
+        }}>
+          <h2 style={{
+            fontSize: "40px",
+            fontWeight: "bold",
+            marginBottom: "16px",
+            color: "#1976d2"
+          }}>
+            PerguntaProSub AI
+          </h2>
+          <p style={{
+            fontSize: "18px",
+            marginBottom: "24px",
+            lineHeight: "1.6",
+            color: "#666"
+          }}>
+            Clique na imagem abaixo para acessar A MAIS AVANÇADA IA do Mundo Militar
+          </p>
+          
+          <div 
+            style={{
+              display: "inline-block",
+              cursor: "pointer",
+              borderRadius: "16px",
+              overflow: "hidden",
+              boxShadow: "0 8px 24px rgba(0,0,0,0.15)",
+              transition: "transform 0.3s ease, box-shadow 0.3s ease",
+              border: "3px solid #1976d2",
+              maxWidth: "100%"
+            }}
+            onClick={() => navigate("/login")}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = "scale(1.05)";
+              e.currentTarget.style.boxShadow = "0 12px 32px rgba(25, 118, 210, 0.3)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = "scale(1)";
+              e.currentTarget.style.boxShadow = "0 8px 24px rgba(0,0,0,0.15)";
+            }}
+          >
+            <img 
+              src="./ia-banner.png" 
+              alt="IA PerguntaProSub - Inteligência Artificial Militar"
+              style={{
+                width: "100%",
+                maxWidth: "1600px",
+                height: "400px",
+                objectFit: "contain",
+                display: "block"
+              }}
+              onError={(e) => {
+                console.error('Erro ao carregar ia-banner.png, tentando caminho alternativo...');
+                // Tenta caminhos alternativos
+                if (e.currentTarget.src.includes('./ia-banner.png')) {
+                  e.currentTarget.src = '/ia-banner.png';
+                } else if (e.currentTarget.src.includes('/ia-banner.png')) {
+                  e.currentTarget.src = '/simbolo.png';
+                  e.currentTarget.style.width = "400px";
+                  e.currentTarget.style.height = "400px";
+                  e.currentTarget.style.objectFit = "contain";
+                  console.log('Usando imagem fallback: simbolo.png');
+                }
+              }}
+              onLoad={() => {
+                console.log('Imagem IA carregada com sucesso!');
+              }}
+            />
+          </div>
+          
+          <p style={{
+            fontSize: "16px",
+            marginTop: "20px",
+            lineHeight: "1.6",
+            color: "#555",
+            maxWidth: "700px",
+            margin: "20px auto 0"
+          }}>
+            <strong style={{ color: "#1976d2" }}>Sua IA especializada em documentos e normas militares!</strong><br />
+            Analise regulamentos, portarias, instruções e demais normas. 
+            Faça perguntas específicas e receba orientações precisas baseadas na documentação oficial. 
+            Ideal para consultas rápidas sobre procedimentos, regulamentações e diretrizes militares.
+          </p>
         </div>
 
         {/* Área de Links para Sites Oficiais */}
