@@ -53,6 +53,18 @@ export default function LandingPage() {
   // Estado do modal de tema
   const [showTemaModal, setShowTemaModal] = useState(false);
   const [temaSelecionado, setTemaSelecionado] = useState<string | null>(null);
+  
+  // Estado do modal de cadastro
+  const [showCadastroModal, setShowCadastroModal] = useState(false);
+
+  // Mostrar modal de cadastro após 3 segundos
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowCadastroModal(true);
+    }, 3000); // 3 segundos de delay
+
+    return () => clearTimeout(timer);
+  }, []);
 
   // Mapeamento de cor do header para cada tema
   const headerCores: Record<string, string> = {
@@ -936,7 +948,7 @@ export default function LandingPage() {
                 />
               </form>
               <div style={{ color: '#888', fontSize: 15, marginTop: 18, textAlign: 'center' }}>
-                O PerguntaproSub pode cometer erros. Considere verificar informações importantes.
+                O PerguntaproSub AI pode cometer erros. Considere verificar informações importantes.
               </div>
             </div>
           )}
@@ -1043,6 +1055,177 @@ export default function LandingPage() {
           </footer>
         </main>
       </div>
+      
+      {/* Modal de Cadastro */}
+      {showCadastroModal && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100vw",
+            height: "100vh",
+            background: "rgba(0, 0, 0, 0.7)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 1000
+          }}
+          onClick={() => setShowCadastroModal(false)}
+        >
+          <div
+            style={{
+              background: "#fff",
+              borderRadius: 16,
+              padding: "40px",
+              maxWidth: 550,
+              width: "90%",
+              boxShadow: "0 8px 32px rgba(0,0,0,0.3)",
+              textAlign: "center",
+              position: "relative"
+            }}
+            onClick={e => e.stopPropagation()}
+          >
+            {/* Botão fechar */}
+            <button
+              style={{
+                position: "absolute",
+                top: 15,
+                right: 20,
+                background: "transparent",
+                border: "none",
+                fontSize: 24,
+                color: "#999",
+                cursor: "pointer",
+                padding: 5
+              }}
+              onClick={() => setShowCadastroModal(false)}
+              title="Fechar"
+            >
+              ×
+            </button>
+
+            {/* Logo */}
+            <img
+              src="/simbolo.png"
+              alt="Logo PerguntaProSub"
+              style={{ width: 80, height: 80, marginBottom: 20, borderRadius: "50%" }}
+            />
+
+            {/* Título */}
+            <h2 style={{
+              color: "#1976d2",
+              fontSize: 28,
+              fontWeight: "bold",
+              marginBottom: 16,
+              margin: 0
+            }}>
+              Bem-vindo ao PerguntaProSub AI!
+            </h2>
+
+            {/* Texto informativo */}
+            <div style={{
+              color: "#666",
+              fontSize: 16,
+              lineHeight: 1.6,
+              marginBottom: 24,
+              textAlign: "left"
+            }}>
+              <p style={{ marginBottom: 16 }}>
+                🚀 <strong>Você está usando uma versão de demonstração</strong> do PerguntaProSub AI, 
+                especialmente criada para que você possa experimentar nossas funcionalidades.
+              </p>
+              
+              <p style={{ marginBottom: 16 }}>
+                ⚠️ <strong>Limitações da versão demo:</strong>
+              </p>
+              <ul style={{ marginLeft: 20, marginBottom: 16 }}>
+                <li>Número limitado de consultas</li>
+                <li>Arquivamento temporário de documentos</li>
+                <li>Funcionalidades reduzidas</li>
+                <li>Sem salvamento de histórico</li>
+              </ul>
+
+              <p style={{ marginBottom: 16 }}>
+                🎯 <strong>Com o cadastro completo você terá:</strong>
+              </p>
+              <ul style={{ marginLeft: 20, marginBottom: 20, color: "#1976d2" }}>
+                <li><strong>Consultas ilimitadas</strong> à IA</li>
+                <li><strong>Upload de documentos em banco de dados</strong> em nuvem</li>
+                <li><strong>Histórico completo</strong> de conversas</li>
+                <li><strong>Bate-papo</strong> com outros usuários</li>
+                <li><strong>Acesso ao perfil completo</strong> de amigos</li>
+                <li><strong>Suporte técnico</strong> especializado</li>
+                <li><strong>Atualizações exclusivas</strong> de conteúdo</li>
+              </ul>
+
+              <p style={{ 
+                color: "#d32f2f", 
+                fontWeight: "bold", 
+                fontSize: 17, 
+                textAlign: "center",
+                marginBottom: 0 
+              }}>
+                💡 Não perca tempo! Cadastre-se agora e tenha acesso completo a todas as funcionalidades do PerguntaProSub AI!
+              </p>
+            </div>
+
+            {/* Botões */}
+            <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
+              <button
+                style={{
+                  background: "#1976d2",
+                  color: "#fff",
+                  border: "none",
+                  borderRadius: 8,
+                  padding: "14px 28px",
+                  fontSize: 16,
+                  fontWeight: "bold",
+                  cursor: "pointer",
+                  boxShadow: "0 4px 12px rgba(25, 118, 210, 0.3)",
+                  transition: "all 0.2s ease"
+                }}
+                onClick={() => navigate("/login")}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = "#1565c0";
+                  e.currentTarget.style.transform = "translateY(-2px)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = "#1976d2";
+                  e.currentTarget.style.transform = "translateY(0)";
+                }}
+              >
+                🚀 Cadastre-se Agora
+              </button>
+              
+              <button
+                style={{
+                  background: "transparent",
+                  color: "#666",
+                  border: "2px solid #ddd",
+                  borderRadius: 8,
+                  padding: "12px 24px",
+                  fontSize: 14,
+                  cursor: "pointer",
+                  transition: "all 0.2s ease"
+                }}
+                onClick={() => setShowCadastroModal(false)}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = "#bbb";
+                  e.currentTarget.style.color = "#444";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = "#ddd";
+                  e.currentTarget.style.color = "#666";
+                }}
+              >
+                Continuar sem cadastro
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      
       {/* Modal de escolha de tema */}
       {showTemaModal && (
         <div

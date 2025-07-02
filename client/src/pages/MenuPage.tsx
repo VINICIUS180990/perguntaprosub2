@@ -57,19 +57,9 @@ function useConversasNaoLidas() {
   return temConversasNaoLidas;
 }
 
-const opcoes = [
-  { id: "perguntaprosub", label: "PerguntaProSub AI" },
-  { id: "perfil", label: "Perfil" },
-  { id: "sobre", label: "Sobre" },
-  { id: "termos", label: "Termos de Uso" },
-  { id: "contato", label: "Contato" },
-  { id: "privacidade", label: "Política de Privacidade" },
-  { id: "seguranca", label: "Redefinir senha" },
-  { id: "excluir", label: "Excluir Conta" }
-];
+// Componente da MenuPage com layout de cards
 
 export default function MenuPage() {
-  const [opcaoSelecionada, setOpcaoSelecionada] = useState("perfil");
   const [headerColor, setHeaderColor] = useState("#fff");
   const [menuUsuarioAberto, setMenuUsuarioAberto] = useState(false);
   const [menuUsuarioPos, setMenuUsuarioPos] = useState<{ top: number; left: number } | null>(null);
@@ -81,79 +71,6 @@ export default function MenuPage() {
     const savedColor = localStorage.getItem("paletaCor");
     setHeaderColor(savedColor || "#fff");
   }, []);
-
-  // Formulário de alteração de senha
-  function AlterarSenhaForm() {
-    const [novaSenha, setNovaSenha] = useState("");
-    const [confirmarSenha, setConfirmarSenha] = useState("");
-    const [carregando, setCarregando] = useState(false);
-    const [mensagem, setMensagem] = useState("");
-
-    async function handleAlterarSenha(e: React.FormEvent) {
-      e.preventDefault();
-      setMensagem("");
-      if (novaSenha.length < 6) {
-        setMensagem("A senha deve ter pelo menos 6 caracteres.");
-        return;
-      }
-      if (novaSenha !== confirmarSenha) {
-        setMensagem("As senhas não coincidem.");
-        return;
-      }
-      setCarregando(true);
-      const { error } = await supabase.auth.updateUser({ password: novaSenha });
-      setCarregando(false);
-      if (error) {
-        setMensagem("Erro ao alterar senha: " + error.message);
-      } else {
-        setMensagem("Senha alterada com sucesso!");
-        setNovaSenha("");
-        setConfirmarSenha("");
-      }
-    }
-
-    return (
-      <form onSubmit={handleAlterarSenha} style={{ display: "flex", flexDirection: "column", gap: 16, marginTop: 18, maxWidth: 340 }}>
-        <input
-          type="password"
-          placeholder="Nova senha"
-          value={novaSenha}
-          onChange={e => setNovaSenha(e.target.value)}
-          style={{ padding: 10, borderRadius: 6, border: "1px solid #ccc", fontSize: 16 }}
-          required
-        />
-        <input
-          type="password"
-          placeholder="Confirmar nova senha"
-          value={confirmarSenha}
-          onChange={e => setConfirmarSenha(e.target.value)}
-          style={{ padding: 10, borderRadius: 6, border: "1px solid #ccc", fontSize: 16 }}
-          required
-        />
-        <button
-          type="submit"
-          style={{ background: carregando ? "#aaa" : "#1976d2", color: "#fff", border: "none", borderRadius: 6, padding: "8px 18px", fontSize: 16, fontWeight: 600, cursor: carregando ? "not-allowed" : "pointer" }}
-          disabled={carregando}
-        >
-          {carregando ? "Alterando..." : "Alterar Senha"}
-        </button>
-        {mensagem && <div style={{ color: mensagem.includes("sucesso") ? "green" : "red", marginTop: 6 }}>{mensagem}</div>}
-      </form>
-    );
-  }
-
-  function FaleConoscoPage() {
-    return (
-      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: 300 }}>
-        <h2 style={{ margin: 0, fontSize: 22, color: "#1976d2" }}>Fale Conosco</h2>
-        <p style={{ color: "#888", marginTop: 24, fontSize: 18, textAlign: "center" }}>
-          Contatos<br />
-          Whatsapp: (21) 98364-2119<br />
-          Email: PERGUNTAPROSUB@GMAIL.COM
-        </p>
-      </div>
-    );
-  }
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -321,78 +238,455 @@ export default function MenuPage() {
           )}
         </div>
       </header>
-      {/* Conteúdo principal */}
-      <div style={{ display: "flex", height: "calc(100vh - 96px)", width: "100vw" }}>
-        {/* Sidebar de opções */}
-        <aside style={{
-          width: 260,
-          background: "#fff",
-          borderRight: "1px solid #eee",
-          padding: 24,
-          height: "100%",
-          boxSizing: "border-box"
+      
+      {/* Conteúdo principal - Layout de Cards */}
+      <main style={{
+        minHeight: "calc(100vh - 96px)",
+        background: "#f7f7f9",
+        padding: "32px",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center"
+      }}>
+        
+        {/* Título da página */}
+        <div style={{
+          textAlign: "center",
+          marginBottom: "48px"
         }}>
-          <nav>
-            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-              {opcoes.map((opcao) => (
-                <button
-                  key={opcao.id}
-                  onClick={() => {
-                    setOpcaoSelecionada(opcao.id);
-                    if (opcao.id === "perguntaprosub") navigate("/main");
-                    else if (opcao.id === "perfil") navigate("/perfil");
-                    else if (opcao.id === "privacidade") navigate("/privacidade");
-                    else if (opcao.id === "sobre") navigate("/sobre");
-                    else if (opcao.id === "termos") navigate("/termos");
-                    else if (opcao.id === "contato") navigate("/contato");
-                    else if (opcao.id === "home") navigate("/main");
-                    else if (opcao.id === "seguranca") navigate("/resetsenha");
-                    else if (opcao.id === "excluir") navigate("/excluir-conta");
-                    // ...demais navegações já existentes...
-                  }}
-                  style={{
-                    padding: "12px 10px",
-                    background: opcaoSelecionada === opcao.id ? "#e3eaff" : "#f7f7f9",
-                    border: opcaoSelecionada === opcao.id ? "1.5px solid #1976d2" : "1px solid #eee",
-                    borderRadius: 6,
-                    fontWeight: 600,
-                    fontSize: 15,
-                    color: "#222",
-                    cursor: "pointer",
-                    textAlign: "left"
-                  }}
-                >
-                  {opcao.label}
-                </button>
-              ))}
-            </div>
-          </nav>
-        </aside>
-        {/* Área de conteúdo */}
-        <main
-          style={{
-            flex: 1,
-            height: "100%",
-            background: "#f7f7f9",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            boxSizing: "border-box"
-          }}
-        >
-          <div style={{ width: "100%", maxWidth: 700, minHeight: 400, background: "#f7f7f9", borderRadius: 12, boxShadow: "0 2px 8px #0001", padding: 32, margin: 24 }}>
-            {opcaoSelecionada === "seguranca" && (
-              <div>
-                <h2 style={{ margin: 0, fontSize: 22 }}>Segurança</h2>
-                <AlterarSenhaForm />
-              </div>
-            )}
-            {opcaoSelecionada === "faleconosco" && (
-              <FaleConoscoPage />
-            )}
+          <h1 style={{
+            fontSize: "32px",
+            fontWeight: "bold",
+            color: "#1976d2",
+            marginBottom: "16px"
+          }}>
+            Estação de Comando
+          </h1>
+          <p style={{
+            fontSize: "18px",
+            color: "#666",
+            margin: 0
+          }}>
+            Acesse todas as funcionalidades do sistema
+          </p>
+        </div>
+
+        {/* Grid de Cards */}
+        <div style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+          gap: "24px",
+          width: "100%",
+          maxWidth: "1200px"
+        }}>
+          
+          {/* Card IA PerguntaProSub */}
+          <div 
+            style={{
+              background: "#fff",
+              border: "1px solid #ddd",
+              borderRadius: "12px",
+              padding: "24px",
+              textAlign: "center",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+              cursor: "pointer",
+              transition: "transform 0.2s ease, box-shadow 0.2s ease",
+              overflow: "hidden"
+            }}
+            onClick={() => navigate("/main")}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = "translateY(-4px)";
+              e.currentTarget.style.boxShadow = "0 4px 16px rgba(0,0,0,0.15)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = "translateY(0)";
+              e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.1)";
+            }}
+          >
+            <div style={{
+              fontSize: "48px",
+              marginBottom: "16px"
+            }}>🤖</div>
+            <h3 style={{
+              color: "#1976d2",
+              fontSize: "20px",
+              fontWeight: "700",
+              marginBottom: "12px"
+            }}>
+              PerguntaProSub AI
+            </h3>
+            <p style={{
+              color: "#666",
+              fontSize: "14px",
+              margin: 0,
+              lineHeight: "1.5"
+            }}>
+              Acesse a Inteligência Artificial para consultas sobre regulamentos e normas militares
+            </p>
           </div>
-        </main>
-      </div>
+
+          {/* Card Perfil */}
+          <div 
+            style={{
+              background: "#fff",
+              border: "1px solid #ddd",
+              borderRadius: "12px",
+              padding: "24px",
+              textAlign: "center",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+              cursor: "pointer",
+              transition: "transform 0.2s ease, box-shadow 0.2s ease",
+              overflow: "hidden"
+            }}
+            onClick={() => navigate("/perfil")}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = "translateY(-4px)";
+              e.currentTarget.style.boxShadow = "0 4px 16px rgba(0,0,0,0.15)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = "translateY(0)";
+              e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.1)";
+            }}
+          >
+            <div style={{
+              fontSize: "48px",
+              marginBottom: "16px"
+            }}>👤</div>
+            <h3 style={{
+              color: "#1976d2",
+              fontSize: "20px",
+              fontWeight: "700",
+              marginBottom: "12px"
+            }}>
+              Meu Perfil
+            </h3>
+            <p style={{
+              color: "#666",
+              fontSize: "14px",
+              margin: 0,
+              lineHeight: "1.5"
+            }}>
+              Gerencie suas informações pessoais e configurações do perfil
+            </p>
+          </div>
+
+          {/* Card Bate-Papo */}
+          <div 
+            style={{
+              background: "#fff",
+              border: "1px solid #ddd",
+              borderRadius: "12px",
+              padding: "24px",
+              textAlign: "center",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+              cursor: "pointer",
+              transition: "transform 0.2s ease, box-shadow 0.2s ease",
+              overflow: "hidden"
+            }}
+            onClick={() => navigate("/chat")}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = "translateY(-4px)";
+              e.currentTarget.style.boxShadow = "0 4px 16px rgba(0,0,0,0.15)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = "translateY(0)";
+              e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.1)";
+            }}
+          >
+            <div style={{
+              fontSize: "48px",
+              marginBottom: "16px"
+            }}>💬</div>
+            <h3 style={{
+              color: "#1976d2",
+              fontSize: "20px",
+              fontWeight: "700",
+              marginBottom: "12px"
+            }}>
+              Bate-Papo
+            </h3>
+            <p style={{
+              color: "#666",
+              fontSize: "14px",
+              margin: 0,
+              lineHeight: "1.5"
+            }}>
+              Converse com outros usuários do sistema em tempo real
+            </p>
+          </div>
+
+          {/* Card Sobre */}
+          <div 
+            style={{
+              background: "#fff",
+              border: "1px solid #ddd",
+              borderRadius: "12px",
+              padding: "24px",
+              textAlign: "center",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+              cursor: "pointer",
+              transition: "transform 0.2s ease, box-shadow 0.2s ease",
+              overflow: "hidden"
+            }}
+            onClick={() => navigate("/sobre")}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = "translateY(-4px)";
+              e.currentTarget.style.boxShadow = "0 4px 16px rgba(0,0,0,0.15)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = "translateY(0)";
+              e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.1)";
+            }}
+          >
+            <div style={{
+              fontSize: "48px",
+              marginBottom: "16px"
+            }}>ℹ️</div>
+            <h3 style={{
+              color: "#1976d2",
+              fontSize: "20px",
+              fontWeight: "700",
+              marginBottom: "12px"
+            }}>
+              Sobre
+            </h3>
+            <p style={{
+              color: "#666",
+              fontSize: "14px",
+              margin: 0,
+              lineHeight: "1.5"
+            }}>
+              Conheça mais sobre o PerguntaProSub e sua missão
+            </p>
+          </div>
+
+          {/* Card Termos de Uso */}
+          <div 
+            style={{
+              background: "#fff",
+              border: "1px solid #ddd",
+              borderRadius: "12px",
+              padding: "24px",
+              textAlign: "center",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+              cursor: "pointer",
+              transition: "transform 0.2s ease, box-shadow 0.2s ease",
+              overflow: "hidden"
+            }}
+            onClick={() => navigate("/termos")}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = "translateY(-4px)";
+              e.currentTarget.style.boxShadow = "0 4px 16px rgba(0,0,0,0.15)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = "translateY(0)";
+              e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.1)";
+            }}
+          >
+            <div style={{
+              fontSize: "48px",
+              marginBottom: "16px"
+            }}>📄</div>
+            <h3 style={{
+              color: "#1976d2",
+              fontSize: "20px",
+              fontWeight: "700",
+              marginBottom: "12px"
+            }}>
+              Termos de Uso
+            </h3>
+            <p style={{
+              color: "#666",
+              fontSize: "14px",
+              margin: 0,
+              lineHeight: "1.5"
+            }}>
+              Consulte os termos e condições de uso da plataforma
+            </p>
+          </div>
+
+          {/* Card Contato */}
+          <div 
+            style={{
+              background: "#fff",
+              border: "1px solid #ddd",
+              borderRadius: "12px",
+              padding: "24px",
+              textAlign: "center",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+              cursor: "pointer",
+              transition: "transform 0.2s ease, box-shadow 0.2s ease",
+              overflow: "hidden"
+            }}
+            onClick={() => navigate("/contato")}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = "translateY(-4px)";
+              e.currentTarget.style.boxShadow = "0 4px 16px rgba(0,0,0,0.15)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = "translateY(0)";
+              e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.1)";
+            }}
+          >
+            <div style={{
+              fontSize: "48px",
+              marginBottom: "16px"
+            }}>📞</div>
+            <h3 style={{
+              color: "#1976d2",
+              fontSize: "20px",
+              fontWeight: "700",
+              marginBottom: "12px"
+            }}>
+              Contato
+            </h3>
+            <p style={{
+              color: "#666",
+              fontSize: "14px",
+              margin: 0,
+              lineHeight: "1.5"
+            }}>
+              Entre em contato conosco para dúvidas e suporte
+            </p>
+          </div>
+
+          {/* Card Política de Privacidade */}
+          <div 
+            style={{
+              background: "#fff",
+              border: "1px solid #ddd",
+              borderRadius: "12px",
+              padding: "24px",
+              textAlign: "center",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+              cursor: "pointer",
+              transition: "transform 0.2s ease, box-shadow 0.2s ease",
+              overflow: "hidden"
+            }}
+            onClick={() => navigate("/privacidade")}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = "translateY(-4px)";
+              e.currentTarget.style.boxShadow = "0 4px 16px rgba(0,0,0,0.15)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = "translateY(0)";
+              e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.1)";
+            }}
+          >
+            <div style={{
+              fontSize: "48px",
+              marginBottom: "16px"
+            }}>🔒</div>
+            <h3 style={{
+              color: "#1976d2",
+              fontSize: "20px",
+              fontWeight: "700",
+              marginBottom: "12px"
+            }}>
+              Política de Privacidade
+            </h3>
+            <p style={{
+              color: "#666",
+              fontSize: "14px",
+              margin: 0,
+              lineHeight: "1.5"
+            }}>
+              Entenda como protegemos e utilizamos seus dados
+            </p>
+          </div>
+
+          {/* Card Redefinir Senha */}
+          <div 
+            style={{
+              background: "#fff",
+              border: "1px solid #ddd",
+              borderRadius: "12px",
+              padding: "24px",
+              textAlign: "center",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+              cursor: "pointer",
+              transition: "transform 0.2s ease, box-shadow 0.2s ease",
+              overflow: "hidden"
+            }}
+            onClick={() => navigate("/resetsenha")}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = "translateY(-4px)";
+              e.currentTarget.style.boxShadow = "0 4px 16px rgba(0,0,0,0.15)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = "translateY(0)";
+              e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.1)";
+            }}
+          >
+            <div style={{
+              fontSize: "48px",
+              marginBottom: "16px"
+            }}>🔑</div>
+            <h3 style={{
+              color: "#1976d2",
+              fontSize: "20px",
+              fontWeight: "700",
+              marginBottom: "12px"
+            }}>
+              Redefinir Senha
+            </h3>
+            <p style={{
+              color: "#666",
+              fontSize: "14px",
+              margin: 0,
+              lineHeight: "1.5"
+            }}>
+              Altere sua senha de acesso ao sistema
+            </p>
+          </div>
+
+          {/* Card Excluir Conta */}
+          <div 
+            style={{
+              background: "#fff",
+              border: "1px solid #ddd",
+              borderRadius: "12px",
+              padding: "24px",
+              textAlign: "center",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+              cursor: "pointer",
+              transition: "transform 0.2s ease, box-shadow 0.2s ease",
+              overflow: "hidden"
+            }}
+            onClick={() => navigate("/excluir-conta")}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = "translateY(-4px)";
+              e.currentTarget.style.boxShadow = "0 4px 16px rgba(0,0,0,0.15)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = "translateY(0)";
+              e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.1)";
+            }}
+          >
+            <div style={{
+              fontSize: "48px",
+              marginBottom: "16px"
+            }}>🗑️</div>
+            <h3 style={{
+              color: "#d32f2f",
+              fontSize: "20px",
+              fontWeight: "700",
+              marginBottom: "12px"
+            }}>
+              Excluir Conta
+            </h3>
+            <p style={{
+              color: "#666",
+              fontSize: "14px",
+              margin: 0,
+              lineHeight: "1.5"
+            }}>
+              Remova permanentemente sua conta do sistema
+            </p>
+          </div>
+
+        </div>
+      </main>
     </div>
   );
 }
