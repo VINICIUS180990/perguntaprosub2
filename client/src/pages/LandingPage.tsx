@@ -523,6 +523,7 @@ export default function LandingPage() {
                 ref={menuRef}
                 onClick={e => e.stopPropagation()}
               >
+                <button style={menuBtnStyle} onClick={() => { setMenuConfigAberto(false); navigate('/'); }}>Página Inicial</button>
                 <button style={menuBtnStyle} onClick={() => { setMenuConfigAberto(false); navigate('/sobre'); }}>Sobre</button>
                 <button style={menuBtnStyle} onClick={() => { setMenuConfigAberto(false); navigate('/termos'); }}>Termos de Uso</button>
                 <button style={menuBtnStyle} onClick={() => { setMenuConfigAberto(false); navigate('/contato'); }}>Contato</button>
@@ -1123,50 +1124,172 @@ export default function LandingPage() {
               Bem-vindo ao PerguntaProSub AI!
             </h2>
 
-            {/* Texto informativo */}
+            {/* Texto introdutório */}
             <div style={{
               color: "#666",
               fontSize: 16,
               lineHeight: 1.6,
               marginBottom: 24,
-              textAlign: "left"
+              textAlign: "center"
             }}>
               <p style={{ marginBottom: 16 }}>
                 🚀 <strong>Você está usando uma versão de demonstração</strong> do PerguntaProSub AI, 
                 especialmente criada para que você possa experimentar nossas funcionalidades.
               </p>
-              
-              <p style={{ marginBottom: 16 }}>
-                ⚠️ <strong>Limitações da versão demo:</strong>
-              </p>
-              <ul style={{ marginLeft: 20, marginBottom: 16 }}>
-                <li>Número limitado de consultas</li>
-                <li>Arquivamento temporário de documentos</li>
-                <li>Funcionalidades reduzidas</li>
-                <li>Sem salvamento de histórico</li>
-              </ul>
+            </div>
 
-              <p style={{ marginBottom: 16 }}>
-                🎯 <strong>Com o cadastro completo você terá:</strong>
-              </p>
-              <ul style={{ marginLeft: 20, marginBottom: 20, color: "#1976d2" }}>
-                <li><strong>Consultas ilimitadas</strong> à IA</li>
-                <li><strong>Upload de documentos em banco de dados</strong> em nuvem</li>
-                <li><strong>Histórico completo</strong> de conversas</li>
-                <li><strong>Bate-papo</strong> com outros usuários</li>
-                <li><strong>Acesso ao perfil completo</strong> de amigos</li>
-                <li><strong>Suporte técnico</strong> especializado</li>
-                <li><strong>Atualizações exclusivas</strong> de conteúdo</li>
-              </ul>
+            {/* Comparação de funcionalidades - Dois quadros lado a lado */}
+            <div style={{
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr",
+              gap: "16px",
+              marginBottom: 24,
+              width: "100%"
+            }}>
+              {/* Quadro Versão Demo */}
+              <div style={{
+                background: "#fff7f0",
+                border: "2px solid #ffa726",
+                borderRadius: 12,
+                padding: "20px",
+                textAlign: "left"
+              }}>
+                <h3 style={{
+                  color: "#f57c00",
+                  fontSize: 18,
+                  fontWeight: "bold",
+                  marginBottom: 16,
+                  textAlign: "center",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "8px"
+                }}>
+                  ⚠️ Versão Demo
+                </h3>
+                <ul style={{ 
+                  listStyle: "none", 
+                  padding: 0, 
+                  margin: 0,
+                  fontSize: 14,
+                  lineHeight: 1.6
+                }}>
+                  <li style={{ marginBottom: 8, display: "flex", alignItems: "center", gap: "8px" }}>
+                    <span style={{ color: "#f57c00" }}>❌</span>
+                    <span>Consultas limitadas</span>
+                  </li>
+                  <li style={{ marginBottom: 8, display: "flex", alignItems: "center", gap: "8px" }}>
+                    <span style={{ color: "#f57c00" }}>❌</span>
+                    <span>Documentos temporários</span>
+                  </li>
+                  <li style={{ marginBottom: 8, display: "flex", alignItems: "center", gap: "8px" }}>
+                    <span style={{ color: "#f57c00" }}>❌</span>
+                    <span>Sem histórico salvo</span>
+                  </li>
+                  <li style={{ marginBottom: 8, display: "flex", alignItems: "center", gap: "8px" }}>
+                    <span style={{ color: "#f57c00" }}>❌</span>
+                    <span>Sem bate-papo</span>
+                  </li>
+                  <li style={{ marginBottom: 8, display: "flex", alignItems: "center", gap: "8px" }}>
+                    <span style={{ color: "#f57c00" }}>❌</span>
+                    <span>Funcionalidades básicas</span>
+                  </li>
+                  <li style={{ marginBottom: 0, display: "flex", alignItems: "center", gap: "8px" }}>
+                    <span style={{ color: "#f57c00" }}>❌</span>
+                    <span>Sem suporte técnico</span>
+                  </li>
+                </ul>
+              </div>
 
+              {/* Quadro Versão Completa */}
+              <div style={{
+                background: "#f0f8ff",
+                border: "2px solid #1976d2",
+                borderRadius: 12,
+                padding: "20px",
+                textAlign: "left",
+                position: "relative"
+              }}>
+                {/* Badge "Recomendado" */}
+                <div style={{
+                  position: "absolute",
+                  top: -10,
+                  right: 15,
+                  background: "#4caf50",
+                  color: "#fff",
+                  fontSize: 12,
+                  fontWeight: "bold",
+                  padding: "4px 12px",
+                  borderRadius: 20,
+                  boxShadow: "0 2px 8px rgba(76, 175, 80, 0.3)"
+                }}>
+                  RECOMENDADO
+                </div>
+
+                <h3 style={{
+                  color: "#1976d2",
+                  fontSize: 18,
+                  fontWeight: "bold",
+                  marginBottom: 16,
+                  textAlign: "center",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "8px"
+                }}>
+                  🚀 Versão Completa
+                </h3>
+                <ul style={{ 
+                  listStyle: "none", 
+                  padding: 0, 
+                  margin: 0,
+                  fontSize: 14,
+                  lineHeight: 1.6
+                }}>
+                  <li style={{ marginBottom: 8, display: "flex", alignItems: "center", gap: "8px" }}>
+                    <span style={{ color: "#4caf50" }}>✅</span>
+                    <span><strong>Consultas ilimitadas</strong></span>
+                  </li>
+                  <li style={{ marginBottom: 8, display: "flex", alignItems: "center", gap: "8px" }}>
+                    <span style={{ color: "#4caf50" }}>✅</span>
+                    <span><strong>Documentos na nuvem</strong></span>
+                  </li>
+                  <li style={{ marginBottom: 8, display: "flex", alignItems: "center", gap: "8px" }}>
+                    <span style={{ color: "#4caf50" }}>✅</span>
+                    <span><strong>Histórico completo</strong></span>
+                  </li>
+                  <li style={{ marginBottom: 8, display: "flex", alignItems: "center", gap: "8px" }}>
+                    <span style={{ color: "#4caf50" }}>✅</span>
+                    <span><strong>Chat com usuários</strong></span>
+                  </li>
+                  <li style={{ marginBottom: 8, display: "flex", alignItems: "center", gap: "8px" }}>
+                    <span style={{ color: "#4caf50" }}>✅</span>
+                    <span><strong>Todas as funcionalidades</strong></span>
+                  </li>
+                  <li style={{ marginBottom: 0, display: "flex", alignItems: "center", gap: "8px" }}>
+                    <span style={{ color: "#4caf50" }}>✅</span>
+                    <span><strong>Suporte especializado</strong></span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            {/* Call to action */}
+            <div style={{
+              background: "#f8f9fa",
+              border: "1px solid #e0e0e0",
+              borderRadius: 8,
+              padding: "16px",
+              marginBottom: 24,
+              textAlign: "center"
+            }}>
               <p style={{ 
                 color: "#d32f2f", 
                 fontWeight: "bold", 
-                fontSize: 17, 
-                textAlign: "center",
-                marginBottom: 0 
+                fontSize: 16,
+                margin: 0
               }}>
-                💡 Não perca tempo! Cadastre-se agora e tenha acesso completo a todas as funcionalidades do PerguntaProSub AI!
+                💡 Não perca tempo! Cadastre-se agora e tenha acesso Completo e Ilimitado!
               </p>
             </div>
 

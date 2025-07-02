@@ -359,9 +359,9 @@ export default function InicialPage() {
                 textAlign: "center"
               }}>
                 <strong style={{ color: "#1976d2" }}>CLIQUE AQUI e acesse o PerguntaProSub AI</strong><br />
-                A mais avançada IA para analise de regulamentos, portarias, instruções e demais normas. 
+                A mais avançada IA para analise de normas, regulamentos, instruções e demais documentos. 
                 Faça perguntas específicas e receba orientações precisas baseadas na documentação oficial. 
-                Ideal para consultas rápidas sobre procedimentos, regulamentações e diretrizes militares.
+                Ideal para consultas rápidas sobre procedimentos, regulamentações e diretrizes.
               </p>
             </div>
           </div>
@@ -421,14 +421,14 @@ export default function InicialPage() {
                   <span style={{ fontSize: "24px" }}>🤖</span>
                   <div>
                     <strong style={{ color: "#1976d2" }}>IA Avançada:</strong>
-                    <span style={{ color: "#333", marginLeft: "8px" }}>Consulte documentos militares com precisão total</span>
+                    <span style={{ color: "#333", marginLeft: "8px" }}>Consulte documentos com precisão total</span>
                   </div>
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
                   <span style={{ fontSize: "24px" }}>👥</span>
                   <div>
-                    <strong style={{ color: "#1976d2" }}>Rede Social Militar:</strong>
-                    <span style={{ color: "#333", marginLeft: "8px" }}>Conecte-se com outros profissionais das Forças</span>
+                    <strong style={{ color: "#1976d2" }}>Rede de Comunicação:</strong>
+                    <span style={{ color: "#333", marginLeft: "8px" }}>Conecte-se com usuários de todas as Forças</span>
                   </div>
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
@@ -461,9 +461,6 @@ export default function InicialPage() {
                 </div>
               </div>
             </div>
-            <p style={{ color: "#666", fontSize: "16px", margin: "0" }}>
-              Clique aqui para solicitar seu acesso à plataforma militar
-            </p>
           </div>
         </div>
 
@@ -666,7 +663,7 @@ export default function InicialPage() {
             <div style={{ fontSize: "48px", marginBottom: "16px" }}>🔒</div>
             <h3 style={{ color: "#333", marginBottom: "8px" }}>Segurança Total</h3>
             <p style={{ color: "#666", fontSize: "14px" }}>
-              Ambiente seguro e exclusivo para militares
+              Ambiente seguro para militares e civis
             </p>
           </div>
         </div>
@@ -680,7 +677,7 @@ export default function InicialPage() {
         textAlign: "center",
         color: "#666"
       }}>
-        <p>&copy; 2025 PerguntaProSub Social. Todos os direitos reservados.</p>
+        <p>&copy; 2025 PerguntaProSub. Todos os direitos reservados.</p>
       </footer>
 
       {/* Modal de escolha de tema (igual ao original) */}

@@ -86,7 +86,7 @@ export default function MenuPage() {
   }, [menuUsuarioAberto]);
 
   return (
-    <div style={{ height: "100vh", width: "100vw", background: "#fff", overflow: "hidden" }}>
+    <div style={{ minHeight: "100vh", width: "100vw", background: "#fff" }}>
       {/* Cabeçalho idêntico ao da MainPage */}
       <header style={{
         height: 96,
@@ -216,7 +216,7 @@ export default function MenuPage() {
                   setMenuUsuarioAberto(false);
                   navigate("/main");
                 }}
-              >IA PerguntaProSub</button>
+              >PerguntaProSub AI</button>
               <div style={{ borderTop: "1px solid #eee" }} />
               <button
                 style={{

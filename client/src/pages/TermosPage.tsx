@@ -9,7 +9,7 @@ export default function TermosPage() {
           <p>Ao utilizar o PerguntaProSub, você concorda com todos os termos e condições descritos neste documento. O uso da plataforma implica na aceitação integral destes termos.</p>
 
           <h3 style={{ color: '#1976d2', marginTop: 20 }}>2. Descrição do Serviço</h3>
-          <p>O PerguntaProSub é uma plataforma de consulta de normas através de inteligência artificial, permitindo upload de documentos e consultas personalizadas sobre regulamentos e normas institucionais.</p>
+          <p>O PerguntaProSub é uma plataforma de consulta de normas através de inteligência artificial, permitindo upload de documentos e consultas personalizadas sobre regulamentos e normas.</p>
 
           <h3 style={{ color: '#1976d2', marginTop: 20 }}>3. Uso Responsável</h3>
           <p>É proibido na plataforma:</p>

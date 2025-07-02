@@ -8,7 +8,7 @@ export default function PrivacidadePage() {
           <p>O PerguntaProSub coleta apenas as informações necessárias para funcionamento da plataforma de consultas:</p>
           <ul>
             <li>Dados de cadastro: nome, e-mail e senha criptografada</li>
-            <li>Documentos anexados temporariamente para processamento</li>
+            <li>Documentos anexados para processamento</li>
             <li>Histórico de conversas e consultas realizadas</li>
             <li>Dados técnicos de uso da plataforma</li>
           </ul>
@@ -24,7 +24,7 @@ export default function PrivacidadePage() {
           </ul>
 
           <h3 style={{ color: '#1976d2', marginTop: 20 }}>3. Tratamento de Documentos</h3>
-          <p>Os documentos anexados são processados de forma segura e temporária. O conteúdo é utilizado apenas para gerar respostas às suas consultas e não é armazenado permanentemente em nossos servidores.</p>
+          <p>Os documentos anexados são processados de forma segura. O conteúdo é utilizado apenas para gerar respostas às suas consultas.</p>
 
           <h3 style={{ color: '#1976d2', marginTop: 20 }}>4. Compartilhamento</h3>
           <p>Não compartilhamos seus dados pessoais ou documentos com terceiros. Todas as informações permanecem confidenciais e são utilizadas exclusivamente para o funcionamento da plataforma.</p>
@@ -51,7 +51,7 @@ export default function PrivacidadePage() {
           <p>Mantemos suas informações apenas pelo tempo necessário para fornecer os serviços. Dados de conversas podem ser mantidos para melhorar a experiência, mas podem ser excluídos mediante solicitação.</p>
 
           <h3 style={{ color: '#1976d2', marginTop: 20 }}>8. Cookies e Tecnologias</h3>
-          <p>Utilizamos cookies essenciais para funcionamento da plataforma, como manutenção de sessões e preferências de usuário. Não utilizamos cookies de rastreamento para publicidade.</p>
+          <p>Utilizamos cookies essenciais para funcionamento da plataforma, como manutenção de sessões e preferências de usuário.</p>
 
           <p style={{ marginTop: 24, textAlign: 'center', fontWeight: 500, color: '#1976d2' }}>
             Dúvidas sobre privacidade? Contate-nos: perguntaprosub@gmail.com
