@@ -245,13 +245,13 @@ export default function InicialPage() {
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        gap: "32px"
+        gap: "0px"
       }}>
         {/* Hero Section */}
         <div style={{
           textAlign: "center",
           maxWidth: "800px",
-          marginBottom: "12px"
+          marginBottom: "0px"
         }}>
           <h1 style={{
             fontSize: "44px",
@@ -267,114 +267,204 @@ export default function InicialPage() {
             lineHeight: "1.6",
             marginBottom: "32px"
           }}>
-            A primeira Inteligência Artificial totalmente integrada a uma revolucionária Rede de Comunicação voltada para Militares das Forças Armadas e de Segurança. 
+            A primeira Inteligência Artificial totalmente integrada a uma revolucionária Rede de Comunicação voltada para Militares das Forças Armadas e de Segurança Pública. 
             Converse, compartilhe experiências e construa sua rede profissional.
           </p>
-          <button 
-            style={{
-              background: "#1976d2",
-              color: "#fff",
-              border: "none",
-              borderRadius: "8px",
-              padding: "16px 32px",
-              fontSize: "18px",
-              fontWeight: "600",
-              cursor: "pointer",
-              boxShadow: "0 4px 12px rgba(25, 118, 210, 0.3)"
-            }}
-            onClick={() => navigate("/login")}
-          >
-            Consultar elegibilidade para cadastro
-          </button>
         </div>
 
         {/* Destaque IA PerguntaProSub */}
         <div style={{
           width: "100%",
-          maxWidth: "1400px",
+          maxWidth: "1600px",
           textAlign: "center",
-          marginBottom: "32px"
+          marginBottom: "0px"
         }}>
-          <h2 style={{
-            fontSize: "40px",
-            fontWeight: "bold",
-            marginBottom: "16px",
-            color: "#1976d2"
-          }}>
-            PerguntaProSub AI
-          </h2>
-          <p style={{
-            fontSize: "18px",
-            marginBottom: "24px",
-            lineHeight: "1.6",
-            color: "#666"
-          }}>
-            Clique na imagem abaixo para acessar A MAIS AVANÇADA IA do Mundo Militar
-          </p>
+          <div 
+            style={{
+              background: "#fff",
+              border: "1px solid #ddd",
+              borderRadius: "12px",
+              padding: "24px",
+              margin: "0px auto",
+              maxWidth: "1150px",
+              width: "100%",
+              textAlign: "center",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+              cursor: "pointer",
+              transition: "transform 0.2s ease, box-shadow 0.2s ease",
+              overflow: "hidden"
+            }}
+            onClick={() => navigate("/landing")}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = "translateY(-4px)";
+              e.currentTarget.style.boxShadow = "0 4px 16px rgba(0,0,0,0.15)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = "translateY(0)";
+              e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.1)";
+            }}
+          >
+            <div style={{
+              background: "#f8f9fa",
+              borderRadius: "12px",
+              padding: "32px 24px",
+              marginBottom: "24px",
+              border: "1px solid #e0e0e0"
+            }}>
+              <div 
+                style={{
+                  display: "inline-block",
+                  borderRadius: "12px",
+                  overflow: "hidden",
+                  boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                  marginBottom: "24px",
+                  maxWidth: "100%"
+                }}
+              >
+                <img 
+                  src="./ia-banner.png" 
+                  alt="IA PerguntaProSub - Inteligência Artificial Militar"
+                  style={{
+                    width: "100%",
+                    maxWidth: "100%",
+                    height: "400px",
+                    objectFit: "contain",
+                    display: "block"
+                  }}
+                  onError={(e) => {
+                    console.error('Erro ao carregar ia-banner.png, tentando caminho alternativo...');
+                    // Tenta caminhos alternativos
+                    if (e.currentTarget.src.includes('./ia-banner.png')) {
+                      e.currentTarget.src = '/ia-banner.png';
+                    } else if (e.currentTarget.src.includes('/ia-banner.png')) {
+                      e.currentTarget.src = '/simbolo.png';
+                      e.currentTarget.style.width = "400px";
+                      e.currentTarget.style.height = "400px";
+                      e.currentTarget.style.objectFit = "contain";
+                      console.log('Usando imagem fallback: simbolo.png');
+                    }
+                  }}
+                  onLoad={() => {
+                    console.log('Imagem IA carregada com sucesso!');
+                  }}
+                />
+              </div>
+              
+              <p style={{
+                fontSize: "20px",
+                lineHeight: "1.6",
+                color: "#555",
+                maxWidth: "700px",
+                margin: "0 auto",
+                textAlign: "center"
+              }}>
+                <strong style={{ color: "#1976d2" }}>CLIQUE AQUI e acesse o PerguntaProSub AI</strong><br />
+                A mais avançada IA para analise de regulamentos, portarias, instruções e demais normas. 
+                Faça perguntas específicas e receba orientações precisas baseadas na documentação oficial. 
+                Ideal para consultas rápidas sobre procedimentos, regulamentações e diretrizes militares.
+              </p>
+            </div>
+          </div>
           
           <div 
             style={{
-              display: "inline-block",
+              background: "#fff",
+              border: "1px solid #ddd",
+              borderRadius: "12px",
+              padding: "24px",
+              margin: "0px auto",
+              marginTop: "40px",
+              maxWidth: "1150px",
+              width: "100%",
+              textAlign: "center",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
               cursor: "pointer",
-              borderRadius: "16px",
-              overflow: "hidden",
-              boxShadow: "0 8px 24px rgba(0,0,0,0.15)",
-              transition: "transform 0.3s ease, box-shadow 0.3s ease",
-              border: "3px solid #1976d2",
-              maxWidth: "100%"
+              transition: "transform 0.2s ease, box-shadow 0.2s ease",
+              overflow: "hidden"
             }}
             onClick={() => navigate("/login")}
             onMouseEnter={(e) => {
-              e.currentTarget.style.transform = "scale(1.05)";
-              e.currentTarget.style.boxShadow = "0 12px 32px rgba(25, 118, 210, 0.3)";
+              e.currentTarget.style.transform = "translateY(-4px)";
+              e.currentTarget.style.boxShadow = "0 4px 16px rgba(0,0,0,0.15)";
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.transform = "scale(1)";
-              e.currentTarget.style.boxShadow = "0 8px 24px rgba(0,0,0,0.15)";
+              e.currentTarget.style.transform = "translateY(0)";
+              e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.1)";
             }}
           >
-            <img 
-              src="./ia-banner.png" 
-              alt="IA PerguntaProSub - Inteligência Artificial Militar"
-              style={{
-                width: "100%",
-                maxWidth: "1600px",
-                height: "400px",
-                objectFit: "contain",
-                display: "block"
-              }}
-              onError={(e) => {
-                console.error('Erro ao carregar ia-banner.png, tentando caminho alternativo...');
-                // Tenta caminhos alternativos
-                if (e.currentTarget.src.includes('./ia-banner.png')) {
-                  e.currentTarget.src = '/ia-banner.png';
-                } else if (e.currentTarget.src.includes('/ia-banner.png')) {
-                  e.currentTarget.src = '/simbolo.png';
-                  e.currentTarget.style.width = "400px";
-                  e.currentTarget.style.height = "400px";
-                  e.currentTarget.style.objectFit = "contain";
-                  console.log('Usando imagem fallback: simbolo.png');
-                }
-              }}
-              onLoad={() => {
-                console.log('Imagem IA carregada com sucesso!');
-              }}
-            />
+            <div style={{
+              background: "#f8f9fa",
+              borderRadius: "12px",
+              padding: "32px 24px",
+              marginBottom: "24px",
+              border: "1px solid #e0e0e0"
+            }}>
+              <h3 style={{
+                color: "#1976d2",
+                fontSize: "24px",
+                fontWeight: "700",
+                marginBottom: "20px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "8px"
+              }}>
+                🚀 CADASTRE-SE e tenha acesso completo!
+              </h3>
+              <div style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(350px, 1fr))",
+                gap: "16px",
+                textAlign: "left"
+              }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                  <span style={{ fontSize: "24px" }}>🤖</span>
+                  <div>
+                    <strong style={{ color: "#1976d2" }}>IA Avançada:</strong>
+                    <span style={{ color: "#333", marginLeft: "8px" }}>Consulte documentos militares com precisão total</span>
+                  </div>
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                  <span style={{ fontSize: "24px" }}>👥</span>
+                  <div>
+                    <strong style={{ color: "#1976d2" }}>Rede Social Militar:</strong>
+                    <span style={{ color: "#333", marginLeft: "8px" }}>Conecte-se com outros profissionais das Forças</span>
+                  </div>
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                  <span style={{ fontSize: "24px" }}>💾</span>
+                  <div>
+                    <strong style={{ color: "#1976d2" }}>Salvar Conversas:</strong>
+                    <span style={{ color: "#333", marginLeft: "8px" }}>Guarde suas consultas e respostas importantes</span>
+                  </div>
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                  <span style={{ fontSize: "24px" }}>📁</span>
+                  <div>
+                    <strong style={{ color: "#1976d2" }}>Biblioteca Pessoal:</strong>
+                    <span style={{ color: "#333", marginLeft: "8px" }}>Organize seus documentos favoritos</span>
+                  </div>
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                  <span style={{ fontSize: "24px" }}>💬</span>
+                  <div>
+                    <strong style={{ color: "#1976d2" }}>Chat Privado:</strong>
+                    <span style={{ color: "#333", marginLeft: "8px" }}>Converse com segurança total</span>
+                  </div>
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                  <span style={{ fontSize: "24px" }}>🔒</span>
+                  <div>
+                    <strong style={{ color: "#1976d2" }}>100% Seguro:</strong>
+                    <span style={{ color: "#333", marginLeft: "8px" }}>Ambiente exclusivo para usuários verificados</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <p style={{ color: "#666", fontSize: "16px", margin: "0" }}>
+              Clique aqui para solicitar seu acesso à plataforma militar
+            </p>
           </div>
-          
-          <p style={{
-            fontSize: "16px",
-            marginTop: "20px",
-            lineHeight: "1.6",
-            color: "#555",
-            maxWidth: "700px",
-            margin: "20px auto 0"
-          }}>
-            <strong style={{ color: "#1976d2" }}>Sua IA especializada em documentos e normas militares!</strong><br />
-            Analise regulamentos, portarias, instruções e demais normas. 
-            Faça perguntas específicas e receba orientações precisas baseadas na documentação oficial. 
-            Ideal para consultas rápidas sobre procedimentos, regulamentações e diretrizes militares.
-          </p>
         </div>
 
         {/* Área de Links para Sites Oficiais */}
@@ -383,7 +473,8 @@ export default function InicialPage() {
           gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
           gap: "24px",
           width: "100%",
-          maxWidth: "1200px"
+          maxWidth: "1200px",
+          marginTop: "40px"
         }}>
           {/* Marinha do Brasil */}
           <div 
