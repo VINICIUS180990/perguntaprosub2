@@ -280,9 +280,9 @@ export default function MenuPage() {
                 }}
                 onClick={() => {
                   setMenuUsuarioAberto(false);
-                  navigate("/main");
+                  navigate("/");
                 }}
-              >IA PerguntaProSub</button>
+              >Página Inicial</button>
               <div style={{ borderTop: "1px solid #eee" }} />
               <button
                 style={{
@@ -297,26 +297,9 @@ export default function MenuPage() {
                 }}
                 onClick={() => {
                   setMenuUsuarioAberto(false);
-                  navigate("/resetsenha");
+                  navigate("/main");
                 }}
-              >Redefinir Senha</button>
-              <div style={{ borderTop: "1px solid #eee" }} />
-              <button
-                style={{
-                  padding: "12px 18px",
-                  background: "none",
-                  border: "none",
-                  textAlign: "left",
-                  fontWeight: 500,
-                  fontSize: 15,
-                  color: "#d32f2f",
-                  cursor: "pointer"
-                }}
-                onClick={() => {
-                  setMenuUsuarioAberto(false);
-                  navigate("/excluir-conta");
-                }}
-              >Excluir Conta</button>
+              >IA PerguntaProSub</button>
               <div style={{ borderTop: "1px solid #eee" }} />
               <button
                 style={{

@@ -16,7 +16,6 @@ const ChatPage: React.FC = () => {
   const [pesquisaConversas, setPesquisaConversas] = useState('');
   const [menuUsuarioAberto, setMenuUsuarioAberto] = useState(false);
   const [menuUsuarioPos, setMenuUsuarioPos] = useState<{ top: number; left: number } | null>(null);
-  const [userName, setUserName] = useState('');
   const [usuariosSupabase, setUsuariosSupabase] = useState<any[]>([]);
   const [buscandoUsuarios, setBuscandoUsuarios] = useState(false);
   const [mensagens, setMensagens] = useState<ChatMessage[]>([]);
@@ -33,6 +32,9 @@ const ChatPage: React.FC = () => {
   // Corrige exibição do perfil do amigo já adicionado
   // Adicione um estado para armazenar o perfil do usuário a ser exibido
   const [perfilUsuarioExibido, setPerfilUsuarioExibido] = useState<any | null>(null);
+  // Estados para foto do perfil
+  const [fotoPerfilUsuario, setFotoPerfilUsuario] = useState<string | null>(null);
+  const [showFotoUsuario, setShowFotoUsuario] = useState(true);
   // Busca cor do tema do localStorage a cada renderização do header
   const [headerColor, setHeaderColor] = useState('#fff');
   const [conversasNaoLidas, setConversasNaoLidas] = useState<{ [id: string]: boolean }>({});
@@ -42,10 +44,28 @@ const ChatPage: React.FC = () => {
     setBuscandoUsuarios(true);
     const { data } = await supabase
       .from('perfil_usuario')
-      .select('user_id, nome, nomeguerra, email')
+      .select('user_id, nome, nomeguerra, email, foto')
       .or(`nome.ilike.%${termo}%,nomeguerra.ilike.%${termo}%,email.ilike.%${termo}%`);
     setUsuariosSupabase(data || []);
     setBuscandoUsuarios(false);
+  }
+
+  // Função para carregar foto do perfil do usuário
+  async function carregarFotoUsuario(fotoPath: string | null) {
+    if (!fotoPath) {
+      setFotoPerfilUsuario(null);
+      return;
+    }
+
+    try {
+      const { data } = supabase.storage.from('fotos-perfil').getPublicUrl(fotoPath);
+      setFotoPerfilUsuario(data.publicUrl);
+      setShowFotoUsuario(true);
+    } catch (error) {
+      console.error('Erro ao carregar foto do perfil:', error);
+      setFotoPerfilUsuario(null);
+      setShowFotoUsuario(false);
+    }
   }
 
   // Atualiza busca ao digitar na barra de pesquisa de amigos
@@ -61,8 +81,7 @@ const ChatPage: React.FC = () => {
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
       setUserId(data?.user?.id || null);
-      const nome = data?.user?.user_metadata?.full_name || data?.user?.email || '';
-      setUserName(nome);
+      // Nome não mais necessário para exibição
     });
   }, []);
 
@@ -302,12 +321,12 @@ const ChatPage: React.FC = () => {
               alignItems: 'center',
               justifyContent: 'center',
               fontWeight: 700,
-              fontSize: 18,
+              fontSize: 20,
               marginRight: 8,
               cursor: 'pointer',
               userSelect: 'none'
             }}
-            title="Menu do usuário"
+            title="Menu"
             onClick={e => {
               const rect = (e.target as HTMLElement).getBoundingClientRect();
               setMenuUsuarioAberto(v => !v);
@@ -317,7 +336,7 @@ const ChatPage: React.FC = () => {
               });
             }}
           >
-            {userName ? userName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0,2) : ''}
+            ☰
           </span>
           {menuUsuarioAberto && menuUsuarioPos && (
             <div
@@ -338,6 +357,23 @@ const ChatPage: React.FC = () => {
                 flexDirection: "column"
               }}
             >
+              <button
+                style={{
+                  padding: "12px 18px",
+                  background: "none",
+                  border: "none",
+                  textAlign: "left",
+                  fontWeight: 500,
+                  fontSize: 15,
+                  color: "#222",
+                  cursor: "pointer"
+                }}
+                onClick={() => {
+                  setMenuUsuarioAberto(false);
+                  window.location.href = "/";
+                }}
+              >Página Inicial</button>
+              <div style={{ borderTop: "1px solid #eee" }} />
               <button
                 style={{
                   padding: "12px 18px",
@@ -429,6 +465,8 @@ const ChatPage: React.FC = () => {
                       setConversaSelecionada(null);
                       setMostrarPerfil(true);
                       setPerfilUsuarioExibido(usuario);
+                      // Carrega foto do perfil do usuário
+                      carregarFotoUsuario(usuario.foto);
                       // NÃO atualize ultimoAcesso ou conversasNaoLidas aqui!
                     }}
                   >
@@ -466,6 +504,7 @@ const ChatPage: React.FC = () => {
                         const usuario = usuariosSupabase.find(u => u.user_id === amigo.id);
                         if (usuario) {
                           setPerfilUsuarioExibido(usuario);
+                          carregarFotoUsuario(usuario.foto);
                         } else {
                           // Busca no Supabase se não estiver em cache
                           supabase
@@ -473,7 +512,10 @@ const ChatPage: React.FC = () => {
                             .select('*')
                             .eq('user_id', amigo.id)
                             .single()
-                            .then(({ data }) => setPerfilUsuarioExibido(data));
+                            .then(({ data }) => {
+                              setPerfilUsuarioExibido(data);
+                              if (data) carregarFotoUsuario(data.foto);
+                            });
                         }
                       }}
                     >
@@ -614,6 +656,42 @@ const ChatPage: React.FC = () => {
               gap: 16
             }}>
               <h2 style={{ margin: 0, color: 'var(--color-title, #1976d2)', textShadow: '0 1px 4px #fff' }}>Perfil do Usuário</h2>
+              
+              {/* Foto do perfil */}
+              <div style={{
+                width: 120,
+                height: 120,
+                borderRadius: "50%",
+                background: "#f0f0f0",
+                border: "3px solid #1976d2",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                overflow: "hidden",
+                marginBottom: 8
+              }}>
+                {showFotoUsuario && fotoPerfilUsuario ? (
+                  <img 
+                    src={fotoPerfilUsuario} 
+                    alt="Foto do perfil"
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover"
+                    }}
+                    onError={() => setShowFotoUsuario(false)}
+                  />
+                ) : (
+                  <span style={{
+                    fontSize: 48,
+                    color: "#1976d2",
+                    fontWeight: "bold"
+                  }}>
+                    {perfilUsuarioExibido.nome ? perfilUsuarioExibido.nome.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0,2) : '??'}
+                  </span>
+                )}
+              </div>
+              
               <div style={{ fontSize: 18, fontWeight: 600, color: '#222', textShadow: '0 1px 4px #fff' }}>{perfilUsuarioExibido.nome}</div>
               <div style={{ fontSize: 16, color: '#555' }}>Nome de guerra: {perfilUsuarioExibido.nomeguerra || '-'}</div>
               <div style={{ fontSize: 16, color: '#555' }}>Email: {perfilUsuarioExibido.email}</div>
@@ -947,6 +1025,7 @@ const ChatPage: React.FC = () => {
                               perfil = data;
                             }
                             setPerfilUsuarioExibido(perfil);
+                            if (perfil) carregarFotoUsuario(perfil.foto);
                             setAmigoSelecionado(conversa.id);
                             setConversaSelecionada(null);
                           }}
