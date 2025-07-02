@@ -426,11 +426,6 @@ export default function LandingPage() {
     setShowTemaModal(false);
   }
 
-  useEffect(() => {
-    const timer = setTimeout(() => setShowTemaModal(true), 2000);
-    return () => clearTimeout(timer);
-  }, []);
-
   // Carrega cor do tema salvo no localStorage
   useEffect(() => {
     const savedColor = localStorage.getItem("paletaCor");
@@ -463,7 +458,7 @@ export default function LandingPage() {
         <div style={{ display: "flex", alignItems: "center" }}>
           <img src="/simbolo.png" alt="Logo" style={{ width: 72, height: 72, borderRadius: "50%", marginRight: 14 }} />
           <div>
-            <div style={{ fontWeight: 700, fontSize: 18, color: "#000" }}>PerguntaProSubIA</div>
+            <div style={{ fontWeight: 700, fontSize: 18, color: "#000" }}>PerguntaProSub</div>
             <div style={{ fontSize: 12, color: "#000" }}>Sistema de IA para o mundo Militar</div>
           </div>
         </div>
@@ -941,7 +936,7 @@ export default function LandingPage() {
                 />
               </form>
               <div style={{ color: '#888', fontSize: 15, marginTop: 18, textAlign: 'center' }}>
-                O PerguntaproSubIA pode cometer erros. Considere verificar informações importantes.
+                O PerguntaproSub pode cometer erros. Considere verificar informações importantes.
               </div>
             </div>
           )}
@@ -1086,7 +1081,7 @@ export default function LandingPage() {
               alt="Símbolo"
               style={{ width: 120, height: 120, marginBottom: 12, borderRadius: "50%" }}
             />
-            <div style={{ fontWeight: 700, fontSize: 32, color: "#000", marginBottom: 0, textAlign: "center" }}>PerguntaProSubIA</div>
+            <div style={{ fontWeight: 700, fontSize: 32, color: "#000", marginBottom: 0, textAlign: "center" }}>PerguntaProSub</div>
             <div style={{ height: 12 }} />
             <div style={{ color: "#000", fontWeight: 500, marginBottom: 8, fontSize: 18, textAlign: "center" }}>
               Tá na onça né Boysinho?

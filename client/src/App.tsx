@@ -11,6 +11,7 @@ import TermosPage from "./pages/TermosPage";
 import InicialPage from "./pages/InicialPage";
 import LandingPage from "./pages/LandingPage";
 import ExcluirContaPage from "./pages/ExcluirContaPage";
+import PerfilPage from "./pages/PerfilPage";
 
 export default function App() {
   return (
@@ -21,6 +22,7 @@ export default function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/main" element={<MainPage />} />
         <Route path="/config" element={<MenuPage />} />
+        <Route path="/perfil" element={<PerfilPage />} />
         <Route path="/resetsenha" element={<RedefinirSenhaPage />} />
         <Route path="/excluir-conta" element={<ExcluirContaPage />} />
         <Route path="/chat" element={<ChatPage />} />

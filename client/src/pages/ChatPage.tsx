@@ -351,26 +351,9 @@ const ChatPage: React.FC = () => {
                 }}
                 onClick={() => {
                   setMenuUsuarioAberto(false);
-                  window.location.href = "/main";
-                }}
-              >Página Inicial</button>
-              <div style={{ borderTop: "1px solid #eee" }} />
-              <button
-                style={{
-                  padding: "12px 18px",
-                  background: "none",
-                  border: "none",
-                  textAlign: "left",
-                  fontWeight: 500,
-                  fontSize: 15,
-                  color: "#222",
-                  cursor: "pointer"
-                }}
-                onClick={() => {
-                  setMenuUsuarioAberto(false);
                   window.location.href = "/config";
                 }}
-              >Menu</button>
+              >Estação de Comando</button>
               <div style={{ borderTop: "1px solid #eee" }} />
               <button
                 style={{
