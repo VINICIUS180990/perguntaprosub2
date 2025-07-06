@@ -28,9 +28,9 @@ PARTES DISPONÍVEIS E SEUS RESUMOS:
 INSTRUÇÕES:
 1. ANALISE CUIDADOSAMENTE a pergunta do usuário
 2. VERIFIQUE quais partes têm informações relevantes para responder
-3. SELECIONE APENAS as partes estritamente necessárias
+3. SELECIONE APENAS as partes estritamente necessárias (máximo 5-7 partes)
 4. USE OS NOMES EXATOS das partes (ex: "Parte 1", "Parte 2", etc.)
-5. Se a pergunta não estiver relacionada ao documento, responda com lista vazia
+5. PRIORIZE qualidade sobre quantidade na seleção
 
 FORMATO DE RESPOSTA (JSON):
 {
@@ -191,7 +191,8 @@ export class PartSelector {
     const filteredParts = documentDivisions.filter(division => {
       const isSelected = selectedPartNames.includes(division.nome);
       if (isSelected) {
-        console.log(`[PART_SELECTOR] ✅ Incluída: "${division.nome}" (${division.conteudo.length} chars)`);
+        const tokens = estimateTokens(division.conteudo);
+        console.log(`[PART_SELECTOR] ✅ Incluída: "${division.nome}" (${tokens} tokens)`);
       }
       return isSelected;
     });

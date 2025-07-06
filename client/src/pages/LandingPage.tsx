@@ -6,10 +6,11 @@ import * as pdfjsLib from "pdfjs-dist/legacy/build/pdf";
 pdfjsLib.GlobalWorkerOptions.workerSrc = "/pdf.worker.mjs";
 import mammoth from "mammoth";
 import { processLandingPageQuery, preProcessDocument } from "../api";
+import { estimateTokens } from "../api/costMonitor";
 
 const ACCEPTED_FORMATS = ".pdf,.txt";
 
-type Arquivo = { nome: string; url: string };
+type Arquivo = { nome: string; url: string; timestamp?: number };
 type Conversa = { id: string; nome: string };
 type Mensagem = { autor: 'user' | 'bot'; texto: string };
 
@@ -19,7 +20,11 @@ export default function LandingPage() {
   const [loading, setLoading] = useState(false);
   const [arquivos, setArquivos] = useState<Arquivo[]>(() => {
     const saved = sessionStorage.getItem("arquivos");
-    return saved ? JSON.parse(saved) : [];
+    const arquivosSalvos = saved ? JSON.parse(saved) : [];
+    // Ordena por timestamp, mais recentes primeiro
+    return arquivosSalvos.sort((a: Arquivo, b: Arquivo) => 
+      (b.timestamp || 0) - (a.timestamp || 0)
+    );
   });
   const fileInputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
@@ -173,7 +178,8 @@ export default function LandingPage() {
     reader.onload = () => {
       const url = reader.result as string;
       setArquivos(prev => {
-        const novosArquivos = [...prev, { nome: file.name, url }];
+        const novoArquivo = { nome: file.name, url, timestamp: Date.now() };
+        const novosArquivos = [novoArquivo, ...prev];
         return novosArquivos;
       });
       
@@ -295,7 +301,7 @@ export default function LandingPage() {
         console.log("Debug - Formato não suportado para pré-carregamento:", arquivoObj.url.substring(0, 50));
         return;
       }
-      console.log(`Debug - Arquivo pré-carregado: ${nome} | Tamanho: ${texto.length} caracteres`);
+      console.log(`Debug - Arquivo pré-carregado: ${nome} | Tamanho: ${texto.length} chars (${estimateTokens(texto)} tokens)`);
       
       // ✅ NOVO: Pré-processar documento automaticamente
       console.log(`[AUTO_PREPROCESS] 🚀 Iniciando pré-processamento automático do documento: ${nome}`);

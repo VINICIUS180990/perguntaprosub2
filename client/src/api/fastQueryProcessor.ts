@@ -95,7 +95,7 @@ export class FastQueryProcessor {
       
       console.log(`[FAST_PROCESSOR] 🔍 ✅ PARTES FILTRADAS:`);
       console.log(`[FAST_PROCESSOR] 🔍 - Partes usadas: ${selectedParts.length}`);
-      console.log(`[FAST_PROCESSOR] 🔍 - Conteúdo selecionado: ${totalSelectedContent} chars`);
+      console.log(`[FAST_PROCESSOR] 🔍 - Conteúdo selecionado: ${totalSelectedContent} chars (${estimateTokens(selectedParts.map(p => p.conteudo).join(''))} tokens)`);
       console.log(`[FAST_PROCESSOR] 🔍 - ECONOMIA: ${economyPercent}% de tokens!`);
       
       // ETAPA 4: Resposta final rápida
@@ -113,10 +113,13 @@ export class FastQueryProcessor {
       };
       
       console.log(`[FAST_PROCESSOR] ✅ CONSULTA RÁPIDA CONCLUÍDA:`);
-      console.log(`[FAST_PROCESSOR] ✅ - Resposta: ${finalAnswer.length} chars`);
+      console.log(`[FAST_PROCESSOR] ✅ - Resposta: ${finalAnswer.length} chars (${estimateTokens(finalAnswer)} tokens)`);
       console.log(`[FAST_PROCESSOR] ✅ - Economia: ${economyPercent}%`);
       console.log(`[FAST_PROCESSOR] ✅ - Custo: $${response.totalCost.toFixed(6)}`);
       console.log(`[FAST_PROCESSOR] ✅ - Tempo: ${response.processingTime}ms`);
+      
+      // ✅ DISPLAY CHAMATIVO DO CUSTO TOTAL DA CONVERSA
+      this.displayConversationCost();
       
       return response;
       
@@ -176,7 +179,7 @@ export class FastQueryProcessor {
       return `=== ${part.nome} ===\n${part.conteudo}\n`;
     }).join('\n');
     
-    console.log(`[FAST_PROCESSOR] 🤖 - Conteúdo total: ${selectedContent.length} chars`);
+    console.log(`[FAST_PROCESSOR] 🤖 - Conteúdo total: ${selectedContent.length} chars (${estimateTokens(selectedContent)} tokens)`);
     
     // Prompt otimizado
     const fullPrompt = FAST_FINAL_ANSWER_PROMPT
@@ -194,7 +197,7 @@ export class FastQueryProcessor {
     const outputTokens = estimateTokens(apiResponse);
     const totalCost = estimateCost(inputTokens, outputTokens);
     
-    console.log(`[FAST_PROCESSOR] 🤖 📥 Resposta recebida: ${apiResponse.length} chars`);
+    console.log(`[FAST_PROCESSOR] 🤖 📥 Resposta recebida: ${apiResponse.length} chars (${outputTokens} tokens)`);
     console.log(`[FAST_PROCESSOR] 🤖 💰 Tokens saída: ${outputTokens}`);
     console.log(`[FAST_PROCESSOR] 🤖 💰 Custo: $${totalCost.toFixed(6)}`);
     
@@ -270,6 +273,35 @@ export class FastQueryProcessor {
     this.queryCount = 0;
     this.totalCost = 0;
     console.log(`[FAST_PROCESSOR] 🔄 Estatísticas resetadas`);
+  }
+
+  /**
+   * Exibir custo total da conversa de forma chamativa
+   */
+  private displayConversationCost(): void {
+    const totalQueries = this.queryCount;
+    const totalCost = this.totalCost;
+    
+    // ✅ DISPLAY CHAMATIVO PARA IDENTIFICAR FACILMENTE NO CONSOLE
+    console.log('');
+    console.log('🎯💰🎯💰🎯💰🎯💰🎯💰🎯💰🎯💰🎯💰🎯💰🎯💰🎯💰🎯💰🎯💰🎯💰🎯💰');
+    console.log('💰                         CUSTO TOTAL DA CONVERSA                         💰');
+    console.log('🎯💰🎯💰🎯💰🎯💰🎯💰🎯💰🎯💰🎯💰🎯💰🎯💰🎯💰🎯💰🎯💰🎯💰🎯💰');
+    console.log(`💰 📊 CONSULTAS REALIZADAS: ${totalQueries}`);
+    console.log(`💰 💵 CUSTO TOTAL: $${totalCost.toFixed(6)}`);
+    console.log(`💰 📈 CUSTO MÉDIO POR CONSULTA: $${(totalCost / Math.max(totalQueries, 1)).toFixed(6)}`);
+    
+    // Aviso se custo está alto
+    if (totalCost > 0.10) {
+      console.log('💰 ⚠️  ATENÇÃO: CUSTO ALTO DETECTADO!');
+    } else if (totalCost > 0.05) {
+      console.log('💰 🟡 CUSTO MODERADO');
+    } else {
+      console.log('💰 ✅ CUSTO BAIXO - ECONOMIA EFICIENTE');
+    }
+    
+    console.log('🎯💰🎯💰🎯💰🎯💰🎯💰🎯💰🎯💰🎯💰🎯💰🎯💰🎯💰🎯💰🎯💰🎯💰🎯💰');
+    console.log('');
   }
 }
 
