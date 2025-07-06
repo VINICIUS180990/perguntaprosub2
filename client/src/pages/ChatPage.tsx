@@ -215,7 +215,9 @@ const ChatPage: React.FC = () => {
   const conversasFiltradas: { id: string, nome: string }[] = conversasSupabase.filter((c: { id: string, nome: string }) => c.nome.toLowerCase().includes(pesquisaConversas.toLowerCase()));
 
   // Certifique-se de que amigosFiltrados está definido antes do return e tipada corretamente
-  const amigosFiltrados: { id: string, nome: string }[] = amigos.filter((a: { nome: string }) => a.nome.toLowerCase().includes(pesquisaAmigo.toLowerCase()));
+  const amigosFiltrados: { id: string, nome: string }[] = amigos
+    .filter((a: { nome: string }) => a.nome.toLowerCase().includes(pesquisaAmigo.toLowerCase()))
+    .sort((a, b) => a.nome.localeCompare(b.nome));
 
   // Fecha o menu ao clicar fora
   React.useEffect(() => {
@@ -454,7 +456,7 @@ const ChatPage: React.FC = () => {
                   marginBottom: 8
                 }}
               />
-              <div style={{ maxHeight: 180, overflowY: 'auto', marginTop: 8 }}>
+              <div style={{ maxHeight: 400, overflowY: 'auto', marginTop: 8 }}>
                 {buscandoUsuarios && (
                   <div style={{ color: '#888', fontSize: 13 }}>Buscando usuários...</div>
                 )}
@@ -928,7 +930,7 @@ const ChatPage: React.FC = () => {
                   marginBottom: 8
                 }}
               />
-              <div style={{ maxHeight: 180, overflowY: 'auto', marginTop: 8 }}>
+              <div style={{ maxHeight: 400, overflowY: 'auto', marginTop: 8 }}>
                 {conversasFiltradas.length === 0 && (
                   <div style={{ color: '#888', fontSize: 13 }}>Nenhuma conversa encontrada.</div>
                 )}
