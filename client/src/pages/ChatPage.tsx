@@ -676,7 +676,7 @@ const ChatPage: React.FC = () => {
             }}>
               <h2 style={{ margin: 0, color: 'var(--color-title, #1976d2)', textShadow: '0 1px 4px #fff' }}>Perfil do Usuário</h2>
               
-              {/* Foto do perfil */}
+              {/* */}
               <div style={{
                 width: 120,
                 height: 120,
