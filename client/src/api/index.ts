@@ -1,49 +1,72 @@
-// Exportações principais da API
+// DEBUG: Log de inicialização do index.ts
+console.log('[DEBUG] index.ts - Iniciando exports da API');
+
+// === NOVO SISTEMA DE ECONOMIA DE TOKENS === //
+export {
+  processLandingPageQuery,
+  processMainPageQuery,
+  preProcessDocument,
+  getSystemStats,
+  clearSystemCache,
+  checkSystemHealth
+} from './newMainAPI';
+
+// === NOVA API PRINCIPAL === //
+// Sistema de Documentos Inteligente  
+export {
+  processDocumentContent,
+  processUserQuery,
+  preloadDocument
+} from './mainAPI';
+
+// === EXPORTAÇÕES BÁSICAS === //
 export { chatWithAI } from './chat';
 export type { MessageHistory } from './chat';
-export { 
-  sendMainPageMessage, 
-  sendLandingPageMessage, 
-  sendCustomMessage 
-} from './messaging';
+
+// === PROMPTS === //
 export { 
   MAIN_PAGE_SYSTEM_PROMPT, 
   LANDING_PAGE_SYSTEM_PROMPT, 
   createContextPrompt 
 } from './prompts';
+
+// === CONFIGURAÇÕES === //
 export { AI_API_KEY, AI_MODEL, AI_API_URL } from './config';
 
-// Exportações para otimização de custos
-export { 
-  chunkDocument, 
-  findRelevantChunks, 
-  combineRelevantChunks,
-  hybridSearch
-} from './chunking';
+// === CACHE === //
 export { apiCache } from './cache';
+
+// DEBUG: Verificando exports do costMonitor
+console.log('[DEBUG] index.ts - Preparando exports do costMonitor');
+
+// === CUSTOS E MONITORAMENTO === //
 export { 
-  compressMessageHistory, 
-  compressContext, 
-  removeRedundantContent,
-  estimateTokens,
-  estimateCost 
-} from './compression';
-export { 
-  preprocessDocument, 
-  extractKeywords, 
-  getProcessingPriority,
-  intelligentDocumentSearch
-} from './preprocessing';
-export { costMonitor } from './costMonitor';
-export { 
-  GEMINI_PRICING,
-  calculateGeminiCost,
-  formatCost,
-  calculateSavings,
-  isCostWithinBudget,
-  suggestOptimizations
-} from './pricing';
-export { debugMonitor, useChunkDebug } from './debug';
-export type { DocumentChunk } from './chunking';
-export type { ProcessingOptions } from './preprocessing';
-export type { DebugInfo } from './debug';
+  costMonitor, 
+  estimateTokens, 
+  estimateCost, 
+  calculateCost, 
+  formatCost 
+} from './costMonitor';
+
+// DEBUG: Verificar se exports do costMonitor funcionaram
+console.log('[DEBUG] index.ts - Exports do costMonitor configurados');
+
+// === TIPOS === //
+export type { 
+  DocumentProcessingResult, 
+  DocumentDivision 
+} from './documentProcessor';
+
+export type {
+  QueryAnalysisResult,
+  QueryResponse
+} from './intelligentQuery';
+
+// === GUIA DE TESTE === //
+export { TESTING_GUIDE } from './testingGuide';
+
+// DEBUG: Importar teste do costMonitor
+import './testCostMonitor';
+
+// DEBUG: Importar teste do prompts
+import './testPrompts';

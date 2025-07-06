@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import * as pdfjsLib from "pdfjs-dist/legacy/build/pdf";
 pdfjsLib.GlobalWorkerOptions.workerSrc = "/pdf.worker.mjs";
 import mammoth from "mammoth";
-import { sendLandingPageMessage } from "../api";
+import { processLandingPageQuery, preProcessDocument } from "../api";
 
 const ACCEPTED_FORMATS = ".pdf,.txt";
 
@@ -296,6 +296,19 @@ export default function LandingPage() {
         return;
       }
       console.log(`Debug - Arquivo pré-carregado: ${nome} | Tamanho: ${texto.length} caracteres`);
+      
+      // ✅ NOVO: Pré-processar documento automaticamente
+      console.log(`[AUTO_PREPROCESS] 🚀 Iniciando pré-processamento automático do documento: ${nome}`);
+      try {
+        const preProcessSuccess = await preProcessDocument(texto, nome);
+        if (preProcessSuccess) {
+          console.log(`[AUTO_PREPROCESS] ✅ Documento pré-processado com sucesso: ${nome}`);
+        } else {
+          console.log(`[AUTO_PREPROCESS] ⚠️ Falha no pré-processamento: ${nome}`);
+        }
+      } catch (error) {
+        console.error(`[AUTO_PREPROCESS] ❌ Erro no pré-processamento:`, error);
+      }
     } catch (e) {
       console.log("Debug - Erro ao pré-carregar arquivo:", e);
     }
@@ -377,12 +390,6 @@ export default function LandingPage() {
     
     setEnviando(true);
 
-    // Monta o histórico para a API
-    const historicoApi = mensagensAtualizadas.map(m => ({
-      autor: m.autor,
-      texto: m.texto
-    }));
-
     // Busca contexto nos documentos
     const contexto = await buscarContextoPergunta();
     console.log("Debug - Contexto retornado:", contexto ? "TEM CONTEXTO" : "SEM CONTEXTO");
@@ -391,7 +398,11 @@ export default function LandingPage() {
     console.log("Debug - Prompt final sendo enviado para IA:", contexto ? contexto.substring(0, 200) : "SEM CONTEXTO");
 
     try {
-      const respostaIA = await sendLandingPageMessage(historicoApi, contexto);
+      const respostaIA = await processLandingPageQuery(
+        inputMensagem,
+        contexto,
+        arquivoSelecionado
+      );
       const mensagensComBot = [
         ...mensagensAtualizadas,
         { autor: 'bot' as const, texto: respostaIA }
@@ -907,12 +918,6 @@ export default function LandingPage() {
                 setTimeout(async () => {
                   setEnviando(true);
                   
-                  // Monta o histórico para a API
-                  const historicoApi = novasMensagens.map(m => ({
-                    autor: m.autor,
-                    texto: m.texto
-                  }));
-
                   // Busca contexto nos documentos
                   const contexto = await buscarContextoPergunta();
                   console.log("Debug FORM - Contexto retornado:", contexto ? "TEM CONTEXTO" : "SEM CONTEXTO");
@@ -921,7 +926,11 @@ export default function LandingPage() {
                   console.log("Debug FORM - Prompt final sendo enviado para IA:", contexto ? contexto.substring(0, 200) : "SEM CONTEXTO");
 
                   try {
-                    const respostaIA = await sendLandingPageMessage(historicoApi, contexto);
+                    const respostaIA = await processLandingPageQuery(
+                      inputMensagem,
+                      contexto,
+                      arquivoSelecionado
+                    );
                     setMensagens(prev => [...prev, { autor: 'bot' as const, texto: respostaIA }]);
                   } catch (err) {
                     setMensagens(prev => [...prev, { autor: 'bot' as const, texto: `Erro ao consultar a API de IA: ${err}` }]);
@@ -1248,6 +1257,10 @@ export default function LandingPage() {
                 }}>
                   <li style={{ marginBottom: 8, display: "flex", alignItems: "center", gap: "8px" }}>
                     <span style={{ color: "#4caf50" }}>✅</span>
+                    <span><strong>Cadastro GRATUITO</strong></span>
+                  </li>
+                  <li style={{ marginBottom: 8, display: "flex", alignItems: "center", gap: "8px" }}>
+                    <span style={{ color: "#4caf50" }}>✅</span>
                     <span><strong>Consultas ilimitadas</strong></span>
                   </li>
                   <li style={{ marginBottom: 8, display: "flex", alignItems: "center", gap: "8px" }}>
@@ -1289,7 +1302,7 @@ export default function LandingPage() {
                 fontSize: 16,
                 margin: 0
               }}>
-                💡 Não perca tempo! Cadastre-se agora e tenha acesso Completo e Ilimitado!
+                💡 Cadastre-se agora e tenha acesso ILIMITADO a todas as funcionalidades!
               </p>
             </div>
 
