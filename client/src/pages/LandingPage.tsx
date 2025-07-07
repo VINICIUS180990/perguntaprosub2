@@ -5,8 +5,7 @@ import { useNavigate } from "react-router-dom";
 import * as pdfjsLib from "pdfjs-dist/legacy/build/pdf";
 pdfjsLib.GlobalWorkerOptions.workerSrc = "/pdf.worker.mjs";
 import mammoth from "mammoth";
-import { processLandingPageQuery, preProcessDocument } from "../api";
-import { estimateTokens } from "../api/costMonitor";
+import { api2 } from "../api2";
 
 const ACCEPTED_FORMATS = ".pdf,.txt";
 
@@ -301,16 +300,18 @@ export default function LandingPage() {
         console.log("Debug - Formato não suportado para pré-carregamento:", arquivoObj.url.substring(0, 50));
         return;
       }
-      console.log(`Debug - Arquivo pré-carregado: ${nome} | Tamanho: ${texto.length} chars (${estimateTokens(texto)} tokens)`);
+      // Usar API2 para estimate e processamento
+      const preview = api2.previewDocument(texto, nome);
+      console.log(`Debug - Arquivo pré-carregado: ${nome} | Tamanho: ${texto.length} chars (${preview.tokenCount} tokens)`);
       
-      // ✅ NOVO: Pré-processar documento automaticamente
+      // ✅ NOVO: Pré-processar documento automaticamente com API2
       console.log(`[AUTO_PREPROCESS] 🚀 Iniciando pré-processamento automático do documento: ${nome}`);
       try {
-        const preProcessSuccess = await preProcessDocument(texto, nome);
-        if (preProcessSuccess) {
-          console.log(`[AUTO_PREPROCESS] ✅ Documento pré-processado com sucesso: ${nome}`);
+        const processResult = await api2.processDocument(texto, nome, 'SELECTED');
+        if (processResult.success) {
+          console.log(`[AUTO_PREPROCESS] ✅ Documento pré-processado com sucesso: ${nome} (${processResult.document?.type})`);
         } else {
-          console.log(`[AUTO_PREPROCESS] ⚠️ Falha no pré-processamento: ${nome}`);
+          console.log(`[AUTO_PREPROCESS] ⚠️ Falha no pré-processamento: ${nome}`, processResult.error);
         }
       } catch (error) {
         console.error(`[AUTO_PREPROCESS] ❌ Erro no pré-processamento:`, error);
@@ -404,11 +405,8 @@ export default function LandingPage() {
     console.log("Debug - Prompt final sendo enviado para IA:", contexto ? contexto.substring(0, 200) : "SEM CONTEXTO");
 
     try {
-      const respostaIA = await processLandingPageQuery(
-        inputMensagem,
-        contexto,
-        arquivoSelecionado
-      );
+      const queryResult = await api2.processQuery(inputMensagem);
+      const respostaIA = queryResult.success ? queryResult.response!.answer : 'Desculpe, ocorreu um erro ao processar sua pergunta.';
       const mensagensComBot = [
         ...mensagensAtualizadas,
         { autor: 'bot' as const, texto: respostaIA }
@@ -932,11 +930,8 @@ export default function LandingPage() {
                   console.log("Debug FORM - Prompt final sendo enviado para IA:", contexto ? contexto.substring(0, 200) : "SEM CONTEXTO");
 
                   try {
-                    const respostaIA = await processLandingPageQuery(
-                      inputMensagem,
-                      contexto,
-                      arquivoSelecionado
-                    );
+                    const queryResult = await api2.processQuery(inputMensagem);
+                    const respostaIA = queryResult.success ? queryResult.response!.answer : 'Desculpe, ocorreu um erro ao processar sua pergunta.';
                     setMensagens(prev => [...prev, { autor: 'bot' as const, texto: respostaIA }]);
                   } catch (err) {
                     setMensagens(prev => [...prev, { autor: 'bot' as const, texto: `Erro ao consultar a API de IA: ${err}` }]);

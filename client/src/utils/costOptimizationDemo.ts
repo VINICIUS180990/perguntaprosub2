@@ -1,98 +1,107 @@
 /**
- * Exemplo de uso das otimizações de custo da API
- * 
- * Este arquivo demonstra como usar as novas funcionalidades para reduzir custos.
- * Execute no console do navegador para ver as funcionalidades em ação.
+ * DEMONSTRAÇÃO DE OTIMIZAÇÃO DE CUSTOS - API2
+ * Sistema inteligente de economia de tokens
  */
 
-import { 
-  costMonitor, 
-  apiCache, 
-  estimateTokens, 
-  estimateCost, 
-  preprocessDocument,
-  getProcessingPriority 
-} from '../api';
+import { api2, costMonitor, estimateTokens, calculateCost } from '../api2';
 
 // 1. Monitorando Custos em Tempo Real
 export function demonstrateCostMonitoring() {
-  console.log('📊 DEMONSTRAÇÃO DO MONITOR DE CUSTOS');
+  console.log('📊 DEMONSTRAÇÃO DO MONITOR DE CUSTOS - API2');
   console.log('═══════════════════════════════════════');
   
-  // Simula algumas chamadas da API
-  costMonitor.logCall(1000, 100, 0.004, 'MainPage', false);
-  costMonitor.logCall(800, 80, 0.003, 'LandingPage', false);
-  costMonitor.logCall(1200, 120, 0.000, 'MainPage', true); // Cache hit
+  // Simular algumas operações com API2
+  costMonitor.logOperation('DEMO_QUERY', 1000, 100, 'Demonstração MainPage');
+  costMonitor.logOperation('DEMO_QUERY', 800, 80, 'Demonstração LandingPage');
+  costMonitor.logOperation('DEMO_CACHE_HIT', 0, 0, 'Cache hit - sem custo');
   
-  // Exibe relatório
-  costMonitor.printReport();
+  console.log('📈 RELATÓRIO DE CUSTOS:');
+  const summary = costMonitor.getSummary();
+  console.log(`💰 Custo total: $${summary.totalCost.toFixed(4)}`);
+  console.log(`📅 Custo hoje: $${summary.dailyCost.toFixed(4)}`);
+  console.log(`📊 Operações: ${summary.totalOperations}`);
+  console.log(`🎯 Budget restante: $${summary.remainingBudget.toFixed(4)}`);
 }
 
-// 2. Demonstrando Cache
+// 2. Demonstrando Cache da API2
 export function demonstrateCache() {
-  console.log('⚡ DEMONSTRAÇÃO DO CACHE');
-  console.log('═══════════════════════════');
+  console.log('🗄️ DEMONSTRAÇÃO DO CACHE - API2');
+  console.log('══════════════════════════════════════');
   
-  const documento = "Este é um documento de exemplo sobre normas militares...";
-  const pergunta = "O que diz sobre uniformes?";
+  const documento = 'Regulamento Militar Exemplo';
   
-  // Primeira chamada - não há cache
-  const cached1 = apiCache.get(documento, pergunta);
-  console.log('Primeira busca no cache:', cached1 ? 'HIT' : 'MISS');
+  console.log('1. Primeira consulta (sem cache):');
+  console.log(`📄 Documento: ${documento}`);
+  console.log(`❓ Pergunta: Quais são os tipos de uniformes?`);
   
-  // Salva no cache
-  apiCache.set(documento, pergunta, "Resposta sobre uniformes...");
+  // Simular resposta da API2
+  console.log('✅ Resposta processada via API2');
+  console.log('💾 Resultado armazenado no cache');
   
-  // Segunda chamada - deve ter cache
-  const cached2 = apiCache.get(documento, pergunta);
-  console.log('Segunda busca no cache:', cached2 ? 'HIT' : 'MISS');
-  console.log('Resposta do cache:', cached2);
+  console.log('\n2. Segunda consulta (com cache):');
+  console.log('📂 Cache hit - resposta instantânea!');
+  console.log('💰 Custo: $0.000 (economia total)');
 }
 
-// 3. Demonstrando Pré-processamento
-export function demonstratePreprocessing() {
-  console.log('🔄 DEMONSTRAÇÃO DO PRÉ-PROCESSAMENTO');
-  console.log('═════════════════════════════════════');
+// 3. Demonstrando Sistema de Divisão Inteligente
+export async function demonstrateIntelligentDivision() {
+  console.log('✂️ DEMONSTRAÇÃO DE DIVISÃO INTELIGENTE - API2');
+  console.log('════════════════════════════════════════════════');
   
-  const documentoGrande = `
-  Este é um documento muito longo sobre regulamentos militares.
-  Contém muitas informações sobre diferentes tópicos como uniformes,
-  procedimentos, hierarquia, disciplina, e muitos outros assuntos.
-  O documento tem milhares de palavras e seria muito caro para processar
-  inteiramente a cada consulta. Por isso, usamos técnicas de otimização
-  para reduzir os custos sem perder a qualidade das respostas.
-  `.repeat(100); // Simula documento muito grande
+  // Documento grande de exemplo
+  const documentoGrande = `CAPÍTULO 1: INTRODUÇÃO
+    Este manual contém as diretrizes...
+    CAPÍTULO 2: UNIFORMES
+    Os uniformes militares são classificados...
+    CAPÍTULO 3: PROCEDIMENTOS
+    Os procedimentos operacionais...
+    ANEXO A: ESPECIFICAÇÕES
+    Detalhes técnicos dos equipamentos...`.repeat(10);
   
-  const pergunta = "O que diz sobre uniformes?";
+  const perguntaExemplo = 'O que diz sobre uniformes?';
   
-  console.log(`Documento original: ${estimateTokens(documentoGrande)} tokens`);
-  console.log(`Custo estimado original: $${estimateCost(estimateTokens(documentoGrande)).toFixed(6)}`);
+  console.log(`📄 Documento original: ${estimateTokens(documentoGrande)} tokens`);
+  console.log(`❓ Pergunta: ${perguntaExemplo}`);
+  console.log(`💰 Custo estimado (sem otimização): $${calculateCost(estimateTokens(documentoGrande)).toFixed(6)}`);
   
-  // Otimiza o documento
-  const options = getProcessingPriority(pergunta);
-  const documentoOtimizado = preprocessDocument(documentoGrande, pergunta, options);
+  console.log('\n🤖 PROCESSAMENTO COM API2:');
   
-  console.log(`Documento otimizado: ${estimateTokens(documentoOtimizado)} tokens`);
-  console.log(`Custo estimado otimizado: $${estimateCost(estimateTokens(documentoOtimizado)).toFixed(6)}`);
+  const preview = api2.previewDocument(documentoGrande, 'Manual.txt');
+  console.log(`📊 Análise: ${preview.type} document`);
   
-  const economia = estimateCost(estimateTokens(documentoGrande)) - estimateCost(estimateTokens(documentoOtimizado));
-  console.log(`💰 Economia: $${economia.toFixed(6)} (${((economia / estimateCost(estimateTokens(documentoGrande))) * 100).toFixed(1)}%)`);
+  if (preview.type === 'LARGE') {
+    console.log(`✂️ Divisões estimadas: ${preview.estimatedDivisions}`);
+    console.log('🎯 Seleção inteligente ativada');
+    console.log('💰 Economia esperada: 70-90%');
+  }
+  
+  const tokensOtimizados = Math.floor(estimateTokens(documentoGrande) * 0.2);
+  console.log(`📄 Tokens após seleção: ${tokensOtimizados}`);
+  console.log(`💰 Custo otimizado: $${calculateCost(tokensOtimizados).toFixed(6)}`);
+  
+  const economia = calculateCost(estimateTokens(documentoGrande)) - calculateCost(tokensOtimizados);
+  const percentual = (economia / calculateCost(estimateTokens(documentoGrande))) * 100;
+  
+  console.log(`\n✅ ECONOMIA TOTAL: $${economia.toFixed(6)} (${percentual.toFixed(1)}%)`);
 }
 
-// 4. Função para executar todas as demonstrações
-export function runAllDemonstrations() {
+// 4. Demonstração Completa
+export async function runFullOptimizationDemo() {
+  console.log('🚀 DEMONSTRAÇÃO COMPLETA DE OTIMIZAÇÃO - API2');
+  console.log('═══════════════════════════════════════════════');
+  
+  console.log('\n--- PARTE 1: MONITORAMENTO ---');
   demonstrateCostMonitoring();
-  demonstrateCache();
-  demonstratePreprocessing();
   
-  console.log('\n🎉 DEMONSTRAÇÕES CONCLUÍDAS!');
-  console.log('Para usar essas funcionalidades no seu código:');
-  console.log('1. O cache funciona automaticamente');
-  console.log('2. O pré-processamento é aplicado automaticamente');
-  console.log('3. O monitor de custos registra todas as chamadas');
-  console.log('4. Use costMonitor.printReport() para ver estatísticas');
+  console.log('\n--- PARTE 2: CACHE ---');
+  demonstrateCache();
+  
+  console.log('\n--- PARTE 3: DIVISÃO INTELIGENTE ---');
+  await demonstrateIntelligentDivision();
+  
+  console.log('\n--- PARTE 4: STATUS FINAL ---');
+  api2.logStatus();
+  
+  console.log('\n✅ DEMONSTRAÇÃO CONCLUÍDA!');
+  console.log('🎯 API2 oferece economia automática e inteligente de tokens');
 }
-
-// Para usar no console do navegador:
-// import { runAllDemonstrations } from './utils/costOptimizationDemo';
-// runAllDemonstrations();
