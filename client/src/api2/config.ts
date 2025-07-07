@@ -33,9 +33,9 @@ export const CACHE_CONFIG = {
 
 // === CONFIGURAÇÕES DA API === //
 export const AI_CONFIG = {
-  API_KEY: import.meta.env.VITE_OPENAI_API_KEY || '',
-  MODEL: 'gpt-4o-mini',
-  API_URL: 'https://api.openai.com/v1/chat/completions',
+  API_KEY: "AIzaSyAPx6__sK5MRLXYTs6IZpKf5tyeIRxBcuA",
+  MODEL: "gemini-1.5-pro",
+  API_URL: `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro:generateContent?key=AIzaSyAPx6__sK5MRLXYTs6IZpKf5tyeIRxBcuA`,
   
   // Configurações de tokens
   MAX_TOKENS: 4000,
@@ -48,9 +48,19 @@ export const AI_CONFIG = {
 
 // === CONFIGURAÇÕES DE CUSTOS === //
 export const COST_CONFIG = {
-  // Preços por 1000 tokens (GPT-4o-mini)
-  INPUT_COST_PER_1K: 0.00015,
-  OUTPUT_COST_PER_1K: 0.0006,
+  // Preços por 1000 tokens (Gemini 1.5 Pro)
+  // Baseado nos preços por 1M de tokens:
+  // Input: $1.25 (<=128K tokens) / $2.50 (>128K tokens) por 1M tokens
+  // Output: $5.00 (<=128K tokens) / $10.00 (>128K tokens) por 1M tokens
+  
+  INPUT_COST_PER_1K: 0.00125,   // $1.25 / 1000 = $0.00125 por 1K tokens (<=128K)
+  INPUT_COST_PER_1K_LARGE: 0.0025, // $2.50 / 1000 = $0.0025 por 1K tokens (>128K)
+  
+  OUTPUT_COST_PER_1K: 0.005,    // $5.00 / 1000 = $0.005 por 1K tokens (<=128K)
+  OUTPUT_COST_PER_1K_LARGE: 0.01, // $10.00 / 1000 = $0.01 por 1K tokens (>128K)
+  
+  // Limite para considerar request grande (em tokens)
+  LARGE_REQUEST_THRESHOLD: 128000, // 128K tokens
   
   // Alertas
   DAILY_BUDGET: 5.0,          // $5 por dia
@@ -81,7 +91,7 @@ export const DEBUG_CONFIG = {
 
 // === VALIDAÇÃO === //
 if (!AI_CONFIG.API_KEY) {
-  console.warn('[CONFIG] ⚠️ VITE_OPENAI_API_KEY não configurada!');
+  console.warn('[CONFIG] ⚠️ API Key do Gemini não configurada!');
 }
 
 console.log('[CONFIG] ✅ Configurações carregadas:');
@@ -89,3 +99,9 @@ console.log('[CONFIG] ✅ - Limite doc pequeno:', DOCUMENT_CONFIG.SMALL_DOCUMENT
 console.log('[CONFIG] ✅ - Cache duration:', CACHE_CONFIG.DURATION / 1000 / 60, 'minutos');
 console.log('[CONFIG] ✅ - AI Model:', AI_CONFIG.MODEL);
 console.log('[CONFIG] ✅ - Debug enabled:', DEBUG_CONFIG.ENABLED);
+
+// === EXPORTAÇÕES COMPATÍVEIS === //
+// Para manter compatibilidade com código existente
+export const AI_API_KEY = AI_CONFIG.API_KEY;
+export const AI_MODEL = AI_CONFIG.MODEL;
+export const AI_API_URL = AI_CONFIG.API_URL;
