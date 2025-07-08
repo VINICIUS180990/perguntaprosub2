@@ -300,29 +300,186 @@ export class DocumentDivider {
   }
   
   private generateSummary(content: string): string {
-    logger.debug(PREFIX, 'Gerando resumo local...');
+    logger.debug(PREFIX, 'Gerando resumo inteligente...');
     
-    // Pegar primeiras sentenças significativas
-    const sentences = content.split(/[.!?]+/).filter(s => s.trim().length > 20);
+    // === ETAPA 1: ANÁLISE ESTRUTURAL === //
+    const lines = content.split('\n').filter(line => line.trim().length > 0);
+    const structuralInfo = this.extractStructuralInfo(content, lines);
     
+    // === ETAPA 2: EXTRAÇÃO DE SENTENÇAS RELEVANTES === //
+    const sentences = content.split(/[.!?]+/).filter(s => s.trim().length > 15);
+    const scoredSentences = this.scoreSentences(sentences, structuralInfo);
+    
+    // === ETAPA 3: CONSTRUÇÃO DO RESUMO === //
+    let summary = this.buildSmartSummary(scoredSentences, structuralInfo);
+    
+    // === ETAPA 4: VALIDAÇÃO E AJUSTES === //
+    summary = this.validateAndAdjustSummary(summary);
+    
+    logger.debug(PREFIX, `Resumo inteligente gerado: ${summary.length} chars`);
+    
+    return summary;
+  }
+
+  /**
+   * Extrai informações estruturais do conteúdo
+   */
+  private extractStructuralInfo(content: string, lines: string[]): any {
+    const info = {
+      title: '',
+      hasNumbering: false,
+      hasDefinitions: false,
+      hasDates: false,
+      hasValues: false,
+      keyTerms: [] as string[],
+      firstLine: '',
+      lastLine: ''
+    };
+
+    // Detectar título/primeiro elemento estrutural
+    const titlePatterns = [
+      /^(art\.|artigo|capítulo|seção|anexo|item)\s+[\w\d]+/i,
+      /^[\d\w]+[\.\)]\s/,
+      /^[A-Z][^.!?]*$/
+    ];
+
+    for (const line of lines.slice(0, 3)) {
+      for (const pattern of titlePatterns) {
+        if (pattern.test(line.trim())) {
+          info.title = line.trim();
+          break;
+        }
+      }
+      if (info.title) break;
+    }
+
+    // Detectar padrões estruturais
+    info.hasNumbering = /\b(art\.|artigo|item|alínea|\d+º|\d+\.|§)\s*\d+/i.test(content);
+    info.hasDefinitions = /\b(é definido como|considera-se|entende-se por|define-se|significa)\b/i.test(content);
+    info.hasDates = /\b\d{1,2}\/\d{1,2}\/\d{4}|\b\d{4}\b|\b(janeiro|fevereiro|março|abril|maio|junho|julho|agosto|setembro|outubro|novembro|dezembro)\b/i.test(content);
+    info.hasValues = /\b(R\$|US\$|\d+%|\d+,\d+)\b/.test(content);
+
+    // Extrair termos-chave (palavras em maiúsculas, siglas)
+    const keyTermMatches = content.match(/\b[A-Z]{2,}[A-Z\d]*\b/g);
+    if (keyTermMatches) {
+      info.keyTerms = [...new Set(keyTermMatches)].slice(0, 5);
+    }
+
+    // Primeira e última linha significativa
+    info.firstLine = lines[0]?.trim() || '';
+    info.lastLine = lines[lines.length - 1]?.trim() || '';
+
+    return info;
+  }
+
+  /**
+   * Pontua sentenças por relevância
+   */
+  private scoreSentences(sentences: string[], structuralInfo: any): Array<{sentence: string, score: number}> {
+    return sentences.map(sentence => {
+      let score = 0;
+      
+      // === PONTUAÇÃO POR POSIÇÃO === //
+      const index = sentences.indexOf(sentence);
+      if (index === 0) score += 3; // Primeira sentença
+      if (index === sentences.length - 1) score += 2; // Última sentença
+      if (index <= 2) score += 1; // Primeiras 3
+
+      // === PONTUAÇÃO POR ESTRUTURA === //
+      if (/^(art\.|artigo|capítulo|seção|item|\d+\.)/i.test(sentence.trim())) score += 4;
+      if (/\b(estabelece|determina|regulamenta|define|dispõe)\b/i.test(sentence)) score += 3;
+      if (/\b(é vedado|é proibido|é obrigatório|deve|deverá)\b/i.test(sentence)) score += 3;
+
+      // === PONTUAÇÃO POR CONTEÚDO === //
+      if (structuralInfo.hasDefinitions && /\b(é definido|considera-se|entende-se)\b/i.test(sentence)) score += 4;
+      if (structuralInfo.hasValues && /\b(R\$|US\$|\d+%|\d+,\d+)\b/.test(sentence)) score += 2;
+      if (structuralInfo.hasDates && /\b\d{1,2}\/\d{1,2}\/\d{4}|\b\d{4}\b/i.test(sentence)) score += 2;
+
+      // === PONTUAÇÃO POR TERMOS-CHAVE === //
+      structuralInfo.keyTerms.forEach((term: string) => {
+        if (sentence.includes(term)) score += 1;
+      });
+
+      // === PENALIZAÇÃO === //
+      if (sentence.length < 20) score -= 2; // Muito curta
+      if (sentence.length > 200) score -= 1; // Muito longa
+      if (/^(e|ou|mas|porém|contudo|todavia)\b/i.test(sentence.trim())) score -= 1; // Conectores
+
+      return { sentence: sentence.trim(), score };
+    }).sort((a, b) => b.score - a.score);
+  }
+
+  /**
+   * Constrói resumo inteligente
+   */
+  private buildSmartSummary(scoredSentences: Array<{sentence: string, score: number}>, structuralInfo: any): string {
     let summary = '';
-    for (const sentence of sentences.slice(0, 3)) {
-      summary += sentence.trim() + '. ';
-      if (summary.length >= DOCUMENT_CONFIG.SUMMARY.MAX_LENGTH) {
+
+    // === PRIORIDADE 1: TÍTULO/ESTRUTURA === //
+    if (structuralInfo.title && structuralInfo.title.length < 100) {
+      summary += structuralInfo.title + '. ';
+    }
+
+    // === PRIORIDADE 2: SENTENÇAS MAIS RELEVANTES === //
+    const maxSentences = structuralInfo.title ? 2 : 3;
+    const selectedSentences = scoredSentences
+      .slice(0, maxSentences)
+      .filter(item => item.score > 0)
+      .map(item => item.sentence);
+
+    for (const sentence of selectedSentences) {
+      const toAdd = sentence.endsWith('.') ? sentence + ' ' : sentence + '. ';
+      
+      if (summary.length + toAdd.length <= DOCUMENT_CONFIG.SUMMARY.MAX_LENGTH) {
+        // Evitar duplicação
+        if (!summary.toLowerCase().includes(sentence.toLowerCase().substring(0, 30))) {
+          summary += toAdd;
+        }
+      } else {
         break;
       }
     }
-    
-    // Garantir tamanho mínimo e máximo
-    if (summary.length < DOCUMENT_CONFIG.SUMMARY.MIN_LENGTH && sentences.length > 0) {
-      summary = sentences[0].trim() + '. ';
+
+    return summary.trim();
+  }
+
+  /**
+   * Valida e ajusta o resumo final
+   */
+  private validateAndAdjustSummary(summary: string): string {
+    // Garantir tamanho mínimo
+    if (summary.length < DOCUMENT_CONFIG.SUMMARY.MIN_LENGTH) {
+      // Fallback para método anterior se resumo inteligente falhar
+      const sentences = summary.split(/[.!?]+/).filter(s => s.trim().length > 10);
+      if (sentences.length === 0) {
+        return 'Seção do documento sem resumo disponível.';
+      }
+      summary = sentences[0].trim() + '.';
     }
-    
+
+    // Garantir tamanho máximo
     if (summary.length > DOCUMENT_CONFIG.SUMMARY.MAX_LENGTH) {
-      summary = summary.substring(0, DOCUMENT_CONFIG.SUMMARY.MAX_LENGTH - 3) + '...';
+      // Cortar na última sentença completa
+      const sentences = summary.split(/[.!?]+/);
+      let truncated = '';
+      
+      for (const sentence of sentences) {
+        const toAdd = sentence.trim() + '. ';
+        if (truncated.length + toAdd.length <= DOCUMENT_CONFIG.SUMMARY.MAX_LENGTH - 3) {
+          truncated += toAdd;
+        } else {
+          break;
+        }
+      }
+      
+      summary = truncated.trim();
+      if (!summary.endsWith('.')) {
+        summary = summary.substring(0, DOCUMENT_CONFIG.SUMMARY.MAX_LENGTH - 3) + '...';
+      }
     }
-    
-    logger.debug(PREFIX, `Resumo gerado: ${summary.length} chars`);
+
+    // Limpar formatação
+    summary = summary.replace(/\s+/g, ' ').trim();
     
     return summary || 'Seção do documento sem resumo disponível.';
   }

@@ -1,6 +1,6 @@
 /**
  * CHAT API - API2
- * Interface limpa com OpenAI
+ * Interface limpa com Gemini
  */
 
 import { AI_CONFIG, DEBUG_CONFIG } from './config';
@@ -52,19 +52,26 @@ export async function callChatAPI(
   logger.info(PREFIX, `Custo estimado: $${estimatedCost.toFixed(6)}`);
   
   try {
-    logger.processing(PREFIX, 'Enviando requisição para OpenAI...');
+    logger.processing(PREFIX, 'Enviando requisição para Gemini...');
+    
+    // Converter mensagens para formato do Gemini
+    const geminiPrompt = messages.map(msg => msg.content).join('\n\n');
     
     const response = await fetch(AI_CONFIG.API_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${AI_CONFIG.API_KEY}`,
       },
       body: JSON.stringify({
-        model: AI_CONFIG.MODEL,
-        messages: messages,
-        temperature: options?.temperature || AI_CONFIG.TEMPERATURE,
-        max_tokens: options?.maxTokens || AI_CONFIG.MAX_TOKENS,
+        contents: [{
+          parts: [{
+            text: geminiPrompt
+          }]
+        }],
+        generationConfig: {
+          temperature: options?.temperature || AI_CONFIG.TEMPERATURE,
+          maxOutputTokens: options?.maxTokens || AI_CONFIG.MAX_TOKENS,
+        }
       }),
     });
     
@@ -77,16 +84,16 @@ export async function callChatAPI(
     const data = await response.json();
     const processingTime = timer.end();
     
-    logger.success(PREFIX, 'Resposta recebida da OpenAI');
+    logger.success(PREFIX, 'Resposta recebida do Gemini');
     
-    // Extrair resposta
-    const content = data.choices?.[0]?.message?.content || '';
-    const usage = data.usage || {};
+    // Extrair resposta do formato Gemini
+    const content = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    const usage = data.usageMetadata || {};
     
     // Calcular tokens e custos reais
-    const actualInputTokens = usage.prompt_tokens || inputTokens;
-    const outputTokens = usage.completion_tokens || estimateTokens(content);
-    const totalTokens = usage.total_tokens || (actualInputTokens + outputTokens);
+    const actualInputTokens = usage.promptTokenCount || inputTokens;
+    const outputTokens = usage.candidatesTokenCount || estimateTokens(content);
+    const totalTokens = usage.totalTokenCount || (actualInputTokens + outputTokens);
     const actualCost = calculateCost(actualInputTokens, outputTokens);
     
     logger.success(PREFIX, `Resposta processada: ${content.length} chars`);

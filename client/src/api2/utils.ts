@@ -79,11 +79,35 @@ export function estimateTokens(text: string): number {
 
 // === COST CALCULATION === //
 export function calculateCost(inputTokens: number, outputTokens: number = 0): number {
-  const inputCost = (inputTokens / 1000) * 0.00015;  // $0.00015 per 1K input tokens
-  const outputCost = (outputTokens / 1000) * 0.0006; // $0.0006 per 1K output tokens
+  // Importar configurações de custo
+  import('./config').then(({ COST_CONFIG }) => {
+    // Determinar se é uma request grande
+    const totalTokens = inputTokens + outputTokens;
+    const isLargeRequest = totalTokens > COST_CONFIG.LARGE_REQUEST_THRESHOLD;
+    
+    // Selecionar preços apropriados
+    const inputCostPer1K = isLargeRequest ? COST_CONFIG.INPUT_COST_PER_1K_LARGE : COST_CONFIG.INPUT_COST_PER_1K;
+    const outputCostPer1K = isLargeRequest ? COST_CONFIG.OUTPUT_COST_PER_1K_LARGE : COST_CONFIG.OUTPUT_COST_PER_1K;
+    
+    const inputCost = (inputTokens / 1000) * inputCostPer1K;
+    const outputCost = (outputTokens / 1000) * outputCostPer1K;
+    const total = inputCost + outputCost;
+    
+    logger.debug('[UTILS]', `Custo calculado (Gemini): $${total.toFixed(6)} (in: ${inputTokens}, out: ${outputTokens}, large: ${isLargeRequest})`);
+    
+    return total;
+  });
+  
+  // Fallback calculation usando preços padrão do Gemini
+  const isLargeRequest = (inputTokens + outputTokens) > 128000;
+  const inputCostPer1K = isLargeRequest ? 0.0025 : 0.00125;  // Gemini pricing
+  const outputCostPer1K = isLargeRequest ? 0.01 : 0.005;     // Gemini pricing
+  
+  const inputCost = (inputTokens / 1000) * inputCostPer1K;
+  const outputCost = (outputTokens / 1000) * outputCostPer1K;
   const total = inputCost + outputCost;
   
-  logger.debug('[UTILS]', `Custo calculado: $${total.toFixed(6)} (in: ${inputTokens}, out: ${outputTokens})`);
+  logger.debug('[UTILS]', `Custo calculado (Gemini): $${total.toFixed(6)} (in: ${inputTokens}, out: ${outputTokens}, large: ${isLargeRequest})`);
   
   return total;
 }

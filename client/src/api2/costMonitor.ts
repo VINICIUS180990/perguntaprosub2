@@ -88,11 +88,22 @@ export class CostMonitor {
   }
   
   /**
-   * Calcula custo baseado em tokens
+   * Calcula custo baseado em tokens (Gemini pricing)
    */
   private calculateCost(inputTokens: number, outputTokens: number): number {
-    const inputCost = (inputTokens / 1000) * COST_CONFIG.INPUT_COST_PER_1K;
-    const outputCost = (outputTokens / 1000) * COST_CONFIG.OUTPUT_COST_PER_1K;
+    // Determinar se é uma request grande
+    const totalTokens = inputTokens + outputTokens;
+    const isLargeRequest = totalTokens > COST_CONFIG.LARGE_REQUEST_THRESHOLD;
+    
+    // Selecionar preços apropriados
+    const inputCostPer1K = isLargeRequest ? COST_CONFIG.INPUT_COST_PER_1K_LARGE : COST_CONFIG.INPUT_COST_PER_1K;
+    const outputCostPer1K = isLargeRequest ? COST_CONFIG.OUTPUT_COST_PER_1K_LARGE : COST_CONFIG.OUTPUT_COST_PER_1K;
+    
+    const inputCost = (inputTokens / 1000) * inputCostPer1K;
+    const outputCost = (outputTokens / 1000) * outputCostPer1K;
+    
+    logger.debug(PREFIX, `Calculando custo: ${inputTokens} input + ${outputTokens} output = ${totalTokens} total (large: ${isLargeRequest})`);
+    
     return inputCost + outputCost;
   }
   

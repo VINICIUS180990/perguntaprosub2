@@ -103,14 +103,25 @@ export class API2 {
     source: 'ATTACHED' | 'SELECTED' = 'ATTACHED'
   ) {
     console.log('[API2] 📄 Processando documento:', name);
+    console.log('[API2] 🔍 Contexto atual antes:', {
+      activeDoc: queryProcessor.getActiveDocument()?.name || 'Nenhum',
+      historyLength: queryProcessor.getStats().conversationLength,
+      totalCost: queryProcessor.getStats().totalConversationCost
+    });
     
     try {
       const document = await documentProcessor.processDocument(content, name, source);
       
       // Definir como documento ativo
+      console.log('[API2] 🔄 Definindo documento ativo...');
       queryProcessor.setActiveDocument(document);
       
       console.log('[API2] ✅ Documento processado e ativo:', document.type);
+      console.log('[API2] 📊 Contexto após processamento:', {
+        activeDoc: queryProcessor.getActiveDocument()?.name,
+        historyLength: queryProcessor.getStats().conversationLength,
+        totalCost: queryProcessor.getStats().totalConversationCost
+      });
       
       return {
         success: true,
