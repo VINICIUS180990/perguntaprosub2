@@ -123,7 +123,7 @@ console.log('Budget restante:', costs.remainingBudget);
 
 ### **Variáveis de Ambiente**
 ```env
-VITE_OPENAI_API_KEY=sk-...
+# VITE_OPENAI_API_KEY= (adicione sua chave aqui, nunca compartilhe chaves reais publicamente)
 ```
 
 ### **Configurações Principais**
