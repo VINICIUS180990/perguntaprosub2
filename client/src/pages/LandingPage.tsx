@@ -21,9 +21,14 @@ export default function LandingPage() {
     const saved = sessionStorage.getItem("arquivos");
     const arquivosSalvos = saved ? JSON.parse(saved) : [];
     // Ordena por timestamp, mais recentes primeiro
-    return arquivosSalvos.sort((a: Arquivo, b: Arquivo) => 
+    const arquivosOrdenados = arquivosSalvos.sort((a: Arquivo, b: Arquivo) => 
       (b.timestamp || 0) - (a.timestamp || 0)
     );
+    
+    console.log(`[LANDING_INIT] 🚀 Inicializando com ${arquivosOrdenados.length} arquivos do sessionStorage`);
+    console.log(`[LANDING_INIT] 📋 Arquivos:`, arquivosOrdenados.map((a: Arquivo) => a.nome));
+    
+    return arquivosOrdenados;
   });
   const fileInputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
@@ -164,6 +169,14 @@ export default function LandingPage() {
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const files = e.target.files;
     if (!files || files.length === 0) return;
+    
+    // 🚀 LIMITAÇÃO: Apenas 1 documento na LandingPage (incentivo ao cadastro)
+    if (arquivos.length >= 1) {
+      alert(`📄 LIMITE DE DOCUMENTOS ATINGIDO!\n\nNa versão gratuita você pode incluir apenas 1 documento por conversa.\n\n🚀 FAÇA LOGIN NO PERGUNTAPROSUB PARA:\n• Incluir múltiplos documentos\n• Conversar sobre vários arquivos simultaneamente\n• Salvar suas conversas\n• Histórico completo\n• E muito mais recursos!\n\n👆 Clique em "Entrar" no menu para fazer seu cadastro GRATUITO!`);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      return;
+    }
+    
     setLoading(true);
     const file = files[0];
     const allowedExtensions = [".pdf", ".txt"];
@@ -177,14 +190,25 @@ export default function LandingPage() {
     reader.onload = () => {
       const url = reader.result as string;
       setArquivos(prev => {
+        console.log(`[LANDING_STATE] ➕ Adicionando arquivo: ${file.name}`);
+        console.log(`[LANDING_STATE] 📊 Estado anterior: ${prev.length} arquivos`, prev.map(a => a.nome));
+        
         const novoArquivo = { nome: file.name, url, timestamp: Date.now() };
         const novosArquivos = [novoArquivo, ...prev];
+        
+        console.log(`[LANDING_STATE] 📊 Estado novo: ${novosArquivos.length} arquivos`, novosArquivos.map(a => a.nome));
+        
+        // CORREÇÃO: Sincronizar sessionStorage imediatamente
+        console.log(`[LANDING_SYNC] 💾 Atualizando sessionStorage com ${novosArquivos.length} arquivos`);
+        sessionStorage.setItem("arquivos", JSON.stringify(novosArquivos));
+        
         return novosArquivos;
       });
       
       // Aguarda um pequeno delay para garantir que o estado seja atualizado, 
       // então seleciona e processa automaticamente o novo arquivo
       setTimeout(() => {
+        console.log(`[LANDING_SYNC] 🔄 Processando arquivo recém-adicionado: ${file.name}`);
         processarArquivoSelecionado(file.name);
       }, 100);
       
@@ -195,7 +219,18 @@ export default function LandingPage() {
   }
 
   function handleDelete(nomeArquivo: string) {
-    setArquivos(arquivos.filter(a => a.nome !== nomeArquivo));
+    console.log(`[LANDING_STATE] 🗑️ Removendo arquivo: ${nomeArquivo}`);
+    console.log(`[LANDING_STATE] 📊 Estado antes da remoção: ${arquivos.length} arquivos`, arquivos.map(a => a.nome));
+    
+    const novosArquivos = arquivos.filter(a => a.nome !== nomeArquivo);
+    setArquivos(novosArquivos);
+    
+    console.log(`[LANDING_STATE] 📊 Estado após remoção: ${novosArquivos.length} arquivos`, novosArquivos.map(a => a.nome));
+    
+    // CORREÇÃO: Sincronizar sessionStorage
+    console.log(`[LANDING_SYNC] 🗑️ Removendo arquivo e atualizando sessionStorage`);
+    sessionStorage.setItem("arquivos", JSON.stringify(novosArquivos));
+    
     if (arquivoSelecionado === nomeArquivo) setArquivoSelecionado(null);
   }
 
@@ -266,58 +301,86 @@ export default function LandingPage() {
   }
   // Função para processar arquivo imediatamente quando selecionado
   async function processarArquivoSelecionado(nome: string) {
+    console.log(`[LANDING_DEBUG] 🔄 Selecionando arquivo: ${nome}`);
+    console.log(`[LANDING_DEBUG] 📄 Arquivo anterior: ${arquivoSelecionado || 'Nenhum'}`);
+    
     setArquivoSelecionado(nome);
     
     // Aguarda um pouco para garantir que os estados estejam sincronizados
     await new Promise(resolve => setTimeout(resolve, 200));
     
-    // Busca o arquivo nos estados atuais ou no sessionStorage
-    const arquivosAtuais = arquivos.length > 0 ? arquivos : JSON.parse(sessionStorage.getItem("arquivos") || "[]");
+    // CORREÇÃO: Sempre buscar arquivos mais recentes primeiro
+    // 1. Estado atual do React
+    let arquivosAtuais = arquivos;
+    
+    // 2. Se não tem no estado, buscar no sessionStorage
+    if (arquivosAtuais.length === 0) {
+      arquivosAtuais = JSON.parse(sessionStorage.getItem("arquivos") || "[]");
+    }
+    
+    // 3. Sincronizar sessionStorage com estado atual (importante!)
+    if (arquivos.length > 0) {
+      sessionStorage.setItem("arquivos", JSON.stringify(arquivos));
+      arquivosAtuais = arquivos; // Usar sempre o estado mais atual
+    }
+    
     const arquivoObj = arquivosAtuais.find((a: any) => a.nome === nome);
     
-    console.log("Debug - Processando arquivo:", nome);
-    console.log("Debug - Arquivo encontrado:", arquivoObj ? "SIM" : "NÃO");
+    console.log(`[LANDING_DEBUG] 📁 Processando arquivo: ${nome}`);
+    console.log(`[LANDING_DEBUG] 🔍 Arquivo encontrado:`, arquivoObj ? "SIM" : "NÃO");
+    console.log(`[LANDING_DEBUG] 📊 Total arquivos no estado React: ${arquivos.length}`);
+    console.log(`[LANDING_DEBUG] 📊 Total arquivos efetivamente usados: ${arquivosAtuais.length}`);
+    console.log(`[LANDING_DEBUG] 📋 Lista arquivos no estado:`, arquivos.map((a: any) => a.nome));
+    console.log(`[LANDING_DEBUG] 📋 Lista arquivos usados:`, arquivosAtuais.map((a: any) => a.nome));
     
-    if (!arquivoObj) return;
+    if (!arquivoObj) {
+      console.warn(`[LANDING_DEBUG] ⚠️ Arquivo não encontrado: ${nome}`);
+      console.warn(`[LANDING_DEBUG] 🔧 Sincronizando estados...`);
+      
+      // Tentar forçar re-render para sincronizar
+      setArquivos([...arquivos]);
+      return;
+    }
     
     let texto = "";
     try {
       if (arquivoObj.url.startsWith("data:application/pdf")) {
-        console.log("Debug - Pré-carregando PDF");
+        console.log(`[LANDING_DEBUG] 📄 Pré-carregando PDF: ${nome}`);
         const response = await fetch(arquivoObj.url);
         const blob = await response.blob();
         texto = await extrairTextoPDF(blob);
       } else if (arquivoObj.url.startsWith("data:application/vnd.openxmlformats-officedocument.wordprocessingml.document")) {
-        console.log("Debug - Pré-carregando DOCX");
+        console.log(`[LANDING_DEBUG] 📄 Pré-carregando DOCX: ${nome}`);
         const response = await fetch(arquivoObj.url);
         const blob = await response.blob();
         texto = await extrairTextoDOCX(blob);
       } else if (arquivoObj.url.startsWith("data:text/plain")) {
-        console.log("Debug - Pré-carregando TXT");
+        console.log(`[LANDING_DEBUG] 📄 Pré-carregando TXT: ${nome}`);
         const response = await fetch(arquivoObj.url);
         texto = await response.text();
       } else {
-        console.log("Debug - Formato não suportado para pré-carregamento:", arquivoObj.url.substring(0, 50));
+        console.warn(`[LANDING_DEBUG] ⚠️ Formato não suportado: ${nome}`, arquivoObj.url.substring(0, 50));
         return;
       }
+      
       // Usar API2 para estimate e processamento
       const preview = api2.previewDocument(texto, nome);
-      console.log(`Debug - Arquivo pré-carregado: ${nome} | Tamanho: ${texto.length} chars (${preview.tokenCount} tokens)`);
+      console.log(`[LANDING_DEBUG] 📊 Arquivo pré-carregado: ${nome} | Tamanho: ${texto.length} chars (${preview.tokenCount} tokens)`);
       
       // ✅ NOVO: Pré-processar documento automaticamente com API2
-      console.log(`[AUTO_PREPROCESS] 🚀 Iniciando pré-processamento automático do documento: ${nome}`);
+      console.log(`[LANDING_DEBUG] 🚀 Iniciando pré-processamento automático do documento: ${nome}`);
       try {
         const processResult = await api2.processDocument(texto, nome, 'SELECTED');
         if (processResult.success) {
-          console.log(`[AUTO_PREPROCESS] ✅ Documento pré-processado com sucesso: ${nome} (${processResult.document?.type})`);
+          console.log(`[LANDING_DEBUG] ✅ Documento pré-processado com sucesso: ${nome} (${processResult.document?.type})`);
         } else {
-          console.log(`[AUTO_PREPROCESS] ⚠️ Falha no pré-processamento: ${nome}`, processResult.error);
+          console.error(`[LANDING_DEBUG] ❌ Falha no pré-processamento: ${nome}`, processResult.error);
         }
       } catch (error) {
-        console.error(`[AUTO_PREPROCESS] ❌ Erro no pré-processamento:`, error);
+        console.error(`[LANDING_DEBUG] ❌ Erro no pré-processamento:`, error);
       }
     } catch (e) {
-      console.log("Debug - Erro ao pré-carregar arquivo:", e);
+      console.error(`[LANDING_DEBUG] ❌ Erro ao pré-carregar arquivo: ${nome}:`, e);
     }
   }
 
@@ -657,7 +720,11 @@ export default function LandingPage() {
                       type="radio"
                       name="arquivo-pesquisa"
                       checked={arquivoSelecionado === arq.nome}
-                      onChange={() => processarArquivoSelecionado(arq.nome)}
+                      onChange={() => {
+                        console.log(`[LANDING_INTERFACE] 🔄 Radio button clicado para: ${arq.nome}`);
+                        console.log(`[LANDING_INTERFACE] 📄 Arquivo atualmente selecionado: ${arquivoSelecionado || 'Nenhum'}`);
+                        processarArquivoSelecionado(arq.nome);
+                      }}
                       style={{ marginRight: 8 }}
                       title="Selecionar para pesquisa"
                     />
