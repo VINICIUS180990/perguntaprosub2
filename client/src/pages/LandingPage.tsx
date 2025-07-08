@@ -1257,7 +1257,11 @@ export default function LandingPage() {
                   </li>
                   <li style={{ marginBottom: 8, display: "flex", alignItems: "center", gap: "8px" }}>
                     <span style={{ color: "#f57c00" }}>❌</span>
-                    <span>Documentos temporários</span>
+                    <span>Limite de um documento</span>
+                  </li>
+                  <li style={{ marginBottom: 8, display: "flex", alignItems: "center", gap: "8px" }}>
+                    <span style={{ color: "#f57c00" }}>❌</span>
+                    <span>Documento temporário</span>
                   </li>
                   <li style={{ marginBottom: 8, display: "flex", alignItems: "center", gap: "8px" }}>
                     <span style={{ color: "#f57c00" }}>❌</span>
@@ -1330,6 +1334,10 @@ export default function LandingPage() {
                   <li style={{ marginBottom: 8, display: "flex", alignItems: "center", gap: "8px" }}>
                     <span style={{ color: "#4caf50" }}>✅</span>
                     <span><strong>Consultas ilimitadas</strong></span>
+                  </li>
+                  <li style={{ marginBottom: 8, display: "flex", alignItems: "center", gap: "8px" }}>
+                    <span style={{ color: "#4caf50" }}>✅</span>
+                    <span><strong>Documentos ilimitados</strong></span>
                   </li>
                   <li style={{ marginBottom: 8, display: "flex", alignItems: "center", gap: "8px" }}>
                     <span style={{ color: "#4caf50" }}>✅</span>

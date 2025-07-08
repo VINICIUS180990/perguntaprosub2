@@ -934,13 +934,13 @@ const ChatPage: React.FC = () => {
                 {conversasFiltradas.length === 0 && (
                   <div style={{ color: '#888', fontSize: 13 }}>Nenhuma conversa encontrada.</div>
                 )}
-                {/* Ordena conversas: as com mensagens não lidas vão para o topo, depois as demais */}
+                {/* Move conversas com mensagens não lidas para o topo, mantém ordem original para as demais */}
                 {conversasFiltradas.sort((a, b) => {
                   const aNaoLida = conversasNaoLidas[a.id] ? 1 : 0;
                   const bNaoLida = conversasNaoLidas[b.id] ? 1 : 0;
                   if (aNaoLida !== bNaoLida) return bNaoLida - aNaoLida;
-                  // Opcional: ordenar por nome se ambas forem lidas ou não lidas
-                  return a.nome.localeCompare(b.nome);
+                  // Mantém ordem original - não reorganiza alfabeticamente
+                  return 0;
                 }).map(conversa => (
                   <div key={conversa.id} style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
                     <button
