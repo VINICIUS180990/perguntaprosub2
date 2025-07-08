@@ -33,9 +33,9 @@ export const CACHE_CONFIG = {
 
 // === CONFIGURAÇÕES DA API === //
 export const AI_CONFIG = {
-  API_KEY: "AIzaSyAPx6__sK5MRLXYTs6IZpKf5tyeIRxBcuA",
+  API_KEY: import.meta.env.VITE_GEMINI_API_KEY,
   MODEL: "gemini-1.5-pro",
-  API_URL: `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro:generateContent?key=AIzaSyAPx6__sK5MRLXYTs6IZpKf5tyeIRxBcuA`,
+  API_URL: `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro:generateContent?key=${import.meta.env.VITE_GEMINI_API_KEY}`,
   
   // Configurações de tokens
   MAX_TOKENS: 4000,

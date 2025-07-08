@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 // @ts-ignore
 import * as pdfjsLib from "pdfjs-dist/legacy/build/pdf";
 pdfjsLib.GlobalWorkerOptions.workerSrc = "/pdf.worker.mjs";
-import mammoth from "mammoth";
+// import mammoth from "mammoth";
 import { api2 } from "../api2";
 
 const ACCEPTED_FORMATS = ".pdf,.txt";
@@ -293,12 +293,7 @@ export default function LandingPage() {
     }
     return texto;
   }
-  // Função para extrair texto de DOCX
-  async function extrairTextoDOCX(blob: Blob): Promise<string> {
-    const arrayBuffer = await blob.arrayBuffer();
-    const { value } = await mammoth.extractRawText({ arrayBuffer });
-    return value;
-  }
+  // Função para extrair texto de DOCX removida
   // Função para processar arquivo imediatamente quando selecionado
   async function processarArquivoSelecionado(nome: string) {
     console.log(`[LANDING_DEBUG] 🔄 Selecionando arquivo: ${nome}`);
@@ -350,10 +345,8 @@ export default function LandingPage() {
         const blob = await response.blob();
         texto = await extrairTextoPDF(blob);
       } else if (arquivoObj.url.startsWith("data:application/vnd.openxmlformats-officedocument.wordprocessingml.document")) {
-        console.log(`[LANDING_DEBUG] 📄 Pré-carregando DOCX: ${nome}`);
-        const response = await fetch(arquivoObj.url);
-        const blob = await response.blob();
-        texto = await extrairTextoDOCX(blob);
+        console.log(`[LANDING_DEBUG] 📄 Pré-carregamento de DOCX removido: ${nome}`);
+        return;
       } else if (arquivoObj.url.startsWith("data:text/plain")) {
         console.log(`[LANDING_DEBUG] 📄 Pré-carregando TXT: ${nome}`);
         const response = await fetch(arquivoObj.url);
@@ -417,9 +410,9 @@ export default function LandingPage() {
         texto = await extrairTextoPDF(blob);
       } else if (url.startsWith("data:application/vnd.openxmlformats-officedocument.wordprocessingml.document")) {
         console.log("Debug - Processando DOCX");
-        const response = await fetch(url);
-        const blob = await response.blob();
-        texto = await extrairTextoDOCX(blob);
+        // const response = await fetch(url);
+        // const blob = await response.blob();
+        // texto = await extrairTextoDOCX(blob); // Função removida
       } else if (url.startsWith("data:text/plain")) {
         console.log("Debug - Processando TXT");
         const response = await fetch(url);
