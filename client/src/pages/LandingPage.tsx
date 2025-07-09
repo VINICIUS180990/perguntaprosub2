@@ -14,6 +14,8 @@ type Conversa = { id: string; nome: string };
 type Mensagem = { autor: 'user' | 'bot'; texto: string };
 
 export default function LandingPage() {
+  // Detecta modo escuro do sistema
+  const isDarkMode = typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
   const [headerColor, setHeaderColor] = useState("#fff");
   const [showDocMenu, setShowDocMenu] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -1136,7 +1138,7 @@ export default function LandingPage() {
             left: 0,
             width: "100vw",
             height: "100vh",
-            background: "rgba(0, 0, 0, 0.7)",
+            background: isDarkMode ? "rgba(0,0,0,0.85)" : "rgba(0, 0, 0, 0.7)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -1146,12 +1148,13 @@ export default function LandingPage() {
         >
           <div
             style={{
-              background: "#fff",
+              background: isDarkMode ? "#181a1b" : "#fff",
+              color: isDarkMode ? "#f1f1f1" : "#222",
               borderRadius: 16,
               padding: "40px",
               maxWidth: 550,
               width: "90%",
-              boxShadow: "0 8px 32px rgba(0,0,0,0.3)",
+              boxShadow: isDarkMode ? "0 8px 32px rgba(0,0,0,0.7)" : "0 8px 32px rgba(0,0,0,0.3)",
               textAlign: "center",
               position: "relative"
             }}
@@ -1185,7 +1188,7 @@ export default function LandingPage() {
 
             {/* Título */}
             <h2 style={{
-              color: "#1976d2",
+              color: isDarkMode ? "#90caf9" : "#1976d2",
               fontSize: 28,
               fontWeight: "bold",
               marginBottom: 16,
@@ -1196,7 +1199,7 @@ export default function LandingPage() {
 
             {/* Texto introdutório */}
             <div style={{
-              color: "#666",
+              color: isDarkMode ? "#bbb" : "#666",
               fontSize: 16,
               lineHeight: 1.6,
               marginBottom: 24,

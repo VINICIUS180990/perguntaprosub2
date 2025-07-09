@@ -1345,7 +1345,7 @@ export default function MainPage() {
           )}
         </main>
       </div>
-      console.log('[MAIN_PAGE] 🎯 MainPage carregada e pronta para uso!');
+
     </div>
   );
 }
