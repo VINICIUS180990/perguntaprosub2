@@ -850,7 +850,9 @@ const ChatPage: React.FC = () => {
                     borderRadius: 8,
                     border: '1px solid #ccc',
                     fontSize: 16,
-                    outline: 'none'
+                    outline: 'none',
+                    background: '#fff',
+                    color: '#000'
                   }}
                   disabled={enviando}
                 />
@@ -901,9 +903,11 @@ const ChatPage: React.FC = () => {
                     borderRadius: 8,
                     border: '1px solid #ccc',
                     fontSize: 16,
-                    outline: 'none'
+                    outline: 'none',
+                    background: '#fff',
+                    color: '#000'
                   }}
-                  disabled={false}
+                  disabled={true}
                 />
                 <button
                   type="submit"
