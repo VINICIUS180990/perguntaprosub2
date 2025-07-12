@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { supabase } from '../supabaseClient';
 import { enviarMensagem as enviarMsgSupabase, buscarMensagens, removerMensagensParaUsuario, marcarMensagensComoLidas } from '../utils/chatMessages';
 import type { ChatMessage } from '../utils/chatMessages';
@@ -38,6 +38,7 @@ const ChatPage: React.FC = () => {
   // Busca cor do tema do localStorage a cada renderização do header
   const [headerColor, setHeaderColor] = useState('#fff');
   const [conversasNaoLidas, setConversasNaoLidas] = useState<{ [id: string]: boolean }>({});
+  const mensagensEndRef = useRef<HTMLDivElement>(null);
 
   // Função para buscar usuários no Supabase
   async function buscarUsuariosSupabase(termo: string) {
@@ -270,10 +271,10 @@ const ChatPage: React.FC = () => {
   // Atualiza o status de não lida ao buscar conversas
   useEffect(() => {
     if (!userId || conversasSupabase.length === 0) return;
+    let isMounted = true;
     async function fetchNaoLidas() {
       const status: { [id: string]: boolean } = {};
       for (const conversa of conversasSupabase) {
-        // Busca se existe pelo menos uma mensagem não lida para o usuário logado nesta conversa
         const { data } = await supabase
           .from('mensagens')
           .select('id')
@@ -283,10 +284,34 @@ const ChatPage: React.FC = () => {
           .limit(1);
         status[conversa.id] = !!(data && data.length > 0);
       }
-      setConversasNaoLidas(status);
+      if (isMounted) setConversasNaoLidas(status);
     }
     fetchNaoLidas();
+    // Atualização periódica a cada 5 segundos
+    const interval = setInterval(fetchNaoLidas, 5000);
+    return () => { isMounted = false; clearInterval(interval); };
   }, [conversasSupabase, userId]);
+
+  // Estilo global para inputs de pesquisa (amigos e conversas)
+  const searchInputStyle: React.CSSProperties = {
+    padding: '8px 10px',
+    borderRadius: 6,
+    border: '1px solid #ccc',
+    fontSize: 14,
+    marginBottom: 8,
+    background: '#fff', // Sempre branco
+    color: '#000',     // Sempre preto
+    boxShadow: 'none',
+    transition: 'none',
+    WebkitBoxShadow: '0 0 0 1000px #fff inset',
+    WebkitTextFillColor: '#000',
+  };
+
+  useEffect(() => {
+    if (mensagensEndRef.current) {
+      mensagensEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [mensagens]);
 
   return (
     <div style={{ height: '100vh', width: '100vw', background: headerColor, overflow: 'hidden' }}>
@@ -448,13 +473,7 @@ const ChatPage: React.FC = () => {
                 placeholder="Pesquisar usuários..."
                 value={pesquisaAmigo}
                 onChange={e => setPesquisaAmigo(e.target.value)}
-                style={{
-                  padding: '8px 10px',
-                  borderRadius: 6,
-                  border: '1px solid #ccc',
-                  fontSize: 14,
-                  marginBottom: 8
-                }}
+                style={searchInputStyle}
               />
               <div style={{ maxHeight: 400, overflowY: 'auto', marginTop: 8 }}>
                 {buscandoUsuarios && (
@@ -817,6 +836,7 @@ const ChatPage: React.FC = () => {
                     }}>{msg.texto}</div>
                   </div>
                 ))}
+                <div ref={mensagensEndRef} />
               </div>
               <form style={{ display: 'flex', gap: 8, width: '100%' }} onSubmit={handleEnviarMensagem}>
                 <input
@@ -922,13 +942,7 @@ const ChatPage: React.FC = () => {
                 placeholder="Pesquisar conversas..."
                 value={pesquisaConversas}
                 onChange={e => setPesquisaConversas(e.target.value)}
-                style={{
-                  padding: '8px 10px',
-                  borderRadius: 6,
-                  border: '1px solid #ccc',
-                  fontSize: 14,
-                  marginBottom: 8
-                }}
+                style={searchInputStyle}
               />
               <div style={{ maxHeight: 400, overflowY: 'auto', marginTop: 8 }}>
                 {conversasFiltradas.length === 0 && (

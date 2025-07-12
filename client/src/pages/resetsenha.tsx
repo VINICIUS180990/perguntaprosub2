@@ -40,7 +40,7 @@ export default function RedefinirSenhaPage() {
             placeholder="Nova senha"
             value={novaSenha || ""}
             onChange={e => setNovaSenha(e.target.value)}
-            style={{ padding: 10, borderRadius: 6, border: "1px solid #ccc", fontSize: 16 }}
+            style={{ padding: 10, borderRadius: 6, border: "1px solid #ccc", fontSize: 16, background: "#fff", color: "#000" }}
             required
             autoComplete="new-password"
           />
@@ -49,7 +49,7 @@ export default function RedefinirSenhaPage() {
             placeholder="Confirmar nova senha"
             value={confirmarSenha || ""}
             onChange={e => setConfirmarSenha(e.target.value)}
-            style={{ padding: 10, borderRadius: 6, border: "1px solid #ccc", fontSize: 16 }}
+            style={{ padding: 10, borderRadius: 6, border: "1px solid #ccc", fontSize: 16, background: "#fff", color: "#000" }}
             required
             autoComplete="new-password"
           />

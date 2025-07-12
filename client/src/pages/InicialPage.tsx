@@ -245,13 +245,18 @@ export default function InicialPage() {
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        gap: "0px"
+        gap: "0px",
+        transform: "scale(0.9)",
+        transformOrigin: "top center",
+        maxWidth: "1200px",
+        margin: "0 auto"
       }}>
         {/* Hero Section */}
         <div style={{
           textAlign: "center",
           maxWidth: "800px",
-          marginBottom: "0px"
+          marginBottom: "0px",
+          fontSize: "100%"
         }}>
           <h1 style={{
             fontSize: "44px",
@@ -277,7 +282,8 @@ export default function InicialPage() {
           width: "100%",
           maxWidth: "1600px",
           textAlign: "center",
-          marginBottom: "0px"
+          marginBottom: "0px",
+          fontSize: "100%"
         }}>
           <div 
             style={{
@@ -292,7 +298,8 @@ export default function InicialPage() {
               boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
               cursor: "pointer",
               transition: "transform 0.2s ease, box-shadow 0.2s ease",
-              overflow: "hidden"
+              overflow: "hidden",
+              fontSize: "100%"
             }}
             onClick={() => navigate("/landing")}
             onMouseEnter={(e) => {
@@ -380,7 +387,8 @@ export default function InicialPage() {
               boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
               cursor: "pointer",
               transition: "transform 0.2s ease, box-shadow 0.2s ease",
-              overflow: "hidden"
+              overflow: "hidden",
+              fontSize: "100%"
             }}
             onClick={() => navigate("/login")}
             onMouseEnter={(e) => {
@@ -417,46 +425,46 @@ export default function InicialPage() {
                 gap: "16px",
                 textAlign: "left"
               }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "12px", fontSize: "18px" }}>
                   <span style={{ fontSize: "24px" }}>🤖</span>
                   <div>
-                    <strong style={{ color: "#1976d2" }}>IA Avançada:</strong>
-                    <span style={{ color: "#333", marginLeft: "8px" }}>Consulte documentos com precisão total</span>
+                    <strong style={{ color: "#1976d2", fontSize: "16px" }}>IA Avançada:</strong>
+                    <span style={{ color: "#333", marginLeft: "8px", fontSize: "15px" }}>Consulte documentos com precisão total</span>
                   </div>
                 </div>
-                <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "12px", fontSize: "18px" }}>
                   <span style={{ fontSize: "24px" }}>👥</span>
                   <div>
-                    <strong style={{ color: "#1976d2" }}>Rede de Comunicação:</strong>
-                    <span style={{ color: "#333", marginLeft: "8px" }}>Conecte-se com usuários de todas as Forças</span>
+                    <strong style={{ color: "#1976d2", fontSize: "16px" }}>Rede de Comunicação:</strong>
+                    <span style={{ color: "#333", marginLeft: "8px", fontSize: "15px" }}>Conecte-se com usuários de todas as Forças</span>
                   </div>
                 </div>
-                <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "12px", fontSize: "18px" }}>
                   <span style={{ fontSize: "24px" }}>💾</span>
                   <div>
-                    <strong style={{ color: "#1976d2" }}>Salvar Conversas:</strong>
-                    <span style={{ color: "#333", marginLeft: "8px" }}>Guarde suas consultas e respostas importantes</span>
+                    <strong style={{ color: "#1976d2", fontSize: "16px" }}>Salvar Conversas:</strong>
+                    <span style={{ color: "#333", marginLeft: "8px", fontSize: "15px" }}>Guarde suas consultas e respostas importantes</span>
                   </div>
                 </div>
-                <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "12px", fontSize: "18px" }}>
                   <span style={{ fontSize: "24px" }}>📁</span>
                   <div>
-                    <strong style={{ color: "#1976d2" }}>Biblioteca Pessoal:</strong>
-                    <span style={{ color: "#333", marginLeft: "8px" }}>Organize seus documentos favoritos</span>
+                    <strong style={{ color: "#1976d2", fontSize: "16px" }}>Biblioteca Pessoal:</strong>
+                    <span style={{ color: "#333", marginLeft: "8px", fontSize: "15px" }}>Organize seus documentos favoritos</span>
                   </div>
                 </div>
-                <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "12px", fontSize: "18px" }}>
                   <span style={{ fontSize: "24px" }}>💬</span>
                   <div>
-                    <strong style={{ color: "#1976d2" }}>Chat Privado:</strong>
-                    <span style={{ color: "#333", marginLeft: "8px" }}>Converse com segurança total</span>
+                    <strong style={{ color: "#1976d2", fontSize: "16px" }}>Chat Privado:</strong>
+                    <span style={{ color: "#333", marginLeft: "8px", fontSize: "15px" }}>Converse com segurança total</span>
                   </div>
                 </div>
-                <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "12px", fontSize: "18px" }}>
                   <span style={{ fontSize: "24px" }}>🔒</span>
                   <div>
-                    <strong style={{ color: "#1976d2" }}>100% Seguro:</strong>
-                    <span style={{ color: "#333", marginLeft: "8px" }}>Ambiente exclusivo para usuários verificados</span>
+                    <strong style={{ color: "#1976d2", fontSize: "16px" }}>100% Seguro:</strong>
+                    <span style={{ color: "#333", marginLeft: "8px", fontSize: "15px" }}>Ambiente exclusivo para usuários verificados</span>
                   </div>
                 </div>
               </div>
@@ -471,7 +479,9 @@ export default function InicialPage() {
           gap: "24px",
           width: "100%",
           maxWidth: "1200px",
-          marginTop: "40px"
+          marginTop: "40px",
+          fontSize: "100%",
+          justifyItems: "center"
         }}>
           {/* Marinha do Brasil */}
           <div 
@@ -643,7 +653,9 @@ export default function InicialPage() {
           gap: "24px",
           width: "100%",
           maxWidth: "1000px",
-          marginTop: "48px"
+          marginTop: "48px",
+          fontSize: "100%",
+          justifyItems: "center"
         }}>
           <div style={{ textAlign: "center" }}>
             <div style={{ fontSize: "48px", marginBottom: "16px" }}>💬</div>

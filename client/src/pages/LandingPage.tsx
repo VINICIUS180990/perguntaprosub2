@@ -1148,13 +1148,13 @@ export default function LandingPage() {
         >
           <div
             style={{
-              background: isDarkMode ? "#181a1b" : "#fff",
-              color: isDarkMode ? "#f1f1f1" : "#222",
+              background: "#fff", // Sempre branco
+              color: "#222",     // Sempre preto
               borderRadius: 16,
               padding: "40px",
               maxWidth: 550,
               width: "90%",
-              boxShadow: isDarkMode ? "0 8px 32px rgba(0,0,0,0.7)" : "0 8px 32px rgba(0,0,0,0.3)",
+              boxShadow: "0 8px 32px rgba(0,0,0,0.3)",
               textAlign: "center",
               position: "relative"
             }}
@@ -1188,7 +1188,7 @@ export default function LandingPage() {
 
             {/* Título */}
             <h2 style={{
-              color: isDarkMode ? "#90caf9" : "#1976d2",
+              color: "#1976d2", // Sempre azul
               fontSize: 28,
               fontWeight: "bold",
               marginBottom: 16,
@@ -1199,7 +1199,7 @@ export default function LandingPage() {
 
             {/* Texto introdutório */}
             <div style={{
-              color: isDarkMode ? "#bbb" : "#666",
+              color: "#666", // Sempre cinza
               fontSize: 16,
               lineHeight: 1.6,
               marginBottom: 24,

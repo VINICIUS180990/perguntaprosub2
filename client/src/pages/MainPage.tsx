@@ -44,7 +44,10 @@ function useConversasNaoLidas() {
 
     verificarMensagensNaoLidas();
 
-    // Configurar subscription para atualizações em tempo real
+    // Atualização periódica a cada 5 segundos
+    const interval = setInterval(verificarMensagensNaoLidas, 5000);
+
+    // Subscription realtime
     const subscription = supabase
       .channel('mensagens-nao-lidas-main')
       .on(
@@ -62,6 +65,7 @@ function useConversasNaoLidas() {
       .subscribe();
 
     return () => {
+      clearInterval(interval);
       subscription.unsubscribe();
     };
   }, [userId]);

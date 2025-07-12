@@ -205,7 +205,7 @@ export default function PerfilPage() {
               placeholder="Nome completo" 
               value={perfil.nome} 
               onChange={e => setPerfil({ ...perfil, nome: e.target.value })} 
-              style={{ padding: 10, borderRadius: 6, border: "1px solid #ccc", fontSize: 16 }} 
+              style={{ padding: 10, borderRadius: 6, border: "1px solid #ccc", fontSize: 16, background: "#fff", color: "#000" }} 
               required 
             />
             <input 
@@ -213,42 +213,42 @@ export default function PerfilPage() {
               placeholder="Nome de guerra" 
               value={perfil.nomeguerra} 
               onChange={e => setPerfil({ ...perfil, nomeguerra: e.target.value })} 
-              style={{ padding: 10, borderRadius: 6, border: "1px solid #ccc", fontSize: 16 }} 
+              style={{ padding: 10, borderRadius: 6, border: "1px solid #ccc", fontSize: 16, background: "#fff", color: "#000" }} 
             />
             <input 
               type="text" 
               placeholder="Posto/Graduação" 
               value={perfil.posto} 
               onChange={e => setPerfil({ ...perfil, posto: e.target.value })} 
-              style={{ padding: 10, borderRadius: 6, border: "1px solid #ccc", fontSize: 16 }} 
+              style={{ padding: 10, borderRadius: 6, border: "1px solid #ccc", fontSize: 16, background: "#fff", color: "#000" }} 
             />
             <input 
               type="text" 
               placeholder="Força/Instituição" 
               value={perfil.forca} 
               onChange={e => setPerfil({ ...perfil, forca: e.target.value })} 
-              style={{ padding: 10, borderRadius: 6, border: "1px solid #ccc", fontSize: 16 }} 
+              style={{ padding: 10, borderRadius: 6, border: "1px solid #ccc", fontSize: 16, background: "#fff", color: "#000" }} 
             />
             <input 
               type="text" 
               placeholder="Organização Militar" 
               value={perfil.om} 
               onChange={e => setPerfil({ ...perfil, om: e.target.value })} 
-              style={{ padding: 10, borderRadius: 6, border: "1px solid #ccc", fontSize: 16 }} 
+              style={{ padding: 10, borderRadius: 6, border: "1px solid #ccc", fontSize: 16, background: "#fff", color: "#000" }} 
             />
             <input 
               type="tel" 
               placeholder="Celular" 
               value={perfil.celular} 
               onChange={e => setPerfil({ ...perfil, celular: e.target.value })} 
-              style={{ padding: 10, borderRadius: 6, border: "1px solid #ccc", fontSize: 16 }} 
+              style={{ padding: 10, borderRadius: 6, border: "1px solid #ccc", fontSize: 16, background: "#fff", color: "#000" }} 
             />
             <input 
               type="email" 
               placeholder="E-mail" 
               value={perfil.email} 
               onChange={e => setPerfil({ ...perfil, email: e.target.value })} 
-              style={{ padding: 10, borderRadius: 6, border: "1px solid #ccc", fontSize: 16 }} 
+              style={{ padding: 10, borderRadius: 6, border: "1px solid #ccc", fontSize: 16, background: "#fff", color: "#000" }} 
               required 
             />
             

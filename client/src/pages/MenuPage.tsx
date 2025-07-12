@@ -32,7 +32,10 @@ function useConversasNaoLidas() {
 
     verificarMensagensNaoLidas();
 
-    // Configurar subscription para atualizações em tempo real
+    // Atualização periódica a cada 5 segundos
+    const interval = setInterval(verificarMensagensNaoLidas, 5000);
+
+    // Subscription realtime
     const subscription = supabase
       .channel('mensagens-nao-lidas')
       .on(
@@ -50,6 +53,7 @@ function useConversasNaoLidas() {
       .subscribe();
 
     return () => {
+      clearInterval(interval);
       subscription.unsubscribe();
     };
   }, [userId]);
@@ -246,7 +250,11 @@ export default function MenuPage() {
         padding: "32px",
         display: "flex",
         flexDirection: "column",
-        alignItems: "center"
+        alignItems: "center",
+        transform: "scale(0.9)",
+        transformOrigin: "top center",
+        maxWidth: "1200px",
+        margin: "0 auto"
       }}>
         
         {/* Título da página */}

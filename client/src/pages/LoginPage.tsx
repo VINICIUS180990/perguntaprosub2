@@ -338,13 +338,13 @@ export default function LoginPage() {
                     onClick={() => setShowReset(false)}
                   >
                     <form onClick={e => e.stopPropagation()} onSubmit={handleResetPassword}>
-                      <div style={{ fontWeight: 600, marginBottom: 8 }}>Redefinir senha</div>
+                      <div style={{ fontWeight: 600, marginBottom: 8, color: "#000" }}>Redefinir senha</div>
                       <input
                         type="email"
                         placeholder="Digite seu email"
                         value={resetEmail}
                         onChange={e => setResetEmail(e.target.value)}
-                        style={{ width: "100%", padding: 10, borderRadius: 6, border: "1px solid #ccc", fontSize: 15, marginBottom: 10 }}
+                        style={{ width: "100%", padding: "10px 12px", borderRadius: 6, border: "1px solid #ccc", fontSize: 15, marginBottom: 10, background: "#fff", color: "#000", boxSizing: "border-box" }}
                         required
                       />
                       <button
@@ -428,7 +428,12 @@ const inputStyle: React.CSSProperties = {
   fontSize: 15,
   outline: "none",
   boxSizing: "border-box",
-  color: "#000",
+  background: "#fff", // Sempre branco
+  color: "#000",     // Sempre preto
+  boxShadow: "none", // Remove highlight do navegador
+  transition: "none", // Remove transição de highlight
+  WebkitBoxShadow: "0 0 0 1000px #fff inset", // Força fundo branco mesmo com autocomplete
+  WebkitTextFillColor: "#000", // Força texto preto mesmo com autocomplete
 };
 
 const buttonStyle: React.CSSProperties = {
